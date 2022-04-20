@@ -3,14 +3,14 @@ Repository for Chris and Rebecca to collect materials for ECPN article submissio
 
 ********
 
-data_code holds data and code that analyzes the data.
+**data_code** holds data and code that analyzes the data.
 
-appendix holds the appendices.
+**appendix** holds the appendices.
 
-manuscript holds the paper.
+**manuscript** holds the paper.
 
-figures hold image files (pdf/png) that the paper (in manuscript folder) uses.
+**figures** hold image files (pdf/png) that the paper (in manuscript folder) uses.
 
-other_docs holds other documents needed for journal submission.
+**other_docs** holds other documents needed for journal submission.
 
-todo holds todo lists.
+**todo** holds todo lists.
