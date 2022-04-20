@@ -1,0 +1,3 @@
+figures for the paper go here.
+
+"manuscript" folder references this folder to show figures.
