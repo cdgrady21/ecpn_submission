@@ -1,0 +1,391 @@
+---
+title: "c-baselineRecode"
+author: "cdgrady21"
+date: "May 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load('a_ecpn_baseline.Rdata')
+```
+
+Make the NAs NA instead of "---" so that R knows they are numeric
+
+```{r}
+test=base # the test df to mess with
+base[base == "---"] <- NA
+base <- droplevels(base)
+```
+
+Some things should still be numeric but are not
+
+```{r}
+thing <- sapply(base,class); table(thing); thing[thing %in% "integer"]
+base$hours <- as.numeric(as.character(sub(":.*", "", base$duration)))
+base$minutes <- as.numeric(as.character(sub(".*:", "", base$duration)))
+base$duration <- (base$hours * 60) + base$minutes
+#base[1:10,c("duration", "hours", "minutes")]
+
+
+numVars <- c("income_month", "income_year", "age", 
+             "contact_market","contact_group.contact_home_num",
+             "contact_group.contact_home_x_num", 
+             "contact_group.contact_event_num",
+             "clash_group.violence_number", 'clash_group.violence_killed',
+             "clash_group.violence_when", "insecurity_group.work_days",
+             "list_exp1a","list_exp1b", "rndm1", "rndm2", "rndm3",
+             "duration"
+             )
+
+base[, numVars] <- sapply(base[,numVars], function(x) as.numeric(as.character(x)))
+
+
+#summary(base$clash_group.violence_killed)
+```
+
+Some open-ended things should be character but are not
+
+```{r}
+charTest <- sapply(base, is.character)
+charTest[charTest %in% T] # only name var is char
+
+levs.fun <- function(var)
+{
+  x <- length(levels(var))
+  if(x>100){
+    TRUE
+  }
+  else
+    FALSE
+}
+
+# chris: here.  Make sure open-baseed char vars are left as chars by the recode function?
+charVars <- c(names(sapply(base, levs.fun)[sapply(base, levs.fun) %in% T]), "ethnic_other", "name.1")
+#head(base[,charVars])
+base[,charVars] <- as.data.frame(lapply(base[,charVars], tolower))
+base[, charVars] <- sapply(base[,charVars], as.character)
+class(base$clash_group.violence_cause)
+class(base$ethnic_other)
+```
+
+
+
+# Recode functions
+
+```{r}
+#########################################
+# baseline Recode Functions
+#########################################
+test <- base
+base_comf.fun<-function(var)
+{
+  car::recode(as.character(var),
+              "'compcomf'=4;
+                      'comf'=3;
+                      'neither'=2;
+                      'uncomf'=1;
+                      'compuncomf'=0;
+                      else=NA")
+}
+#table(test$comfort_group.marry)
+#test$marry_x <- base_comf.fun(test$comfort_group.marry)
+#table(test$marry_x)
+#class(test$marry_x)
+
+base_agree.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'stragree'=3;
+                      'soagree'=2;
+                      'sodisagree'=1;
+                      'strdisagree'=0;
+                      else=NA")
+}
+#table(base$econ_benefit_group.benefit_econ)
+#test$ben_con <- base_agree.fun(test$econ_benefit_group.benefit_econ)
+#table(test$ben_con, exclude=c())
+#class(test$ben_con)
+
+base_vio.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'always'=0;
+                            'sometimes'=1;
+                            'rarely'=2;
+                            'never'=3;
+                            else=NA")
+}
+#table(base$violence_group.criminals)
+#base$vio_crim <- base_vio.fun(base$violence_group.criminals)
+#table(base$vio_crim)
+#class(base$vio_crim)
+
+base_trust.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'notrust'=0;
+                      'trustcomplete'=5;
+                      '---'=NA;
+              'ref'=NA")
+}
+#table(base$outgroup_atts_group.trust_x)
+#base$trust_x <- base_trust.fun(base$outgroup_atts_group.trust_x)
+#table(base$trust_x)
+#class(base$trust_x)
+
+base_yn.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'yes'=1;
+              'no'=0;
+              else=NA")
+}
+#table(base$insecurity_group.in_field)
+#base$insec_field <- base_yn.fun(base$insecurity_group.in_field)
+#table(base$insec_field, exclude=c())
+#class(base$insec_field)
+
+base_contr.fun <- function(var)
+{
+  car::Recode(as.character(var),
+                            "'none'=0;
+                            'lesshalf'=1;
+                            'half'=2;
+                            'morehalf'=3;
+                            'everyone'=4;
+                            else=NA")
+}
+#table(base$social_cohesion_group2.contribute_x)
+#base$sc_contr_x <- base_contr.fun(base$social_cohesion_group2.contribute_x)
+#table(base$sc_contr_x)
+#class(base$sc_contr_x)
+
+radio.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'rare'=0;
+              'monthly'=1;
+              'weekly'=2;
+              '2+week'=3;
+              'daily'=4;
+              else=NA")
+}
+#table(test$radio)
+#test$rad <- radio.fun(test$radio)
+#table(test$rad)
+
+likely.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'veryunlikely'=0;
+              'somewhatunlikely'=1;
+              'neither'=3;
+              'somewhatlikely'=4;
+              'verylikely'=5;
+              else=NA")
+}
+#table(test$social_cohesion_group2.water_prob)
+#test$water <- likely.fun(test$social_cohesion_group2.water_prob)
+#table(test$water)
+
+resp.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'xresp'=0;
+              'bothx'=1;
+              'bothresp'=2;
+              else=NA")
+}
+#table(test$threat_group.x_responsible)
+#test$resp <- resp.fun(test$threat_group.x_responsible)
+#table(test$resp)
+
+pos.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'veryneg'=0;
+              'somewhatneg'=1;
+              'neither'=2;
+              'somewhatpos'=3;
+              'verypos'=4;
+              else=NA")
+}
+#table(test$contact_market_pos, exclude=c())
+#test$newvar <- pos.fun(test$contact_market_pos)
+#table(test$newvar,exclude=c())
+
+resolve.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'never'=0;
+              'rare'=1;
+              'some'=2;
+              'most'=3;
+              'all'=4;
+              else=NA")
+}
+#table(base$market_disputes_resolved)
+#test$newvar <- resolve.fun(test$market_disputes_resolved)
+#table(test$newvar)
+
+# Effectiveness, satisfaction are endline only
+#thing <- sapply(base, function(x) length(grep("sat", levels(x)))>0)
+#thing[thing %in% T] #nothing
+
+address.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'vsmall'=0;
+              'small'=1;
+              'medium'=2;
+              'great'=3;
+              'vgreat'=4;
+              else=NA")
+}
+#table(base$local_gov_address)
+#test$newvar<-address.fun(test$local_gov_address)
+#table(test$newvar)
+
+endorse.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'stroppose'=0;
+              'sooppose'=1;
+              'indiff'=2;
+              'sosupport'=3;
+              'strsupport'=4;
+              else=NA")
+}
+#table(test$end_exp1a)
+#test$newvar <- endorse.fun(test$end_exp1a)
+#table(test$newvar)
+
+# Combining the functions
+base_code.fun=function(var)
+{
+  if(is.character(var) %in% TRUE){ # tell it to ignore char vars
+    var
+  }
+  else if(length(grep("comf",levels(var)))>0){
+    base_comf.fun(var)
+  }
+  else if(length(grep("disagree",levels(var)))>0){
+    base_agree.fun(var)
+  }
+  else if(length(grep("always",levels(var)))>0){
+    base_vio.fun(var)
+  }
+  else if(length(grep("notrust",levels(var)))>0){
+    base_trust.fun(var)
+  }
+  else if(length(grep("yes", levels(var)))>0){
+    base_yn.fun(var)
+  }
+  else if(length(grep("lesshalf", levels(var)))>0){
+    base_contr.fun(var)
+  }
+  else if(length(grep("2.week", levels(var)))>0){
+    radio.fun(var)
+  }
+  else if(length(grep("somewhatunlikely", levels(var)))>0){
+    likely.fun(var)
+  }
+  else if(length(grep("most", levels(var)))>0){
+    resolve.fun(var)
+  }
+  else if(length(grep("medium", levels(var)))>0){
+    address.fun(var)
+  }
+  else if(length(grep("strsupport", levels(var)))>0){
+    endorse.fun(var)
+  }
+  else if(length(grep("somewhatpos", levels(var)))>0){
+    pos.fun(var)
+  }
+  else if(length(grep("xresp", levels(var)))>0){
+    resp.fun(var)
+  }
+  else
+  var
+}
+```
+
+
+Now test and run the mass recode functions!
+
+```{r}
+test$newvar=base_code.fun(test$social_cohesion_group2.contribute_x)
+stopifnot(table(test$newvar)['3']==table(test$social_cohesion_group2.contribute_x)['morehalf'])
+stopifnot(class(test$newvar) %in% "numeric")
+
+test$newvar <- base_code.fun(test$clash_group.violence_cause)
+stopifnot(class(test$newvar) %in% "character")
+
+test$newvar <- base_code.fun(test$list_exp1a)
+table(test$newvar)
+table(test$list_exp1a)
+
+#
+rm(test)
+
+##########
+# Recoding baseline
+#########
+df1<-base # keep around for actual wording in responses
+base<-as.data.frame(lapply(base,base_code.fun))
+
+stopifnot(nrow(base)==nrow(df1))
+typetest=sapply(base,is.numeric)
+stopifnot(typetest['list_exp1a']==TRUE)
+stopifnot(typetest['leader_influence']==FALSE)
+
+```
+
+
+
+# Some questions need to be reverse coded
+
+get_along
+values
+share_farmland/pasture/market_dispute/tension
+
+NOT the threat vars (these are handled later), which are all coded so HIGH is BAD:
+x_threat
+x_influence
+x_values
+
+All 4 category 0-3 vars.
+
+```{r}
+##########
+# Reverse code questions that need to be reversed
+##########
+rev.fun<-function(var)
+{
+  var <- abs(var-max(var, na.rm=T))
+}
+
+revVars <- c('social_cohesion_group.get_along', 'social_cohesion_group.values', "dispute_persist",
+             names(base)[grepl("share_.*_(tension|dispute)", names(base))]
+             #'threat_group.x_threat', 'threat_group.x_influence',
+             #'threat_group.x_values'
+             )
+# summary(base[,revVars])
+base[,revVars] <- sapply(base[,revVars], rev.fun)
+
+```
+
+# Save
+
+The things like "treatment community" will be added when baseline and endline are combined.
+
+Rescale all vars 0-1 will be done when baseline and endline are combined.
+
+A-arewa_data_recode.R in the NigeriaTV/Endline/wrkfolder can help.
+
+```{r}
+save(base, df1, file="b_baselineRecode.Rdata")
+
+```

@@ -1,0 +1,19 @@
+---
+title: "test"
+author: "Christopher Grady"
+date: "November 18, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("g-aggAnalComplete.Rdata")
+```
+
+## stuff
+
+```{r}
+end1
+
+```

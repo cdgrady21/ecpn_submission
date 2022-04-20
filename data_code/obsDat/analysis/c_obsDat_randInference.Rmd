@@ -1,0 +1,326 @@
+---
+title: "obsDat_randInference"
+author: "Chris Grady"
+date: "12/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+
+# data (from obsDat_analysis) ##chris: why scanning in from there? 
+## to get results of quantile regression?
+#load("eventsMedian.Rdata")
+#load("marketMedian.Rdata")
+
+# data from data cleaning file
+load("../clean/a_obsDat_clean.rda")
+
+events <- events[!events[,"eat_past"] %in% NA | !events$eat_farm %in% NA,] # remove the bad observation
+
+# libs
+library(dplyr)
+library(mosaic)
+library(estimatr)
+
+#author: "cdgrady21"
+#date: '`r format(Sys.Date(), "%B %d, %Y")`'
+```
+
+```{r}
+##analysis with no rand inference.
+## using rank because not skewed.
+lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, clusters = site)
+#thelm <- lm(pastoralists_index_rank~treatment*time+State+site, data=markets)
+##note: lm_robust is same as this but with clustered SEs.
+
+# coef not accounting for site-level or state-level, but clustering
+lm_robust(pastoralists_index_rank ~ treatment*time, data=markets, clusters = site)
+
+```
+
+```{r}
+#Want a true pval from randomization inference.  Would use coin for speed/brevity, but don't know how to account for sites and states in coin's oneway_test, so writing a true pval function.
+
+#To create this null distribution:
+#- within state, shuffle TR assignment between sites.
+#    - sites within a state are randomly assigned TR or CO
+
+#- within site, shuffle time between observations?
+#    - obs within a site are randomly assigned t1 or t2.
+
+#Definitely need to shuffle TR between sites.  Not sure if it makes sense to randomly assign observations as pre/post.  Pretty sure that doesn't make sense, actually, since pre/post are systematically different in ways we did not randomly assign.
+
+#True p-value function.
+
+# shuffle tr between sites
+true.fun <- function(var, nsims=5000, dat)
+{
+  thelm <- lm(dat[,var]~treatment*time+State+site, data=dat)
+  thecoef <-coef(thelm)['treatment:time']
+  
+  # randomly grab 6 in nas and 4 in ben to be treated
+  rand.coef = rep(NA,nsims)
+  for(i in 1:nsims){
+    rand.nas <- sample(unique(dat$site[dat$State %in% "nasarawa"]), size=6)
+    rand.ben <- sample(unique(dat$site[dat$State %in% "benue"]), size=4)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- dat
+    rand.samp[,'treatment'] <- ifelse(rand.samp$site %in% rand, 1, 0)
+     
+    lm.null <- lm(rand.samp[,var]~treatment*time+State+site, data=rand.samp)
+    rand.coef[i] <- coef(lm.null)['treatment:time']
+    }
+  
+  thep <- mean(rand.coef>=thecoef, na.rm=T)
+  thedf <- data.frame(coef=thecoef,truep=thep)
+  rownames(thedf) <- paste0(var, "~","ECPN")
+  return(thedf)
+}
+#true.fun(var='pastoralists_index_rank', dat=markets)
+
+```
+
+# Markets
+
+## Pastoralists
+
+Pastoralists Index Rank
+
+```{r}
+(mark_pasts <- true.fun(var='pastoralists_index_rank', dat=markets))
+#(mark_pasts <- true.fun(var='pastoralists_index_raw', dat=markets))
+```
+
+
+### Components of pastoralists index -- ranked and raw
+
+Outcomes: `r rankOutcomes[grepl("past", rankOutcomes)]`
+
+Pastoralist buyers
+
+```{r}
+(mark_pasts_buyers_raw <- true.fun(var='pastoralist_buyers', dat=markets))
+(mark_pasts_buyers <- true.fun(var='pastoralist_buyers_rank', dat=markets))
+
+```
+
+Pastoralist sellers
+
+```{r}
+(mark_pasts_sellers_raw <- true.fun(var='pastoralist_sellers', dat=markets))
+(mark_pasts_sellers <- true.fun(var='pastoralist_sellers_rank', dat=markets))
+```
+
+pastoralist_women_sell_fura_rank
+
+```{r}
+
+```
+
+pastoralist_nono_buyers_rank. chris: this one shouldn't be much affected.
+
+```{r}
+
+```
+
+
+## Farmers
+
+```{r}
+(mark_farms <- true.fun(var='farmers_index_rank', dat=markets))
+#(mark_farms <- true.fun(var='farmers_index_raw', dat=markets))
+```
+
+
+
+# Events
+
+no rand inf
+
+```{r, eval=F}
+lm_robust(outgroup_index_rank~treatment*time+site, data=events, clusters=site)
+
+# TR group drops by 5, CO group drops by 10.
+mosaic::mean(events[events$time %in% 0 & events$treatment %in% 0, "outgroup_index_rank"], na.rm=T)
+mosaic::mean(events[events$time %in% 1 & events$treatment %in% 0, "outgroup_index_rank"])
+mosaic::mean(events[events$time %in% 0 & events$treatment %in% 1, "outgroup_index_rank"])
+mosaic::mean(events[events$time %in% 1 & events$treatment %in% 1, "outgroup_index_rank"])
+
+```
+
+*rand inf.*
+
+Outgroup Variables. Index.
+
+```{r}
+#(out_ind <- true.fun(var='outgroup_index', dat=events))
+(out_ind <- true.fun(var='outgroup_index_rank', dat=events))
+(out_ind <- true.fun(var='outgroupPerc_index', dat=events))
+
+```
+
+Outgroup variables.  Attend and eat.
+
+```{r}
+#(out_att <- true.fun(var='attend_outgroup', dat=events))
+(out_att <- true.fun(var='attend_outgroup_rank', dat=events))
+(out_att <- true.fun(var='attend_outgroup_presPerc', dat=events))
+
+(out_att <- true.fun(var='eat_outgroup_rank', dat=events))
+(out_att <- true.fun(var='eat_outgroup_eatPerc', dat=events))
+
+# variable is: % of eaters who are farm/past, not % of farm/past who ate.
+events[,c("attend_outgroup", "eat_outgroup", "eat_outgroup_eatPerc", 
+          "eat_farm", "eat_past", "eat_farm_eatPerc", "eat_past_eatPerc")]
+```
+
+attend
+
+```{r}
+(event_att <- true.fun(var='attend_total_rank', dat=events))
+
+true.fun(var='attend_past_presPerc', dat=events)
+true.fun(var='attend_farm_presPerc', dat=events)
+```
+
+eat
+
+```{r}
+(event_eat <- true.fun(var='eat_total_rank', dat=events))
+
+true.fun(var='eat_past_eatPerc', dat=events)
+#true.fun(var='eat_farm_eatPerc', dat=events) # some infinite
+```
+
+index. Using Perc_index to account for size of gathering.
+
+```{r}
+# the Perc_index is not a count, so I don't think I need ranks.
+## even though pastoralists result looks better with ranks.
+(event_past <- true.fun(var='pastoralistsPerc_index', dat=events))
+(event_farm <- true.fun(var='farmersPerc_index', dat=events))
+
+```
+
+### restrict events to things hosted by other community
+
+```{r}
+farm_host <- events[events$Host.Community %in% "farmer",]
+past_host <- events[events$Host.Community %in% "pastoralist",]
+```
+
+In farmers community. Not seeing a strong pattern.  Maybe more pastoralists.
+
+```{r}
+# farmers host; care about pastoralists
+true.fun(var='attend_past_presPerc', dat=farm_host)
+true.fun(var='eat_past_eatPerc', dat=farm_host)
+true.fun(var='pastoralistsPerc_index', dat=farm_host)
+```
+
+In pastoralists community. Also maybe a pattern of more farmers, but again not strong.
+
+```{r}
+# farmers host; care about pastoralists
+true.fun(var='attend_farm_presPerc', dat=farm_host)
+true.fun(var='eat_farm_eatPerc', dat=farm_host)
+true.fun(var='farmersPerc_index', dat=farm_host)
+```
+
+
+
+
+# Misc
+
+## See the null distribution
+
+```{r, eval=F}
+# shuffle tr between sites
+null.fun <- function(var, nsims=5000, dat)
+{
+  thelm <- lm(dat[,var]~treatment*time+State+site, data=dat)
+  thecoef <-coef(thelm)['treatment:time']
+  
+  # randomly grab 6 in nas and 4 in ben to be treated
+  rand.coef = rep(NA,nsims)
+  for(i in 1:nsims){
+    rand.nas <- sample(unique(dat$site[dat$State %in% "nasarawa"]), size=6)
+    rand.ben <- sample(unique(dat$site[dat$State %in% "benue"]), size=4)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- dat
+    rand.samp[,'treatment'] <- ifelse(rand.samp$site %in% rand, 1, 0)
+     
+    lm.null <- lm(rand.samp[,var]~treatment*time+State+site, data=rand.samp)
+    rand.coef[i] <- coef(lm.null)['treatment:time']
+    }
+  
+ return(rand.coef)
+}
+
+## markets
+null_dist1 <- null.fun(var='pastoralists_index_rank', dat=markets)
+plot(density(null_dist1))
+## null distribution is bimodal?
+
+null_dist2 <- null.fun(var='pastoralists_index', dat=markets)
+plot(density(null_dist2))
+
+## events
+null_dist3 <- null.fun(var='pastoralists_index', dat=events)
+plot(density(null_dist3, na.rm=T))
+## some coefs are NA?
+
+null_dist4 <- null.fun(var='attend_total', dat=events)
+plot(density(null_dist4, na.rm=T))
+## this one makes no damn sense.
+
+```
+
+Why the null distributions so weird (bimodal and/or skewed?)
+
+```{r}
+# high variance between sites
+(siteVar <- tapply(markets$pastoralists_index_rank, markets$site, mean, na.rm=T))
+sd(siteVar)
+summary(siteVar)
+
+```
+
+
+
+## Different true pval function
+
+```{r}
+# also shuffle time within sites. chris: Decided this is wrong!
+true.fun1 <- function(var, nsims=3000, dat)
+{
+  thelm <- lm(dat[,var]~treatment*time+State+site, data=dat)
+  thecoef <-coef(thelm)['treatment:time']
+  
+  rand.coef = rep(NA,nsims)
+  for(i in 1:nsims){
+    # shuffle tr
+    rand.nas <- sample(unique(dat$site[dat$State %in% "nasarawa"]), size=6)
+    rand.ben <- sample(unique(dat$site[dat$State %in% "benue"]), size=4)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- dat
+    rand.samp[,'treatment'] <- ifelse(rand.samp$site %in% rand, 1, 0)
+    
+    # shuffle time, keeping same number of obs in t1 and t2
+    rand.samp <- rand.samp %>% dplyr::group_by(site) %>%
+      mutate(time=sample(time, replace=F)) %>%
+      as.data.frame()
+    
+    lm.null <- lm(rand.samp[,var]~treatment*time+State+site, data=rand.samp)
+    rand.coef[i] <- coef(lm.null)['treatment:time']
+    }
+  
+  thep <- mean(rand.coef>=thecoef, na.rm=T)
+  thedf <- data.frame(coef=thecoef,truep=thep)
+  rownames(thedf) <- paste0(var, "~","ECPN")
+  return(thedf)
+}
+#true.fun1(var='pastoralists_index_rank', dat=markets)
+```

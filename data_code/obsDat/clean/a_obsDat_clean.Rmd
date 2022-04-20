@@ -1,0 +1,408 @@
+---
+title: "obsDat"
+output:
+  pdf_document:
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+  word_document:
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+events <- read.csv("../raw/ecpn_events.csv")
+markets <- read.csv("../raw/ecpn_markets.csv")
+library(lubridate)
+library(dplyr)
+library(estimatr)
+
+```
+
+# Overview
+
+This file cleans the observational data.  The outcomes are the raw number of people attending the market/event or engaging in some behavior at the market/event.  The outcomes are non-normal and skewed.  As a result of this skew, outcomes are rank rescaled.  Later, the unmodified raw outcomes may be analyzed using quantile regression or robust regression.  COULD create a new version of the raw outcome to modify large outliers.  
+
+We want to know if treatment communities improved more than control communities over time.  We can do this in two ways: (1) code observations as 0 or 1 on a "time" variable, where 0 is early/baseline and 1 is late/endline; (2) code observations by month using a "month number" variable that is 1 for the first month of observation, 2 for the second, month, 3 for the third month, etc.
+
+# Markets
+
+## Cleaning
+
+Fixing community names (ie making aguda and Agudu and agudu all the same thing).  Telling R that the outcomes are numeric.
+
+```{r, include=F} 
+# clean white space, make lower case
+markets$Community.Name <- trimws(tolower(markets$Community.Name))
+markets$site <- markets$Community.Name
+
+# make outcomes numeric
+outcomes <- names(markets)[grepl("(market|farm|past)", names(markets))]
+markets[,outcomes] <- sapply(markets[,outcomes], function(x) {as.numeric(as.character(x))}) # warning is fine, just making empty cells like <NA> into NA.
+
+# fix treatment assignment
+#tapply(markets$treatment, markets$site, mean)
+markets[markets$site %in% "ushata", "treatment"] <- 0
+
+# fix state
+markets[markets$site %in% "sabon gida agan", "State"] <- "benue"
+```
+
+## New Vars
+
+### Time
+
+Making a 0-1 variable for if the observations are between July 2016 - Feb 2017 (0) or Sept 2017 - End of study (1).  Making a time variable that increases each month, and predicting that treatment areas get better over time wheres control stays the same.
+
+```{r, include=F}
+# dichotomous before/after
+##july 2016 - feb 2017
+## sept 2017 - end
+class(markets$date.of.observation..M.D.Y.)
+markets$date <- lubridate::mdy(markets$date.of.observation..M.D.Y.)
+markets$time <- ifelse(markets$date > "2017-03-01", 1, 0)
+
+# date as numeric with 0 as first month and max(month) as last month
+## make a "month" variable
+markets$month <- sub("-[0-9]*$", "", markets$date)
+table(markets$Community.Name, markets$month)
+markets$month_num <- car::recode(as.character(markets$month),
+                                 "'2016-07'=0;
+                                 '2016-08'=1;
+                                 '2016-09'=2;
+                                 '2016-10'=3;
+                                 '2016-11'=4;
+                                 '2016-12'=5;
+                                 '2017-01'=6;
+                                 '2017-02'=7;
+                                 '2017-09'=14;
+                                 '2017-10'=15;
+                                 '2017-11'=16;
+                                 '2017-12'=17")
+#03=8, 04=9, 05=10, 06=11, 07=12, 08=13
+
+```
+
+### Outcomes
+
+Making variables representing (1) farmers behavior and (2) pastoralists behavior.  Refer to it as farmers index and pastoralists index.
+
+First looked at the skew and decided these outcomes need to be transformed.  Went with ranks & additive index. Might create indices other ways: factors?  ICW?  
+    - Would I do that on the ranked or raw variable?
+    - raw makes no sense
+    - could SD-scale the raw var and then cut it at -3/+3 SDs...still problem of a lot of values at +3 SDs.
+
+```{r, eval=F}
+# first look at skew
+## extremely right-skewed
+summary(markets[,outcomes])
+## see biggest 10 values for each outcome (could loop outcomes but not worth it)
+#markets[order(markets[,outcomes[4]]),outcomes][(nrow(markets)-10):nrow(markets),]
+sapply(markets[outcomes], function(x) quantile(x, seq(0,1,0.1), na.rm=T))
+
+# what kind of distribution are these?
+testvar1 <- sample(markets[,outcomes[4],], 3000, replace=T)
+plot(density(testvar1, na.rm=T))
+## maybe weird poisson-type?
+```
+
+Rank the outcomes.
+
+```{r}
+# rank the outcomes
+# Rank-based outcomes since the raw outcomes are everywhere
+## separate t1-t2 ranks
+rankOutcomes <- paste0(outcomes, "_rank")
+markets[, rankOutcomes] <- NA
+markets[markets$time %in% 0,rankOutcomes] <- sapply(markets[markets$time %in% 0,outcomes], dense_rank)
+markets[markets$time %in% 1,rankOutcomes] <- sapply(markets[markets$time %in% 1,outcomes], dense_rank)
+#summary(markets[,rankOutcomes])
+## combined -- I don't like this, don't want outcomes at t1 ranked with outcomes at t2.
+#rankOutcomes <- paste0(outcomes, "_rank")
+#markets[, rankOutcomes] <- NA
+#markets[,rankOutcomes] <- sapply(markets[,outcomes], dense_rank)
+
+# make sure ranked works
+markets[order(markets$pastoralist_sellers),c("pastoralist_sellers", "pastoralist_sellers_rank")][1:10,]
+```
+
+#### Additive Index
+
+Now make the pastoralists index and the farmers index.
+
+```{r}
+# Make a "pastoralist" index and a "Farmer" index
+### Rank
+markPastor <- names(markets)[grepl("pastor", names(markets))]
+markPastor_rank <- markPastor[grepl("_rank", markPastor)]
+markets$pastoralists_index_rank <- rowMeans(markets[,markPastor_rank], na.rm=T) # remove NA?
+
+markFarmers <- names(markets)[grepl("farm", names(markets))]
+markFarmers_rank <- markFarmers[grepl("_rank", markFarmers)]
+markets$farmers_index_rank <- rowMeans(markets[,markFarmers_rank], na.rm=T) # remove NA?
+```
+
+Also making raw outcomes for robustness check.
+
+```{r}
+### Raw outcome (but cut above 95th percentile because crazy right-skew)
+#sapply(markets[outcomes], function(x) quantile(x, seq(0,1,0.05), na.rm=T))
+markets[,outcomes] <- lapply(markets[,outcomes], function(x){
+  ifelse(x>quantile(x, 0.95, na.rm=T), quantile(x, 0.95, na.rm=T), x)
+})
+#sapply(markets[outcomes], function(x) quantile(x, seq(0,1,0.05), na.rm=T))
+
+markPastor_raw <- markPastor[!grepl("_rank", markPastor)]
+markets$pastoralists_index_raw <- rowMeans(markets[,markPastor_raw], na.rm=T) # remove NA?
+
+markFarmers_raw <- markFarmers[!grepl("_rank", markFarmers)]
+markets$farmers_index_raw <- rowMeans(markets[,markFarmers_raw], na.rm=T) # remove NA?
+
+
+# Revise outcome list to include the indices
+outcomes <- names(markets)[grepl("(market|farm|past)", names(markets))]
+
+```
+
+#### Explore other indices
+
+Look at covariance & factor loads.
+
+```{r}
+
+
+```
+
+
+
+
+
+
+<!--
+## Stuff to Look at
+
+What do we have?  How many observations for each community in the before (0) and after (1) time categories?
+
+```{r}
+(thetab1 <- as.matrix(table(markets$site, markets$time)))
+```
+
+Only use a community if it has at least 2 obs before and after.
+
+```{r, include=F}
+sigh <- data.frame(comm = rownames(thetab1), bef = thetab1[,1], end = thetab1[,2])
+
+dropsies <- na.omit(ifelse(sigh$bef < 2 | sigh$end < 2, as.character(sigh$comm), NA))
+markets <- droplevels(markets[!markets$site %in% dropsies,])
+```
+-->
+
+
+
+************************
+
+
+
+
+
+
+# Events
+
+This cleans the event data in the same way as the market data ws cleaned.  It also uses the same analyses as the _Markets_ data: (i) a before-after analysis, and (ii) a panel analysis.
+
+## Cleaning
+
+Here we clean the data, collapse event types (i.e. all festivals as "festival" and wedding/marriage as "marriage"), and other stuff.
+
+```{r, include=F}
+# get rid of nothing columns
+events <- events[,!grepl("^X", names(events))]
+
+#lower case all non-numerics
+typeList <- sapply(events, class)
+lowNames <- names(typeList)[!typeList %in% "integer"]
+events[,names(events) %in% lowNames] <- as.data.frame(sapply(events[,names(events) %in% lowNames], tolower))
+
+#trim white space
+events[,names(events) %in% lowNames] <- as.data.frame(sapply(events[,names(events) %in% lowNames], trimws))
+
+# chris: if events has "marriage|wedding" in the level, just make it "marriage"
+# chris: since so few events are not naming ceremonies and weddings, make "other" category.
+events$event_type1 <- as.factor(events$event_type)
+levels(events$event_type1) <- c("Other", "Marriage", "Marriage", "Naming", 'Other', "Marriage")
+
+# check treatment assignment and state
+#tapply(events$treatment, events$site, mean)
+events[events$Community.Name %in% "torkula", "State"] <- "benue"
+
+# what's up with totals?
+events$test <- events$attend_farm + events$attend_past
+test <- events[!events$test %in% events$attend_total,]
+test[,c(10:12,20)]
+events$test1 <- events$eat_farm + events$eat_past
+test <- events[!events$test1 %in% events$eat_total,]
+test[,c(13:15,21)]
+
+
+## making "attend_total" the sum of attend_farm and attend_past in the 7 cases it is slightly different.
+events$attend_total <- events$test
+events$eat_total <- events$test1
+events[,c('test', 'test1')] <- NULL
+rm(test)
+```
+
+
+## New Vars
+
+Making a 0-1 variable for if the observations are between July 2016 - Feb 2017 (0) or Sept 2017 - End of study (1).  Make a variable that is 0 in the first month of the study, 10 in the 10th month, 20 in the 20th, etc.
+
+```{r, include=F}
+# dichotomous before/after
+##july 2016 - feb 2017
+## sept 2017 - end
+class(events$date.of.observation..M.D.Y.)
+events$date <- lubridate::mdy(events$date.of.observation..M.D.Y.)
+events$time <- ifelse(events$date > "2017-03-01", 1, 0)
+
+# site
+events$site <- events$Community.Name
+
+# date as numeric with 0 as first month and max(month) as last month
+## make a "month" variable
+events$month <- sub("-[0-9]*$", "", events$date)
+table(events$Community.Name, events$month)
+events$month_num <- car::recode(as.character(events$month),
+                                 "'2016-07'=0;
+                                 '2016-08'=1;
+                                 '2016-09'=2;
+                                 '2016-10'=3;
+                                 '2016-11'=4;
+                                 '2016-12'=5;
+                                 '2017-01'=6;
+                                 '2017-02'=7;
+                                 '2017-09'=14;
+                                 '2017-10'=15;
+                                 '2017-11'=16;
+                                 '2017-12'=17")
+
+```
+
+Make outcomes numeric and make outcome variables.
+- farmers index and pastoralists index to combine attendance & eating of farmers/pastoralists.
+- % variables and index that asks what % of attendees are farmers/pastoralists
+- rank variables and index that ranks the number of farmers/pastoralists in attendance and who ate (instead of the raw number, which is super skewed).
+
+```{r}
+# make outcomes numeric
+eventOutcomes <- names(events)[grepl("(attend|eat)_", names(events))]
+events[,eventOutcomes] <- sapply(events[,eventOutcomes], function(x) {as.numeric(as.character(x))}) # i think is already integer
+
+# make pastoralist/farmers index outcomes - attend_grp, eat_grp
+eventPastor <- names(events)[grepl("past", names(events))]
+events$pastoralists_index <- rowMeans(events[,eventPastor])
+eventFarmers <- names(events)[grepl("farm", names(events))]
+events$farmers_index <- rowMeans(events[,eventFarmers])
+
+# remake outcomes obj
+eventOutcomes <- names(events)[grepl("(attend|eat)_|index", names(events))]
+
+# make percentage outcomes: % of attendees who were farm/past & % of eaters who were farm/past
+## sort of a farmers/pastoralists "per capita" variable
+events[,paste0(eventOutcomes[2:3],"_presPerc")] <- events[,eventOutcomes[2:3]]/events[,eventOutcomes[1]]
+events[,paste0(eventOutcomes[5:6],"_eatPerc")] <- events[,eventOutcomes[5:6]]/events[,eventOutcomes[4]]
+
+# make perc index
+eventPastorp <- names(events)[grepl("past_(pres|eat)Perc", names(events))]
+events$pastoralistsPerc_index <- rowMeans(events[,eventPastorp])
+eventFarmerp <- names(events)[grepl("farm_(pres|eat)Perc", names(events))]
+events$farmersPerc_index <- rowMeans(events[,eventFarmerp])
+
+# add %s to "eventOutcomes"
+eventOutcomes <- names(events)[grepl("(attend|eat)_|index", names(events))]
+
+#rank outcomes
+events[,paste0(eventOutcomes, "_rank")] <- sapply(events[,eventOutcomes], dense_rank)
+rankEventOutcomes <- paste0(eventOutcomes, "_rank")
+
+summary(events[,eventOutcomes])
+```
+
+Now make variable for each observation that is the % of attendees/eaters who are members of the OTHER COMMUNITY.  Main outcome variable created below should be: outgroupPerc_index and outgroup_index_rank.  But need to fix all the outgroup rank variables because they rank within farmer/pastoralist and not within outgroup.
+
+```{r}
+farmVars <- names(events)[grepl("farm", names(events))]
+pastVars <- names(events)[grepl("past", names(events))]
+outgroupVars <- gsub("(farm|farmers)", "outgroup", farmVars)
+for(i in 1:length(outgroupVars))
+{
+  events[,outgroupVars[i]] <- ifelse(events$Host.Community %in% "farmer", events[,pastVars[i]], events[,farmVars[i]])
+}
+
+#events[,c("Host.Community", "attend_outgroup", "attend_farm", "attend_past")]
+
+# fix ranks so it ranks within outgroup, not within farmer and pastoralist separately.
+outgroupRankVars <- outgroupVars[grepl("rank", outgroupVars)]
+outgroupOtherVars <- setdiff(outgroupVars, outgroupRankVars)
+markets[markets$time %in% 0,rankOutcomes] <- sapply(markets[markets$time %in% 0,outcomes], dense_rank)
+events[,outgroupRankVars] <- sapply(events[,outgroupOtherVars], dense_rank)
+
+#chris: look at ranks to make sure they make sense.
+## code correct
+events[,c("Host.Community", "pastoralists_index", "farmers_index", "outgroup_index", "outgroup_index_rank")]
+## farmers/pastoralists tend to be higher? nope, about same. More farmers attend farmer events than pastoralists attend pastoralist events, but outgroup is about equal.
+#mosaic::mean(events$outgroup_index~events$Host.Community, na.rm=T)
+#tapply(events$attend_farm, events$Host.Community, mean, na.rm=T)
+#tapply(events$attend_past, events$Host.Community, mean, na.rm=T)
+
+tapply(events$attend_farm, events$Host.Community, sd, na.rm=T)
+tapply(events$attend_past, events$Host.Community, sd, na.rm=T)
+```
+
+
+<!--
+## Stuff to look at
+
+What do we have?  How many observations per community before/after?
+
+```{r}
+(thetab <- as.matrix(table(events$Community.Name, events$time)))
+#table(events$Community.Name, events$time, events$treatment)
+```
+
+Again, only use a community if it has at least 2 obs before and after.
+
+```{r, include=F}
+sigh <- data.frame(comm = rownames(thetab), bef = thetab[,1], end = thetab[,2])
+
+dropsies <- na.omit(ifelse(sigh$bef < 2 | sigh$end < 2, as.character(sigh$comm), NA))
+events <- droplevels(events[!events$Community.Name %in% dropsies,])
+```
+
+```{r, include=F, eval=F}
+#with(events[events$treatment %in% 0 & events$time %in% 0,], summary(Number.of.People..in.atttenddance))
+#with(events[events$treatment %in% 0 & events$time %in% 1,], summary(Number.of.People..in.atttenddance))
+
+#with(events[events$treatment %in% 1 & events$time %in% 0,], summary(Number.of.People..in.atttenddance))
+#with(events[events$treatment %in% 1 & events$time %in% 1,], summary(Number.of.People..in.atttenddance))
+
+# number of pppl in attendance has a huge mean for control at endline, but low median because some people had numbers in the thousands.
+##chris: changed var name after this because var names sooo long
+#events[events$treatment %in% 0 & events$time %in% 1, c('Number.of.People..in.atttenddance', "event_type", "Community.Name", "Observer.Name", "time")]
+
+#events[events$Observer.Name %in% "alayin apakhi moses", c('Number.of.People..in.atttenddance', "event_type", "Community.Name", "Observer.Name", "time")]
+#events[events$event_type %in% "festival", c('Number.of.People..in.atttenddance', "event_type", "Community.Name", "Observer.Name", "time")]
+
+```
+-->
+
+# Save clean files
+
+```{r}
+save(events, file="a_events_clean.rda")
+save(markets, file="a_markets_clean.rda")
+save.image("a_obsDat_clean.rda")
+```

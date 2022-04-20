@@ -1,0 +1,711 @@
+---
+title: "ecpn_coefplot"
+author: "cdgrady21"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load('ag.coefs.Rdata')
+load('ind.coefs.Rdata')
+
+#load('ind2.coefs.Rdata')
+#load('ag.coefs_orig.Rdata')
+#load('ind.coefs_orig.Rdata')
+#load('ind2.coefs_orig.Rdata')
+
+## add obs data to coefs
+#load("../../obsDat/figs/marketCoefs1.rda") # no FEs, should be unbiased
+#load("../../obsDat/figs/eventCoefs1.rda") # no FEs
+load("../../obsDat/figs/obsDat_fig_dat.rda")
+
+
+```
+```{r, eval=F}
+# OLD adding non-bootstrap obs data
+load("../../obsDat/analysis/marketMedian.Rdata")
+load("../../obsDat/analysis/eventsMedian.Rdata")
+
+marks <- as.data.frame(markMed.thing[c("pastoralists_index", "farmers_index"),])
+marks$sd <- NA
+marks["pastoralists_index","sd"] <- sd(markets$pastoralists_index, na.rm=T)
+marks["farmers_index","sd"] <- sd(markets$farmers_index, na.rm=T)
+
+evs <- as.data.frame(eventsMed.thing[c("attend_total", "eat_total"),])
+evs$sd <- NA
+evs["attend_total","sd"] <- sd(events$attend_total, na.rm=T)
+evs["eat_total","sd"] <- sd(events$eat_total, na.rm=T)
+
+markEvs <- rbind(marks,evs)
+markEvs[,c("ll", "ul")] <- markEvs[,c("lower", "upper")]; markEvs[,c("lower", "upper")] <- NULL
+addNames <- setdiff(names(ag.coefs), names(markEvs))
+markEvs[,addNames] <- NA
+markEvs$var <- rownames(markEvs)
+markEvs$size <- markEvs$coef/markEvs$sd
+markEvs[,c("ll_size", "ul_size")] <- markEvs[,c("ll", "ul")]/markEvs$sd
+markEvs <- markEvs[c(names(ag.coefs))]
+
+ag.coefs <- rbind(ag.coefs, markEvs)
+
+```
+
+# Coefplots
+
+1. Aggregate Survey outcomes
+2. Aggregate + observational outcomes
+3. Individual-level survey outcomes
+
+Survey Outcomes: 
+  - voluntary intergroup contact ()
+  - feelings of physical security
+  - intergroup attitudes
+
+```{r}
+outcome <- ag.coefs
+outcome <- outcome[grepl("Trust|contact|in_cw|end_exp|rMean", outcome$var),]
+outcome <- outcome[,c("var", "size", "ll_size", "ul_size")]
+names(outcome) <- c("var", "coef_sd", "ll_sd", "ul_sd")
+outcome$var <- c("Self-reported Attitudes", "Self-reported Contact", 
+                 "Perceptions of Insecurity", 
+                 "Percent Experiment", "Endorsement Experiment")
+outcome$outcome_type <- c("atts", "con", "in", "con", "atts")
+
+svy_coefplot <- ggplot(outcome, aes(y=coef_sd, x = var)) +
+  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
+  geom_point(aes(shape=outcome_type, size=4)) +
+  scale_shape_manual(values=c("atts"=19, "con"=18, "in"=17))+
+  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0)) +
+  #scale_linetype_manual(values = c("dotted", "solid")) +
+  labs(x = "Outcome", y = "Est. Effect Size and 95% CI") +
+  scale_y_continuous(limits=c(-1, 2),
+                     n.breaks=7)+
+  guides(shape=F) +
+  theme_classic()+
+  theme(text = element_text(size=15),
+        legend.position="none") +
+  coord_flip()
+
+pdf(file="svy_coefplot.pdf",bg="transparent", width=10, height=7)
+svy_coefplot
+dev.off()
+  
+```
+
+2. Aggregate + observational outcomes
+
+```{r}
+outcome2$outcome_type <- outcome2$df
+outcome2$df <- "obs"
+outcome2$var <- c("Pastoralists in Market",
+                  "Farmers in Market",
+                  "Outgroup Event Attendance")
+outcome$df <- "svy"
+svyObs_outcomes <- rbind(outcome, outcome2)
+svyObs_outcomes$var <- 
+  factor(svyObs_outcomes$var, 
+         levels = c("Perceptions of Insecurity",
+                    "Endorsement Experiment",
+                    "Self-reported Attitudes", 
+                    "Outgroup Event Attendance",
+                    "Farmers in Market","Pastoralists in Market",
+                    "Percent Experiment",
+                    "Self-reported Contact"))
+svyObs_outcomes$hypothesis <- c("Attitudes", "Contact", "Insecurity", "Contact",
+                                "Attitudes", "Contact", "Contact", "Contact")
+
+svyObs_coefplot <- ggplot(svyObs_outcomes, aes(y=coef_sd, x = var)) +
+  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
+  geom_point(aes(shape=hypothesis, size=4)) +
+  scale_shape_manual(values=c("Attitudes"=19, "Contact"=17, "Insecurity"=18))+
+  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0, linetype=df)) +
+  scale_linetype_manual(values = c("dotted", "solid")) +
+  labs(x = "Outcome", y = "Est. Effect Size and 95% CI") +
+  scale_y_continuous(limits=c(-1, 2),
+                     n.breaks=7)+
+  guides(shape=F) +
+  theme_classic()+
+  theme(text = element_text(size=15),
+        legend.position="none") +
+  coord_flip()
+
+pdf(file="svyObs_coefplot.pdf",bg="transparent", width=10, height=7)
+svyObs_coefplot
+dev.off()
+
+png(file="svyObs_coefplot.png",bg="transparent")
+svyObs_coefplot
+dev.off()
+
+```
+
+3. Individual-level survey outcomes
+
+Survey Outcomes: 
+  - voluntary intergroup contact
+  - feelings of physical security
+  - intergroup attitudes
+
+Need two point estimates & CI per outcome.
+
+```{r}
+outcome_ind <- ind.coefs
+outcome_ind <- outcome_ind[grepl("Trust|contact|in_cw", outcome_ind$var),]
+outcome_ind <- outcome_ind[,c(1,grep("^size.*(non|part)", names(outcome_ind)))]
+outcome_ind$var <- c("Attitudes", "Contact", 
+                 "Perceptions of Insecurity")
+part <- outcome_ind[,c(1,grep("part", names(outcome_ind)))]
+non <- outcome_ind[,c(1,grep("non", names(outcome_ind)))]
+names(part) <- gsub("_part", "", names(part))
+names(non) <- gsub("_non", "", names(non))
+part$dat <- "part"; non$dat <- "non"
+outcome_ind <- rbind(part,non)
+outcome_ind$var <- paste0(outcome_ind$dat, ":", outcome_ind$var)
+outcome_ind$outcome_type <- c(rep(c("atts", "con", "in"),2))
+outcome_ind$var <- 
+  factor(outcome_ind$var, 
+         levels = c("non:Perceptions of Insecurity",
+                    "part:Perceptions of Insecurity",
+                    "non:Attitudes",
+                    "part:Attitudes",
+                    "non:Contact",
+                    "part:Contact"))
+outcome_ind$dat <- factor(outcome_ind$dat, levels=
+                            c("part", "non"))
+
+svyInd_coefplot <- ggplot(outcome_ind, aes(y=size, x = var)) +
+  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
+  geom_point(aes(shape=outcome_type, size=4)) +
+  scale_shape_manual(values=c("atts"=19, "con"=17, "in"=18))+
+  geom_errorbar(aes(ymin=size_ll, ymax=size_ul, width=0, linetype=dat)) +
+  #scale_linetype_manual(values = c("dotted", "solid")) +
+  labs(x = "Outcome", y = "Est. Effect Size and 95% CI") +
+  scale_y_continuous(limits=c(-0.75, 1.5),
+                     n.breaks=5)+
+  guides(shape=F) +
+  theme_classic()+
+  theme(text = element_text(size=15),
+        legend.position="none") +
+  coord_flip()
+
+pdf(file="svyInd_coefplot.pdf",bg="transparent", width=10, height=7)
+svyInd_coefplot
+dev.off()
+
+png(file="svyInd_coefplot.png",bg="transparent")
+svyInd_coefplot
+dev.off()
+```
+
+
+
+
+
+******************************
+Older plots made more manually
+******************************
+<!--Note: have made all of these into png, but works with pdf.  just add width=7, height=4 -->
+
+# Make a combined coefplot
+
+Cbind ag.coefs and ind.coefs together.
+
+```{r}
+# need to add the outcomes that we don't use at the individual-level (the survey exps, obsDat)
+ind.coefs <- add_row(ind.coefs, var=setdiff(ag.coefs$var, ind.coefs$var)[!grepl("pgp", setdiff(ag.coefs$var, ind.coefs$var))])
+#names(ind.coefs) <- paste0(names(ind.coefs), "_ind")
+thecoefs <- cbind(ag.coefs, ind.coefs[,2:length(ind.coefs)])
+
+```
+
+Set the plot df
+
+```{r}
+# order by size
+thecoefs <- thecoefs[order(thecoefs$size),]
+varNames<-thecoefs$var
+res<-t(thecoefs[,c("size", "ll_size", "ul_size",
+                   "size_ind", "size_ll_ind", "size_ul_ind",
+                   "size_part", "size_ll_part", "size_ul_part",
+                   "size_non", "size_ll_non", "size_ul_non")]) # drop sd, varnames
+colnames(res)<-varNames
+
+# chris: renaming the outcomes, need to change code when outcome order changes.
+orignames <- colnames(res)
+
+newlabs <- c("Markets-pastoralists",
+              "Perceptions of security",
+                  "Contact",
+                  "Outgroup affect",
+             "Bargaining",
+             "PGG Donate",
+             "Empathy",
+             "Percent exp",
+              "Endorsement exp",
+             "Events-attend",
+             "Perceived benefit",
+             "Ingroup expansion",
+             "Percent exp1",
+             "Markets-farmers",
+             "Events-eat",
+             "Threat",
+             "PGG amount",
+              "List exp",
+             "Clash awareness"
+             )
+newlabs <- rev(newlabs)
+cbind(newlabs,orignames) # check
+colnames(res) <- newlabs
+
+MainOuts <- res[,c("Contact", "List exp", "Percent exp1", "Percent exp", "Endorsement exp", "Outgroup affect", "PGG amount", "Perceptions of security")]
+MarkEvents <- res[,c("Markets-pastoralists", "Markets-farmers", "Events-attend", "Events-eat")]
+MainMechs <- res[,c("Empathy", "Threat", "Ingroup expansion", "Perceived benefit", "Bargaining")]
+
+
+res1 <- res[,colnames(res) %in% intersect(colnames(res), colnames(MainOuts))]
+res2 <- res[,colnames(res) %in% intersect(colnames(res), colnames(MarkEvents))]
+res3 <- res[,colnames(res) %in% intersect(colnames(res), colnames(MainMechs))]
+```
+
+
+# MAKE DIFFERENT COEFPLOTS
+
+### Intergroup Affect Outcomes
+
+Survey self-reports (allTrustVars) and endorsement experiment.
+
+```{r}
+affect_outcomes <- c("Endorsement exp", "Outgroup affect")
+affect_outcomes <- rev(affect_outcomes)
+res1 <- res1[,affect_outcomes] # change order away from effect size and towards outcome type
+
+lablen <- nchar(colnames(res1))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_MainOuts-cats.png")
+
+par(mar=c(3,10,2,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res1)
+newmods <- c(1,2.25,3.5,4.75,5.25,5.75,6.25,7.5)
+
+## Community and individual on same
+plot(range(as.vector(res1[c("ll_size","ul_size"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Main outcomes: Community and Individual-level")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res1["size",],newmods,pch=19)
+segments(res1["ll_size",],newmods, res1["ul_size",],newmods)
+axis(2,at=newmods,labels=dimnames(res1)[[2]],las=2)
+# adding in the panel
+points(res1["size_ind",],(newmods)-.3,pch=1)
+segments(res1["size_ll_ind",],(newmods)-.3,
+         res1["size_ul_ind",],(newmods)-.3,lty=2)
+legend("bottomleft",legend=c("Community Data","Individual Data"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+```
+
+
+
+************************
+
+Make the coefplot with all outcomes.
+
+```{r}
+main_outcomes <- c("Outgroup affect", "Endorsement exp", "Contact", "Percent exp", "Markets-pastoralists", "Markets-farmers", "Events-attend", "Events-eat", "Perceptions of security")
+main_outcomes <- rev(main_outcomes)
+res_main <- res[,main_outcomes] # change order away from effect size and towards outcome type
+
+lablen <- nchar(colnames(res_main))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_MainOuts-cats.png")
+
+par(mar=c(3,10,2,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res_main)
+newmods <- c(1.0, 2.25,3.0,3.75,4.5,5.25,6.0, 7.0,7.75)
+
+## Community and individual on same
+plot(range(as.vector(res_main[c("ll_size","ul_size"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Main outcomes: Community and Individual-level")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res_main["size",],newmods,pch=19)
+segments(res_main["ll_size",],newmods, res_main["ul_size",],newmods)
+axis(2,at=newmods,labels=dimnames(res_main)[[2]],las=2)
+# adding in the panel
+points(res_main["size_ind",],(newmods)-.3,pch=1)
+segments(res_main["size_ll_ind",],(newmods)-.3,
+         res_main["size_ul_ind",],(newmods)-.3,lty=2)
+legend("topright",legend=c("Community Data","Individual Data"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+```
+
+Now just the survey outcomes
+
+```{r}
+survey_outcomes <- c("Outgroup affect", "Endorsement exp", "Contact", 
+                   "Percent exp", "Perceptions of security", "PGG amount",
+                   "PGG Donate")
+survey_outcomes <- rev(survey_outcomes)
+res_survey <- res[,survey_outcomes] # change order away from effect size and towards outcome type
+
+lablen <- nchar(colnames(res_survey))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_SurveyOuts-cats.png")
+
+par(mar=c(3,10,4,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res_survey)
+newmods <- c(1.0,1.75, 3.0, 4.25,5.0, 6.25,7.0)
+
+## Community and individual on same
+plot(range(as.vector(res_survey[c("ll_size","ul_size"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Main outcomes: Community and Individual-level")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res_survey["size",],newmods,pch=19)
+segments(res_survey["ll_size",],newmods, res_survey["ul_size",],newmods)
+axis(2,at=newmods,labels=dimnames(res_survey)[[2]],las=2)
+# adding in the panel
+points(res_survey["size_ind",],(newmods)-.3,pch=1)
+segments(res_survey["size_ll_ind",],(newmods)-.3,
+         res_survey["size_ul_ind",],(newmods)-.3,lty=2)
+legend("topleft",legend=c("Community Data","Individual Data"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+```
+
+
+Now for the panel
+
+Dark spots are Committee/Full Participant vs control, Open spots are the non-participants vs control.
+
+```{r}
+res1_p <- res1[,c("Perceptions of security", "Contact", "Outgroup affect")]
+lablen <- nchar(colnames(res1_p))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_MainOuts_panel-cats.png")
+
+par(mar=c(3,10,1.5,2),oma=c(8,0,8,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res1_p)
+newmods <- c(1,1.75,2.5)
+
+## panel
+plot(range(as.vector(res1_p[c("size_ll_non","size_ul_part"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Main outcomes: Individual-level")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res1_p["size_part",],newmods,pch=19)
+segments(res1_p["size_ll_part",],newmods, res1_p["size_ul_part",],newmods)
+axis(2,at=newmods,labels=dimnames(res1_p)[[2]],las=2)
+# adding in the nonparts
+points(res1_p["size_non",],(newmods)-.2,pch=1)
+segments(res1_p["size_ll_non",],(newmods)-.2,
+         res1_p["size_ul_non",],(newmods)-.2,lty=2)
+legend("topright",legend=c("Participants","Nonparticipants"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.9)
+dev.off()
+
+```
+
+
+
+
+
+*****************
+
+Market/Events Outcomes
+
+```{r}
+mark_outcomes <- c("Markets-pastoralists", "Markets-farmers", "Events-attend", "Events-eat")
+mark_outcomes <- rev(mark_outcomes)
+res2 <- res2[,mark_outcomes] # change order away from effect size and towards outcome type
+colnames(res2) <- c("Events: eat", "Events: attend", "Markets: farmers", "Markets: pastoralists")
+
+lablen <- nchar(colnames(res2))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_markEvents.png")
+
+par(mar=c(6,9,2,1),oma=c(6,0,6,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res2)
+
+## Community and individual on same
+plot(c(-0.25,0.8),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Median Effect Size and 95% CI",
+     main="Markets and social observations")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res2["size",],1:maxmods,pch=19)
+segments(res2["ll_size",],1:maxmods, res2["ul_size",],1:maxmods)
+axis(2,at=1:maxmods,labels=dimnames(res2)[[2]],las=2)
+#legend("bottomright",legend=c("Community Data","Individual Data"),
+#       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+```
+
+
+
+# Make mechanism coefplot
+
+```{r}
+main_mechs <- c("Empathy", "Threat", "Ingroup expansion", "Perceived benefit")
+main_mechs <- rev(main_mechs)
+res3 <- res3[,main_mechs] # change order away from effect size and towards outcome type
+
+png(file="ecpn_coefplots_Mechs.png")
+
+par(mar=c(3,10,2,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res3)
+
+## Community and individual on same
+plot(range(as.vector(res3[c("ll_size","ul_size"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Main mechanisms: Community and Individual-level")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res3["size",],1:maxmods,pch=19)
+segments(res3["ll_size",],1:maxmods, res3["ul_size",],1:maxmods)
+axis(2,at=1:maxmods,labels=dimnames(res3)[[2]],las=2)
+# adding in the panel
+points(res3["size_ind",],(1:maxmods)-.3,pch=1)
+segments(res3["size_ll_ind",],(1:maxmods)-.3,
+         res3["size_ul_ind",],(1:maxmods)-.3,lty=2)
+legend("bottomleft",legend=c("Community Data","Individual Data"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+
+
+```
+
+
+# Make mechanisms for panel only
+
+Dark spots are Committee/Full Participant vs control, Open spots are the non-participants vs control.
+
+```{r}
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_mechs_panel.png")
+
+par(mar=c(3,10,2,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res3)
+newmods <- c(1.5,2.25,3,3.75)
+
+## panel
+plot(range(as.vector(res3[c("size_ll_non","size_ul_non"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Main mechanisms: Individual-level")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res3["size_part",],newmods,pch=19)
+segments(res3["size_ll_part",],newmods, res3["size_ul_part",],newmods)
+axis(2,at=newmods,labels=dimnames(res3)[[2]],las=2)
+# adding in the nonparts
+points(res3["size_non",],(newmods)-.3,pch=1)
+segments(res3["size_ll_non",],(newmods)-.3,
+         res3["size_ul_non",],(newmods)-.3,lty=2)
+legend("bottomleft",legend=c("Participants","Nonparticipants"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+```
+
+
+**********************
+
+# Make the ag.df coefplot only
+
+Set the plot df
+
+```{r}
+res_agdf <- res1[1:3,]
+```
+
+Make the coefplot
+
+```{r}
+lablen <- nchar(colnames(res_agdf))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_agdf.png")
+
+par(mar=c(3,10,2,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(res1)
+
+## ag.df
+plot(range(as.vector(res1[c("ll","ul"),]),na.rm=TRUE),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Effects of ECPN in Community-Level Data")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(res1["size",],1:maxmods,pch=19)
+segments(res1["ll",],1:maxmods, res1["ul",],1:maxmods)
+axis(2,at=1:maxmods,labels=dimnames(res1)[[2]],las=2)
+dev.off()
+
+```
+
+
+# Make the panel.df coefplot only
+
+Set the plot df
+
+```{r}
+# order by size
+pan.coefs <- ind.coefs[order(ind.coefs$size_part),]
+varNames<-pan.coefs$var
+pan.res<-t(pan.coefs[,c("size_non", "size_ll_non", "size_ul_non",
+                        "size_part", "size_ll_part", "size_ul_part")])
+colnames(pan.res)<-varNames
+pan.res <- pan.res[,1:9] # drop svy exps
+
+orignames <- colnames(pan.res)
+newlabs <- c("Intergroup Contact",
+             "Outgroup Trust",
+             "Perceptions of Security",
+             "Intergroup Cohesion",
+             "PGG Donate",
+             "Dispute Resolution",
+             "Shared Resources",
+             "Clash History",
+             "PGG Amount"
+             )
+
+newlabs <- rev(newlabs)
+cbind(newlabs,orignames) # check
+colnames(pan.res) <- newlabs
+
+pan.notHyps <- pan.res[,c("Shared Resources", "Clash History")]
+pan.res1 <- pan.res[,!colnames(pan.res) %in% intersect(colnames(pan.res), colnames(pan.notHyps))]
+pan.res2 <- pan.res[,colnames(pan.res) %in% intersect(colnames(pan.res), colnames(pan.notHyps))]
+```
+
+
+Dark spots are Committee/Full Participant vs control, Open spots are the non-participants vs control.
+
+```{r}
+lablen <- nchar(colnames(pan.res1))
+#ub<-rep(max(ind_un["ul",]),ncol(ind)) # if want to change bounds for aesthetics
+#lb<-rep(-0.05,ncol(ind))
+#ind<-rbind(res,ub,lb)
+
+png(file="ecpn_coefplots_panOrdered.png")
+
+par(mar=c(3,10,2,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(pan.res1)
+
+## Community and individual on same
+plot(round(range(as.vector(pan.res1[c("size_ll_part","size_ul_part"),]),na.rm=TRUE)),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Effects of ECPN on Participants and Nonparticipants")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(pan.res1["size_part",],1:maxmods,pch=19)
+segments(pan.res1["size_ll_part",],1:maxmods, pan.res1["size_ul_part",],1:maxmods)
+axis(2,at=1:maxmods,labels=dimnames(pan.res1)[[2]],las=2)
+# adding in the non-participants
+points(pan.res1["size_non",],(1:maxmods)-.3,pch=1)
+segments(pan.res1["size_ll_non",],(1:maxmods)-.3,
+         pan.res1["size_ul_non",],(1:maxmods)-.3,lty=2)
+legend("topleft",legend=c("Participants","Non-participants"),
+       pch=c(19,1),lty=c(1,2),bty="n", cex=0.75)
+dev.off()
+
+```
+
+
+# Old
+
+```{r, eval=F, include=F}
+# ag.coefs
+# for use with original diff-in-diff estimation strategy
+newlabs_orig <- c("Perceptions of Security",
+             "Comfort with Other Group",
+             "Intergroup Contact",
+             "Public Goods Game - Donation",
+             "Endorsement Experiment",
+             "Random Experiment",
+             "Cohesion with Other Group",
+             "Random Experiment1",
+             "Dispute Resolution",
+             "List Experiment",
+             "Public Goods Game - Amount",
+             "Clash History",
+             "Shared Resources"
+             )
+# for use with lm(end~tr+base) strategy
+newlabs <- c("Public Goods Game - Donation",
+                  "Comfort with Other Group",
+                  "Endorsement Experiment",
+             "Random Experiment",
+             "Perceptions of Insecurity",
+             "Clash History",
+              "Cohesion with Other Group",
+             "Intergroup Contact",
+             "Dispute Resolution",
+             "Random Experiment1",
+              "List Experiment",
+              "Shared Resources",
+              "Public Goods Game - Amount"
+             )
+
+
+# panel
+# for use with original diff-in-diff estimation strategy
+newlabs_orig <- c("Intergroup Contact",
+             "Comfort with Other Group",
+             "Cohesion with Other Group",
+             "Perceptions of Insecurity",
+             "Public Goods Game - Donation",
+             "Dispute Resolution",
+             "Clash History",
+             "Shared Resources",
+             "Public Goods Game - Amount"
+             )
+# for use with lm(end~tr+base) strategy.
+newlabs <- c("Public Goods Game - Donation",
+             "Comfort with Other Group",
+             "Intergroup Contact",
+             "Clash History",
+             "Cohesion with Other Group",
+             "Dispute Resolution",
+             "Shared Resources",
+             "Perceptions of Insecurity",
+             "Public Goods Game - Amount"
+             )
+
+```

@@ -1,0 +1,423 @@
+---
+title: "b-endlineRecode"
+author: "cdgrady21"
+date: "May 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("a_ecpn_endline.Rdata")
+```
+
+Make the NAs NA instead of "---" so that R knows they are numeric
+
+```{r}
+test=end # the test df to mess with
+dates <- end[,c("start", "end", "done_calc", "start_calc")]
+end[,c("start", "end", "done_calc", "start_calc")] <- NULL
+end[end == "---"] <- NA
+end <- droplevels(cbind(end, dates))
+
+stopifnot(end[,names(end) %in% names(dates)]==test[,names(test) %in% names(dates)])
+```
+
+Some things should still be numeric but are not
+
+```{r}
+numVars <- c("income_month", "income_year", "house_num", 
+             "how_interact_group.contact_market","contact_group.inHome_group.contact_home_num",
+             "contact_group.theirHome_group.contact_home_x_num", 
+             "contact_group.social_event_group.contact_event_num",
+             "clash_group.violence_number", 'clash_details_group.violence_killed',
+             "clash_details_group.violence_injured", "clash_details_group.violence_burned",
+             "clash_details_group.violence_when", "insecurity_group.work_days",
+             "forum_group.forum_num", "list_exp1a","list_exp1b",
+             "rndm1", "rndm2", "rndm3", "duration"
+             )
+
+end[, numVars] <- sapply(end[,numVars], function(x) as.numeric(as.character(x)))
+
+
+#summary(end$clash_details_group.violence_burned)
+```
+
+Some open-ended things should be character but are not
+
+```{r}
+charTest <- sapply(end, is.character)
+charTest[charTest %in% T] # only one var is char
+
+levs.fun <- function(var)
+{
+  x <- length(levels(var))
+  if(x>100){
+    TRUE
+  }
+  else
+    FALSE
+}
+
+# chris: here.  Make sure open-ended char vars are left as chars by the recode function?
+charVars <- c(names(sapply(end, levs.fun)[sapply(end, levs.fun) %in% T]), "ethnic_other")
+#head(end[,charVars])
+end[,charVars] <- as.data.frame(lapply(end[,charVars], tolower))
+end[, charVars] <- sapply(end[,charVars], as.character)
+class(end$violence_cause)
+
+```
+
+
+# Recode functions
+
+```{r}
+#########################################
+# endline Recode Functions
+#########################################
+test <- end
+end_comf.fun<-function(var)
+{
+  car::recode(as.character(var),
+              "'compcomf'=4;
+                      'comf'=3;
+                      'neither'=2;
+                      'uncomf'=1;
+                      'compuncomf'=0;
+                      else=NA")
+}
+#table(test$comfort_group.marry)
+#test$marry_x <- end_comf.fun(test$comfort_group.marry)
+#table(test$marry_x)
+#class(test$marry_x)
+
+end_agree.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'stragree'=3;
+                      'soagree'=2;
+                      'sodisagree'=1;
+                      'strdisagree'=0;
+                      else=NA")
+}
+#table(end$econ_benefit_group.benefit_econ)
+#test$ben_con <- end_agree.fun(test$econ_benefit_group.benefit_econ)
+#table(test$ben_con, exclude=c())
+#class(test$ben_con)
+
+end_vio.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'always'=0;
+                            'sometimes'=1;
+                            'rarely'=2;
+                            'never'=3;
+                            else=NA")
+}
+#table(end$violence_group.criminals)
+#end$vio_crim <- end_vio.fun(end$violence_group.criminals)
+#table(end$vio_crim)
+#class(end$vio_crim)
+
+end_trust.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'notrust'=0;
+                      'trustcomplete'=5;
+                      '---'=NA;
+              'ref'=NA")
+}
+#table(end$outgroup_atts_group.trust_x)
+#end$trust_x <- end_trust.fun(end$outgroup_atts_group.trust_x)
+#table(end$trust_x)
+#class(end$trust_x)
+
+end_yn.fun<-function(var)
+{
+  car::recode(as.character(var), 
+              "'yes'=1;
+              'no'=0;
+              else=NA")
+}
+#table(end$insecurity_group.in_field)
+#end$insec_field <- end_yn.fun(end$insecurity_group.in_field)
+#table(end$insec_field, exclude=c())
+#class(end$insec_field)
+
+end_contr.fun <- function(var)
+{
+  car::Recode(as.character(var),
+                            "'none'=0;
+                            'lesshalf'=1;
+                            'half'=2;
+                            'morehalf'=3;
+                            'everyone'=4;
+                            else=NA")
+}
+#table(end$social_cohesion_group2.contribute_x)
+#end$sc_contr_x <- end_contr.fun(end$social_cohesion_group2.contribute_x)
+#table(end$sc_contr_x)
+#class(end$sc_contr_x)
+
+radio.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'rare'=0;
+              'monthly'=1;
+              'weekly'=2;
+              '2+week'=3;
+              'daily'=4;
+              else=NA")
+}
+#table(test$radio)
+#test$rad <- radio.fun(test$radio)
+#table(test$rad)
+
+likely.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'veryunlikely'=0;
+              'somewhatunlikely'=1;
+              'neither'=3;
+              'somewhatlikely'=4;
+              'verylikely'=5;
+              else=NA")
+}
+#table(test$social_cohesion_group2.water_prob)
+#test$water <- likely.fun(test$social_cohesion_group2.water_prob)
+#table(test$water)
+
+resp.fun <- function(var) # note the threat vars are the ONLY vars where HIGH scores are BAD
+{
+  car::Recode(as.character(var),
+              "'xresp'=0;
+              'bothx'=1;
+              'bothresp'=2;
+              else=NA")
+}
+#table(test$threat_group.x_responsible)
+#test$resp <- resp.fun(test$threat_group.x_responsible)
+#table(test$resp)
+
+pos.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'veryneg'=0;
+              'somewhatneg'=1;
+              'neither'=2;
+              'somewhatpos'=3;
+              'verypos'=4;
+              else=NA")
+}
+#table(test$contact_market_pos)
+#test$newvar <- pos.fun(test$contact_market_pos)
+#table(test$newvar,exclude=c())
+
+resolve.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'never'=0;
+              'rare'=1;
+              'some'=2;
+              'most'=3;
+              'all'=4;
+              else=NA")
+}
+#table(end$market_disputes_resolved)
+#test$newvar <- resolve.fun(test$market_disputes_resolved)
+#table(test$newvar)
+
+effect.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'not'=0;
+              'somewhat'=1;
+              'effective'=2;
+              'very'=3;
+              else=NA")
+}
+#table(test$ews_comm_grp.ews_comm_effect)
+#test$newvar <- effect.fun(test$ews_comm_grp.ews_comm_effect)
+#table(test$newvar)
+
+sat.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'not'=0;
+              'some'=1;
+              'very'=2;
+              else=NA")
+}
+#table(end$pcome_use_group.peace_comm_sat)
+#test$newvar <- sat.fun(end$pcome_use_group.peace_comm_sat)
+#table(test$newvar)
+
+address.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'vsmall'=0;
+              'small'=1;
+              'medium'=2;
+              'great'=3;
+              'vgreat'=4;
+              else=NA")
+}
+#table(end$local_gov_address)
+#test$newvar<-address.fun(test$local_gov_address)
+#table(test$newvar)
+
+endorse.fun <- function(var)
+{
+  car::Recode(as.character(var),
+              "'stroppose'=0;
+              'sooppose'=1;
+              'indiff'=2;
+              'sosupport'=3;
+              'strsupport'=4;
+              else=NA")
+}
+#table(test$end_exp1a)
+#test$newvar <- endorse.fun(test$end_exp1a)
+#table(test$newvar)
+
+# Combining the functions
+end_code.fun=function(var)
+{
+  if(is.character(var) %in% TRUE){ # tell it to ignore char vars
+    var
+  }
+  else if(length(grep("comf",levels(var)))>0){
+    end_comf.fun(var)
+  }
+  else if(length(grep("disagree",levels(var)))>0){
+    end_agree.fun(var)
+  }
+  else if(length(grep("always",levels(var)))>0){
+    end_vio.fun(var)
+  }
+  else if(length(grep("notrust",levels(var)))>0){
+    end_trust.fun(var)
+  }
+  else if(length(grep("yes", levels(var)))>0){
+    end_yn.fun(var)
+  }
+  else if(length(grep("lesshalf", levels(var)))>0){
+    end_contr.fun(var)
+  }
+  else if(length(grep("2.week", levels(var)))>0){
+    radio.fun(var)
+  }
+  else if(length(grep("somewhatunlikely", levels(var)))>0){
+    likely.fun(var)
+  }
+  else if(length(grep("most", levels(var)))>0){
+    resolve.fun(var)
+  }
+  else if(length(grep("effective", levels(var)))>0){
+    effect.fun(var)
+  }
+  else if(length(grep("not", levels(var)))>0){ # has to come after effect.fun ("not" level is in both)
+    sat.fun(var)
+  }
+  else if(length(grep("medium", levels(var)))>0){
+    address.fun(var)
+  }
+  else if(length(grep("strsupport", levels(var)))>0){
+    endorse.fun(var)
+  }
+  else if(length(grep("somewhatpos", levels(var)))>0){
+    pos.fun(var)
+  }
+  else if(length(grep("xresp", levels(var)))>0){
+    resp.fun(var)
+  }
+  else
+  var
+}
+```
+
+Now test the mass recode functions!
+
+```{r}
+test$newvar=end_code.fun(test$social_cohesion_group2.contribute_x)
+stopifnot(table(test$newvar)['3']==table(test$social_cohesion_group2.contribute_x)['morehalf'])
+stopifnot(class(test$newvar) %in% "numeric")
+
+test$newvar <- end_code.fun(test$violence_cause)
+stopifnot(class(test$newvar) %in% "character")
+
+test$newvar <- end_code.fun(test$local_gov_address)
+#table(test$newvar); table(test$local_gov_address)
+
+test$newvar <- end_code.fun(test$radio)
+#table(test$newvar); table(test$radio)
+
+
+rm(test)
+
+##########
+# Recoding endline
+#########
+df2<-end # keep around for actual wording in responses
+end<-data.frame(lapply(end,end_code.fun))
+
+stopifnot(nrow(end)==nrow(df2))
+typetest=sapply(end,is.numeric)
+stopifnot(typetest['list_exp1a']==TRUE)
+stopifnot(typetest['leader_influence']==FALSE)
+#stopifnot(length(sapply(df2,class)[sapply(df2,class) %in% "character"]) == length(sapply(end,class)[sapply(end,class) %in% "character"])) # it does not leave character vars as characters, but it does not replace them with NA, either. So, huzzah!
+
+# note chris: end_code.fun needs variables to be FACTORS so it can read the levels.
+#typeFacs <- sapply(df2, is.character)
+#typeFacs[typeFacs %in% TRUE] # the only character vars in df2 were coerced to factors and then left alone by the recode function.
+```
+
+# Some questions need to be reverse coded
+
+get_along
+values
+share_farmland/pasture/market_tension/dispute
+dispute_persist
+
+NOT the threat vars, which are all coded so HIGH is BAD:
+x_threat
+x_influence
+x_values
+
+All 4 category 0-3 vars.
+
+```{r}
+##########
+# Reverse code questions that need to be reversed
+##########
+rev.fun<-function(var)
+{
+  var <- abs(var-max(var, na.rm=T))
+}
+
+revVars <- c('social_cohesion_group.get_along', 'social_cohesion_group.values', "dispute_persist",
+             names(end)[grepl("share_.*_(tension|dispute)", names(end))]
+             #'threat_group.threat_dis_group.x_threat', 'threat_group.threat_dis_group.x_influence',
+             #'threat_group.threat_dis_group.x_values'
+             )
+end[,revVars] <- sapply(end[,revVars], rev.fun)
+
+```
+
+
+
+
+
+# Save
+
+The things like "treatment community" will be added when baseline and endline are combined.
+
+Rescale all vars 0-1 will be done when baseline and endline are combined.
+
+A-arewa_data_recode.R in the NigeriaTV/Endline/wrkfolder can help.
+
+```{r}
+save(end, df2, file="b_endlineRecode.Rdata")
+
+```
+

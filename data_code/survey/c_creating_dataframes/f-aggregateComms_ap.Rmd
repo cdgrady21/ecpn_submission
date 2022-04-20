@@ -1,0 +1,304 @@
+---
+title: "f-aggregateComms"
+author: "cdgrady21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("../b_creating_outcomes/d-additiveIndices.Rdata")
+load("../b_creating_outcomes/rand_df.Rdata")
+library(plyr)
+library(dplyr)
+library(estimatr)
+```
+
+# Aggregate
+
+Now aggregate data to community-year level
+
+```{r}
+# stuff from above that needs to be run because above is now eval=F
+possCovars <- c('age', 'ethnic2', 'radio',
+            'gender', 'income_month',
+            'username', 'duration',
+            "state"
+            )
+rand.df$age <- as.numeric(as.character(rand.df$age))
+
+
+# fix/make numeric variables
+rand.df$ethnic2 <- as.factor(rand.df$ethnic2)
+rand.df <- cbind(rand.df,model.matrix(~ . + 0, data=rand.df['ethnic2'], contrasts.arg = lapply(rand.df['ethnic2'], contrasts, contrasts=FALSE))) #
+rand.df$psu <- as.numeric(as.character(rand.df$psu)) #for aggregation we want psu as a number
+rand.df$female <- ifelse(rand.df$gender %in% "female", 1, 0)
+possCovars <- c(possCovars[!possCovars %in% c("ethnic2", "username", "gender", "state")], "female")
+
+# aggregate vars
+listVars <- ls(pattern="Vars") # there is a way to do this just from this list of values, but idk how offhand.
+expVars <- names(rand.df)[grepl("^(...|....)_(exp[0-9])|^rand_", names(rand.df))]
+pgpVars <- names(rand.df)[grepl("pgp", names(rand.df))]
+ag.vars <- unique(c(names(rand.df)[grepl("index", names(rand.df))], 
+             names(rand.df)[grepl("cw", names(rand.df))], 
+             allTrustVars, beneVars, bargVars, clashVars, 
+             cohesVars, contactVars, conVioEffVars, dispVars, 
+             disVars, otherVars, vioVars, threatVars, vioExpVars,
+             expVars, pgpVars, perspVars,
+             'treatment', 'community', 'survey', "psu", #"tr_resid",
+             possCovars, 
+             names(rand.df)[grepl("ethnic2[a-z]", names(rand.df))]))
+
+ag1 <- aggregate(rand.df[rand.df$survey %in% 0,ag.vars], by=list(comm=rand.df[rand.df$survey %in% 0,ag.vars]$community), mean,na.rm=T)
+ag2 <- aggregate(rand.df[rand.df$survey %in% 1,ag.vars], by=list(comm=rand.df[rand.df$survey %in% 1,ag.vars]$community), mean,na.rm=T)
+# warnings because "community" is factor and cannot be aggregated by itself...
+
+stopifnot(names(ag1)==names(ag2))
+names(ag1) <- paste0(names(ag1),"_base")
+names(ag2) <- paste0(names(ag2),"_end")
+```
+
+Merge to one big dataset.  Now have two versions of every variable: the baseline version, and the "_end" version for endline
+
+```{r}
+ag2[, c('treatment_end','psu_end', "comm_end")] <- NULL # remove things from ag2 that are also in ag1 so no useless duplicates
+ag.df<-as.data.frame(cbind(ag1,ag2))
+ag.df$state <- rand.df$state[match(ag.df$comm_base,rand.df$community)]
+ag.df$clash_index_end[is.na(ag.df$clash_in)] # if there is an NA in clash_index (no one even knew about conflict), make it 0
+stopifnot(mean(ag.df$clash_index_base)==mean(ag1$clash_index_base, na.rm=T))
+stopifnot(mean(ag.df$clash_index_end)==mean(ag2$clash_index_end, na.rm=T))
+names(ag.df)[names(ag.df) %in% c("comm_base", "treatment_base", "psu_base")] <- c("comm", "treatment","psu" )
+ag.df[,grepl("(survey|community)", names(ag.df))] <- NULL
+rm(ag1); rm(ag2)
+```
+
+
+# Now scale as 0-1 so that we can easily discuss them as % increase/decrease for MC report.
+
+Did this for individuals before aggregate, also doing it now for communities.  Before the DiD outcomes created, because we want the DiD outcome to be the change on a 0-1 scale. I f we did it after DiD outcomes created, the _change_ itself would be on the 0-1 scale.  And the scales would not be comparable.
+
+
+
+```{r}
+## re-scale before DiD outcome.  It puts both baseline and endline on 0-1, then asks about movement on that 0-1.  Otherwise, max score at baseline/endline would look like a big change when they are supposed to be the same thing.
+icVars <- names(ag.df)[grepl("_cw", names(ag.df))]
+
+ag.df[,icVars] <- reshape::rescaler(ag.df[,icVars],type="range")
+ag.df[,icVars] <- reshape::rescaler(ag.df[,icVars],type="range")
+```
+
+
+
+# Make the DiD outcomes.
+
+First need to make list & end exp vars that are tr-co for baseline and tr-co for endline.  
+
+Rand exp is not a "tr vs co".  Addressed in d-additiveIndices file.  
+(1) Made a variable describing the lm(randOutcome ~ randCondition) relationship at baseline and endline for each community. High values good. Now can be treated like a typical aggregate variable.  
+(2) Made variable for the % of each community saying "yes".  Can also be treated like a typical aggregate variable.
+
+```{r}
+# list exp
+ag.df$list_exp_base <- ag.df$list_exp1b_base - ag.df$list_exp1a_base
+ag.df$list_exp_end <- ag.df$list_exp1b_end - ag.df$list_exp1a_end
+ag.df[,names(ag.df)[grepl("list_exp1(a|b)", names(ag.df))]] <- NULL
+
+# end_exp: 1a goes to pastoralists, 1b goes to farmer's, 1c is generic.
+ag.df$end_expTR_end <- ifelse(is.na(ag.df$end_exp1a_end), ag.df$end_exp1b_end, ag.df$end_exp1a_end)
+ag.df$end_expTR_base <- ifelse(is.na(ag.df$end_exp1a_base), ag.df$end_exp1b_base, ag.df$end_exp1a_base)
+
+ag.df$end_exp_end <- ag.df$end_expTR_end - ag.df$end_exp1c_end
+ag.df$end_exp_base <- ag.df$end_expTR_base - ag.df$end_exp1c_base
+
+#ag.df[,c("comm",names(ag.df)[grepl("end_exp", names(ag.df))])]
+ag.df[,names(ag.df)[grepl("end_exp1(a|b)", names(ag.df))]] <- NULL 
+
+```
+
+Make DiD outcomes that are "[var]_end" - "[var]_base".
+
+```{r}
+ag.df[,sub("_end$", "", names(ag.df)[grepl("_end$",names(ag.df))])] <- ag.df[,grepl("_end", names(ag.df))] - ag.df[,grepl("_base", names(ag.df))]
+
+# test that worked right
+ag.df$test <- ag.df$cohes_index_end - ag.df$cohes_index_base
+stopifnot(ag.df$test==ag.df$cohes_index)
+ag.df$test <- ag.df$list_exp_end - ag.df$list_exp_base
+stopifnot(ag.df$test==ag.df$list_exp)
+ag.df$test <- NULL
+
+# pgp is only at endline, so remove pgp base vars
+ag.df[,names(ag.df)[grepl("(pgp_.*_base|pgp_[[:alpha:]]*$)", names(ag.df))]] <- NULL 
+
+```
+
+
+**************
+
+
+
+# Added Later - the Randomization Experiment pt2
+
+Instead of asking "did the relationship between % outgroup and saying yes change from baseline to endline?" Let's ask "Did more people say yes in the treatment group than the control group?"  The reason for this: in Treatment, "yes" was higher for every % outgroup, which means the Relationship between X & Y did not change, but looks like a treatment effect.  Just doesn't work because the 5% outgroup condition is supposed to be a calibrate/everyone says yes condition, but it didn't work.
+
+To measure %respondents saying yes at each %outgroup members (i.e. experimental condition): first I aggregated to community-condition level with outcomes that tell us (1) % who say yes in each condition at BASELINE and (2) the % who says yes in each condition at ENDLINE.  Then I aggregated it to the community-level so it could merge with ag.df.  The two are mathematically equivalent.
+
+```{r, include=F}
+# aggregate to treatment/condition level, outcomes are (1) % who say yes in each condition at BASELINE and (2) the % who says yes in each condition at ENDLINE.
+table(rand.df$rand_condition, exclude=c())
+rand.df <- rand.df[!is.na(rand.df$rand_condition),]
+
+new.df <- rand.df %>%
+  select(treatment,survey, community, rand_outcome, rand_condition, state, psu) %>%
+  dplyr::group_by(community, treatment, rand_condition, state, psu) %>%
+  dplyr::summarise(randOut_end=mean(rand_outcome[survey %in% 1], na.rm=T), 
+                   randOut_base=mean(rand_outcome[survey %in% 0]),
+                   randOut=randOut_end-randOut_base) %>%
+  as.data.frame()
+
+#summary(lm(randOut~treatment+factor(rand_condition)+state, new.df))
+# looks right, now to make it a randomization test
+
+#####
+# But how to do this in a way that lets me easily test it with NPC?  Not possible now, diff datasets.  Maybe if we collapse this into a comm-level with columns for: (1) increase at 5%, (2) increase at 25%, (3) increase at 50%, (4) increase at 75%, and (5) average increase.  Can then merge/cbind with ag.df.  Will be functionally identical to above, but at ag.df level!
+####
+merge.df <- new.df %>% dplyr::group_by(community) %>%
+  summarise(r5=randOut[rand_condition %in% 5],
+            r25=randOut[rand_condition %in% 25],
+            r50=randOut[rand_condition %in% 50],
+            r75=randOut[rand_condition %in% 75],
+            r5_base=randOut_base[rand_condition %in% 5],
+            r25_base=randOut_base[rand_condition %in% 25],
+            r50_base=randOut_base[rand_condition %in% 50],
+            r75_base=randOut_base[rand_condition %in% 75],
+            r5_end=randOut_end[rand_condition %in% 5],
+            r25_end=randOut_end[rand_condition %in% 25],
+            r50_end=randOut_end[rand_condition %in% 50],
+            r75_end=randOut_end[rand_condition %in% 75]
+            ) %>%
+  as.data.frame()
+merge.df$rMean <- rowMeans(merge.df[c('r5','r25','r50','r75')])
+merge.df$rMean_base <- rowMeans(merge.df[c('r5_base','r25_base','r50_base','r75_base')])
+merge.df$rMean_end <- rowMeans(merge.df[c('r5_end','r25_end','r50_end','r75_end')])
+
+ag.df <- merge(ag.df, merge.df, all=T, by.x="comm", by.y="community")
+rm(new.df)
+rm(merge.df)
+```
+
+
+chris: check if this is different than the rand_outcome variables that should have been created when aggregating and making DiD outcomes.
+
+
+# Moved here later - reversing Indices where LOW is good
+
+Was previously doing this in the analysis file and in the plot files, but is just better to do it here.  High is now GOOD for all variables.
+
+```{r}
+ag.df$psu <- as.factor(as.character(ag.df$psu))
+
+# need to reverse some cols so that HIGH is GOOD for all variables.  For these variables right now, HIGH is BAD.  This makes HIGH GOOD.
+revCols <- c("clash_index", "clash_cw", "clash_cw_base", "clash_cw_end",
+             "threat_index", "threat_cw", "threat_cw_base", "threat_cw_end",
+             "in_index", "in_cw", "in_cw_base", "in_cw_end",
+             "list_exp", "list_exp_base", "list_exp_end")
+ag.df[,revCols] <- ag.df[,revCols]*-1
+
+```
+
+
+# ADDED LATER - all_index with Inverse Covariance Weighting
+
+What if we combined all the outcomes in ag.df using inverse covariance weighting?  Does that make sense?
+
+Slightly difference than NPC.  NPC does not weight them, though it will account for their interdependence because really correlated things will be correlated in the null distribution, making extreme values on both less rare than if they were independent.
+
+Not sure how NPC and icw results should be interpreted differently...they should really tell the same story.
+
+Chris: Not sure this is right.
+Chris: NOT UPDATED FOR ACADEMIC PAPER.
+
+```{r}
+allIndices <- c("x_cw", "cohes_cw", "pgp_amount_end",
+                "pgp_donate_end", "contactOnly_cw", "in_cw",
+                "resolve_cw", "list_exp", "rMean", "end_exp")
+# chris: if we are comfortable, could replace rand_lm with rMean, the diff outcome of the rando_exp.  Or add it.
+
+matStand <- function(x, sgroup = rep(TRUE, nrow(x))){
+  for(j in 1:ncol(x)){
+    x[,j] <- (x[,j] - mean(x[sgroup,j]))/sd(x[sgroup,j])
+  }
+  return(x)
+}
+
+icwIndex <- function(	xmat,
+                      wgts=rep(1, nrow(xmat)),
+                      revcols = NULL,
+                      sgroup = rep(TRUE, nrow(xmat))){
+  X <- matStand(xmat, sgroup)
+  if(length(revcols)>0){
+    X[,revcols] <-  -1*X[,revcols]
+  }
+  i.vec <- as.matrix(rep(1,ncol(xmat)))
+  Sx <- cov.wt(X, wt=wgts)[[1]]
+  weights <- solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)
+  index <- t(solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)%*%t(X))
+  return(list(weights = weights, index = index))
+}
+
+ag.df$control <- ifelse(ag.df$treatment == 1, 0, 1)
+ic2.fun <- function(vars)
+{
+  x <- ag.df[,vars]
+  x <- zoo::na.aggregate(x)
+  out_cw <- icwIndex(xmat=x, sgroup=as.logical(ag.df$control))
+  print(cor(x))
+  print(out_cw$weights)
+  return(as.vector(out_cw$index))
+}
+
+baseIndices <- c(paste0(allIndices[grepl("cw", allIndices)], "_base"), allIndices[!grepl("cw", allIndices)])
+endIndices <- sub("_base", "_end", baseIndices)
+ag.df$all_cw_base <- reshape::rescaler(ic2.fun(baseIndices), type="sd")
+ag.df$all_cw_end <- reshape::rescaler(ic2.fun(endIndices), type="sd")
+ag.df$all_cw <- ag.df$all_cw_end-ag.df$all_cw_base
+
+
+# no pgg
+ag.df$all2_cw <- ic2.fun(allIndices[-c(3,4)])
+```
+
+
+# ADDED LATER - rank-based outcomes
+
+Idea from Ekrem.  Remember to thank him in paper.
+
+```{r}
+rankCols <- c(names(ag.df)[grepl("_cw", names(ag.df))], 
+              "pgp_amount_end", "pgp_donate_end", 
+              'list_exp', 'rMean', 'end_exp') # still more outcomes than I care about, but that's okay
+
+ag.df[,paste0(rankCols, "_rank")] <- sapply(ag.df[,rankCols], rank)
+
+```
+
+
+# Save
+
+```{r}
+save(rand.df, file="rand_df.Rdata")
+rm(list=ls(pattern="(rand|base|end|^df|^i$|^lm|lm$|new_fmla|test)"))
+save.image(file="f-aggregateComms_ap.Rdata")
+
+```
+
+
+
+
+# not included other ideas
+
+chris: not good ideas here that I either didn't implement or started to implement before realizing they make no sense.
+
+What happens if we make community level icw indices?
+What happens if we do covariate adjustment at the individual level before aggregating?
+Can I somehow make an individual-level index with the xVars and the survey experiments?

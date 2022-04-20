@@ -1,0 +1,213 @@
+site_num,farm_past,name,site_name,state,phone,gender,age,ethnic,religion,z,part,full
+51,farmers,Ayele Usman,Ashige,nas,9092578338,male,40,Koro,christian,1,0,1
+51,farmers,Aloko Zhe Bitrus,Ashige,nas,8090689577,male,30,Migili,christian,1,0,1
+51,farmers,Nuhu Kaba,Ashige,nas,8107102550,male,30,Koro,christian,1,0,1
+51,farmers,Ishaya Anthony,Ashige,nas,9094111547,male,18,Koro,christian,1,0,1
+51,farmers,Augustine Danladi Godwin,Ashige,nas,8108828347,male,33,Migili,christian,1,0,1
+51,farmers,Macheal Danladi Agube,Ashige,nas,7065862286,male,36,Koro,christian,1,0,1
+51,farmers,Saratu mala iwa,Ashige,nas,8101455671,female,25,koro,christian,1,0,1
+51,farmers,Makpo Gimba,Ashige,nas,8175277862,female,65,Koro,christian,1,0,1
+51,farmers,Paulina Samaila,Ashige,nas,8187749022,female,21,Koro,christian,1,0,1
+51,farmers,Suzana Sunday,Ashige,nas,11111111111,female,60,Koro,christian,1,0,1
+51,farmers,Zana Danbala,Ashige,nas,81111111111,female,30,Koro,christian,1,0,1
+51,farmers,Victoria Joseph,Ashige,nas,81111111111,female,40,Koro,christian,1,0,1
+51,farmers,Salina Daniel,Ashige,nas,8104475169,female,45,Koro,christian,1,0,1
+51,farmers,Sarah Livinus,Ashige,nas,9111111111,female,25,Koro,christian,1,0,1
+51,farmers,Maria Jacob,Ashige,nas,8027588232,female,40,Koro,christian,1,0,1
+51,farmers,Rhoda Agidi,Ashige,nas,91111111111,female,60,Koro,christian,1,0,1
+51,pastoralists,Hussaini umar,Ashige,nas,8181458079,male,35,fulani,muslim,1,0,1
+51,pastoralists,mohamadu Adamu,Ashige,nas,11111111111,male,27,fulani,muslim,1,0,1
+51,pastoralists,Alhaji Adamu Abubakar,Ashige,nas,80159768595,male,60,fulani,muslim,1,0,1
+51,pastoralists,Adamu Abubakar,Ashige,nas,8107704716,male,30,fulani,muslim,1,0,1
+51,pastoralists,Damina Muhammadu,Ashige,nas,9011111111,male,60,fulani,muslim,1,0,1
+51,pastoralists,Hamidu Sani,Ashige,nas,9022072844,male,38,fulani,muslim,1,0,1
+51,pastoralists,Ibrahim Audu,Ashige,nas,9022072844,male,25,fulani,muslim,1,0,1
+51,pastoralists,Molereic Aliyu,Ashige,nas,8055529601,male,55,fulani,muslim,1,0,1
+51,pastoralists,Isiyaku Idris,Ashige,nas,8117441356,male,50,fulani,muslim,1,0,1
+51,pastoralists,Halfsat ibrahim,Ashige,nas,11111111111,female,30,fulani,muslim,1,0,1
+51,pastoralists,Hasiya Musa,Ashige,nas,9111111111,female,25,fulani,muslim,1,0,1
+51,pastoralists,Halima Hamza,Ashige,nas,9111111111,female,20,fulani,muslim,1,0,1
+51,pastoralists,Asabe Musa,Ashige,nas,9022072844,female,26,fulani,muslim,1,0,1
+51,pastoralists,Larai Musa,Ashige,nas,91111111111,female,28,fulani,muslim,1,0,1
+51,pastoralists,Rekiya Musa,Ashige,nas,7081207818,female,25,fulani,muslim,1,0,1
+51,pastoralists,Halima Landi,Ashige,nas,8111111111,female,20,fulani,muslim,1,0,1
+51,pastoralists,Zulai Ardo,Ashige,nas,9022072844,female,47,fulani,muslim,1,0,1
+20,farmers,Aliyu abubakar,Assakio,nas,8064682572,male,44,Migili,muslim,1,0,1
+20,pastoralists,Abu Galma,Assakio,nas,8083292136,male,25,fulani,muslim,1,0,1
+20,pastoralists,ibrahim ishaku,Assakio,nas,11111111111,male,40,fulani,muslim,1,0,1
+20,farmers,Osepishi Ogoruwe,Assakio,nas,7085968459,male,48,Alago,christian,1,0,1
+20,farmers,Abdulkareem Dauda,Assakio,nas,8053636329,male,22,Alago,muslim,1,0,1
+20,farmers,priscilla Alekufo,Assakio,nas,8024330366,female,24,Alago,christian,1,0,1
+20,farmers,kushumela Aduga,Assakio,nas,7011499361,female,30,Alago,christian,1,0,1
+20,farmers,Bilkisu Shehu,Assakio,nas,8124595991,female,22,Alago,muslim,1,0,1
+20,farmers,Rhoda Maikudi,Assakio,nas,8086124237,female,38,Angas,christian,1,0,1
+20,farmers,Nishi Godwin,Assakio,nas,8023491410,female,38,Ankwai,christian,1,0,1
+50,farmers,shawiya Amadu,Gidan Buba,nas,11111111111,female,21,Eggon,muslim,1,0,1
+50,farmers,Marian Ali,Gidan Buba,nas,12345678900,female,25,Rindre,muslim,1,0,1
+50,farmers,Mercy Michael,Gidan Buba,nas,12345678900,female,27,eggon,christian,1,0,1
+50,farmers,Aisha Abdulrazak,Gidan Buba,nas,1234567890,female,20,eggon,muslim,1,0,1
+50,farmers,Hafsat Salisu,Gidan Buba,nas,7058150846,female,28,eggon,muslim,1,0,1
+50,farmers,Hadiza Yahaya,Gidan Buba,nas,8083926579,female,30,Randare,muslim,1,0,1
+50,pastoralists,zubairu  Adamu,Gidan Buba,nas,8058281420,male,21,fulani,muslim,1,0,1
+50,pastoralists,Ibrahim Garba,Gidan Buba,nas,8100000000,male,40,fulani,muslim,1,0,1
+50,pastoralists,Mulmuni Garba,Gidan Buba,nas,8111111111,male,35,fulani,muslim,1,0,1
+50,pastoralists,Yakubu Adamu,Gidan Buba,nas,7055895843,male,36,fulani,muslim,1,0,1
+50,pastoralists,Abubakar Adamu,Gidan Buba,nas,9051723069,male,37,fulani,muslim,1,0,1
+50,pastoralists,karimatu sule,Gidan Buba,nas,8115576037,female,25,fulani,muslim,1,0,1
+50,pastoralists,Rakiya jibrin,Gidan Buba,nas,8154321002,female,30,fulani,muslim,1,0,1
+50,pastoralists,Hannatu Ali,Gidan Buba,nas,11111111111,female,29,fulani,muslim,1,0,1
+50,pastoralists,Halfatu Tata,Gidan Buba,nas,9050453396,female,60,fulani,muslim,1,0,1
+50,pastoralists,Salamatu Saleh,Gidan Buba,nas,12345678900,female,38,fulani,muslim,1,0,1
+50,pastoralists,Hajiya Kande,Gidan Buba,nas,12345678900,female,30,fulani,muslim,1,0,1
+50,pastoralists,Suwaiba Jibrin,Gidan Buba,nas,11111111111,female,40,fulani,muslim,1,0,1
+10,farmers,Sanni Hassan,Loko,nas,11111111111,male,42,agatu,muslim,1,0,1
+10,farmers,sanni loko,Loko,nas,11111111111,male,28,hausa,muslim,1,0,1
+10,farmers,Sarkin Baki,Loko,nas,1234567890,male,63,hausa,muslim,1,0,1
+10,farmers,shuaibu Baba,Loko,nas,7056615035,male,52,AFO,muslim,1,0,1
+10,farmers,Tababa Sarkinkwata,Loko,nas,1234567890,female,58,hausa,muslim,1,0,1
+10,farmers,Haj. Ladi Jakadiyar Sarki,Loko,nas,8071631388,female,70,hausa,muslim,1,0,1
+10,farmers,Hassana mohammed,Loko,nas,11111111111,female,50,baribari,muslim,1,0,1
+4,farmers,Alaku Audu Abraham,Tudun Adabu,nas,8186169609,male,30,eggon,christian,1,0,1
+4,farmers,JOSEPH KUJEH,Tudun Adabu,nas,8188644450,male,25,eggon,christian,1,0,1
+4,farmers,Saliu Yunisa,Tudun Adabu,nas,7032196343,male,26,eggon,muslim,1,,1
+4,farmers,Abdullahi ibrahim,Tudun Adabu,nas,8094941792,male,21,eggon,muslim,1,,1
+4,farmers,Alh Haruna Aku,Tudun Adabu,nas,8189398771,male,46,eggon,muslim,1,,1
+4,farmers,Muhammadu Abdullahi,Tudun Adabu,nas,8094828707,male,65,eggon,muslim,1,,1
+4,farmers,Salisu Tanko Aku,Tudun Adabu,nas,7089331296,male,32,eggon,muslim,1,,1
+4,farmers,Afiku Kuje,Tudun Adabu,nas,8.11E+11,male,50,eggon,christian,1,0,1
+4,farmers,Usman Malam,Tudun Adabu,nas,9093986671,male,45,eggon,muslim,1,0,1
+4,farmers,Rose Daniel,Tudun Adabu,nas,11111111111,female,25,eggon,christian,1,0,1
+4,farmers,Margret Benjamine,Tudun Adabu,nas,8111111111,female,34,eggon,christian,1,0,1
+4,farmers,Mary Abaku,Tudun Adabu,nas,9094111362,female,30,eggon,christian,1,0,1
+4,pastoralists,Gamla Auta,Tudun Adabu,nas,8110838593,male,50,fulani,muslim,1,0,1
+4,pastoralists,Sa'adu Usman,Tudun Adabu,nas,8072553489,male,45,fulani,muslim,1,0,1
+4,pastoralists,Abubakar sule,Tudun Adabu,nas,8152522130,male,50,fulani,muslim,1,0,1
+4,pastoralists,Mahmuda Jibril,Tudun Adabu,nas,12345678900,male,50,fulani,muslim,1,0,1
+4,pastoralists,Alhjai Umaru,Tudun Adabu,nas,12345678900,male,50,fulani,muslim,1,0,1
+4,pastoralists,Alhaji Bako,Tudun Adabu,nas,8111111111,male,73,fulani,muslim,1,0,1
+4,pastoralists,Hassan Bako,Tudun Adabu,nas,9050372454,male,25,fulani,muslim,1,0,1
+4,pastoralists,Alh Aliyu Ahmadu,Tudun Adabu,nas,8131533778,male,60,fulani,muslim,1,0,1
+4,pastoralists,Alh Abdullahi Hassan,Tudun Adabu,nas,8188979083,male,55,fulani,muslim,1,0,1
+4,pastoralists,ADAMA ABDULLAHI,Tudun Adabu,nas,7062628470,female,30,fulani,muslim,1,0,1
+4,pastoralists,Ademu Mariam,Tudun Adabu,nas,9091250417,female,37,fulani,muslim,1,0,1
+4,pastoralists,jumai magaji,Tudun Adabu,nas,8011221122,female,40,fulani,muslim,1,0,1
+4,pastoralists,Ismaila Hassan,Tudun Adabu,nas,8172878721,female,28,fulani,muslim,1,0,1
+4,pastoralists,Ramatu Adamu,Tudun Adabu,nas,9037890484,female,38,fulani,muslim,1,0,1
+4,pastoralists,Habiba Saidu,Tudun Adabu,nas,8037314594,female,20,fulani,muslim,1,0,1
+4,pastoralists,Jummai Abdullahi,Tudun Adabu,nas,7058604489,female,45,fulani,muslim,1,0,1
+4,pastoralists,Hannatu Muhammadu,Tudun Adabu,nas,7055905581,female,49,fulani,muslim,1,0,1
+4,pastoralists,Fatima Muhammadu,Tudun Adabu,nas,8111111111,female,19,fulani,muslim,1,0,1
+4,pastoralists,safiya iliyasu,Tudun Adabu,nas,1.11E+11,female,20,fulani,muslim,1,0,1
+32,farmers,Iorkyaa door,Anyiin,ben,7059711220,male,21,tiv,christian,1,,1
+32,farmers,Benjamin ayor,Anyiin,ben,8155932508,male,39,tiv,christian,1,,1
+32,farmers,Orbee Awashue,Anyiin,ben,7059304928,male,63,tiv,christian,1,,1
+32,farmers,Theresa Ormea,Anyiin,ben,8075276982,female,28,tiv,christian,1,,1
+32,pastoralists,Kudore Isa,Anyiin,ben,8029325899,male,30,fulani,muslim,1,,1
+32,pastoralists,alh Biniyo,Anyiin,ben,7082234564,male,41,fulani,muslim,1,,1
+32,pastoralists,Usman Ardo Ture,Anyiin,ben,7013448099,male,34,fulani,muslim,1,,1
+32,pastoralists,Ibrahim Abdullahi,Anyiin,ben,7083502543,male,36,fulani,muslim,1,,1
+32,pastoralists,Fiyayo Laulo,Anyiin,ben,8086556086,male,42,fulani,muslim,1,,1
+32,pastoralists,Yuguda Usaini,Anyiin,ben,8113178842,male,28,fulani,muslim,1,,1
+32,pastoralists,Hauwa'u Iliyasu,Anyiin,ben,8127101375,female,23,fulani,muslim,1,,1
+35,farmers,terzungwe tswerga,Mbaku,ben,8097112260,male,22,tiv,christian,1,,1
+35,farmers,Aguleh Christopher,Mbaku,ben,8172967360,male,35,tiv,christian,1,0,1
+35,farmers,EMMANUEL TYOSHIO,Mbaku,ben,7012239558,male,43,tiv,christian,1,0,1
+35,farmers,ihyande bufu,Mbaku,ben,7085814410,male,55,tiv,christian,1,0,1
+35,farmers,zungwega samuel,Mbaku,ben,7083398409,male,30,tiv,christian,1,,1
+35,farmers,EMMANUEL IYUADA,Mbaku,ben,8126563726,male,42,tiv,christian,1,0,1
+35,farmers,TYOSHOM BAWA,Mbaku,ben,8145013924,male,48,tiv,christian,1,,1
+35,farmers,APESUGH UTWA,Mbaku,ben,8089609881,male,59,tiv,christian,1,,1
+35,farmers,ageva joe,Mbaku,ben,7032812685,male,43,tiv,christian,1,0,1
+35,farmers,Matthew Awuhe,Mbaku,ben,8110998579,male,29,tiv,christian,1,,1
+35,farmers,Philip Gbaguma,Mbaku,ben,7011603274,male,25,tiv,christian,1,,1
+35,farmers,akuuete anande,Mbaku,ben,7034500926,female,25,tiv,christian,1,,1
+35,farmers,CATHERINE AKENDE,Mbaku,ben,8138723247,female,40,tiv,christian,1,,1
+35,farmers,Elizabeth Ageva,Mbaku,ben,7013743284,female,40,tiv,christian,1,0,1
+35,farmers,HEMBADOON VEAN,Mbaku,ben,7010603349,female,28,tiv,christian,1,,1
+21,farmers,Uluva Peter,Torkula,ben,7039263437,male,41,tiv,christian,1,0,1
+21,farmers,Jirgba Torkula,Torkula,ben,9034985910,male,35,tiv,christian,1,0,1
+21,farmers,Atoh samuel,Torkula,ben,8153242344,male,38,tiv,christian,1,0,1
+21,farmers,RONALD TACHIA.,Torkula,ben,7063442489,male,35,tiv,christian,1,0,1
+21,farmers,James Iortyom,Torkula,ben,8130937244,male,42,tiv,christian,1,,1
+21,farmers,Samuel Shausu,Torkula,ben,8107197001,male,25,tiv,christian,1,,1
+21,farmers,Elijah Tsebo,Torkula,ben,7080423882,male,51,tiv,christian,1,,1
+21,farmers,James iortyom,Torkula,ben,8130937244,female,20,tiv,christian,1,,1
+21,farmers,Ruth YINA,Torkula,ben,7032348803,female,60,tiv,christian,1,0,1
+21,farmers,Evelyn Ayiman,Torkula,ben,9096386915,female,26,tiv,christian,1,,1
+21,farmers,Thabita Mgbough,Torkula,ben,9034985910,female,19,tiv,christian,1,0,1
+21,farmers,ELIZABETH UGUMA,Torkula,ben,8111441515,female,60,tiv,christian,1,,1
+21,farmers,VCTORIA LAFIA,Torkula,ben,7055020669,female,25,tiv,christian,1,0,1
+21,farmers,mwarlave mmbei.,Torkula,ben,9035757978,female,29,tiv,christian,1,,1
+21,farmers,veronica dyege,Torkula,ben,7053198454,female,32,tiv,christian,1,0,1
+21,farmers,HELEN KUNGE,Torkula,ben,9051923864,female,38,tiv,christian,1,,1
+21,farmers,EUCHARIA OSONDU,Torkula,ben,8122437092,female,26,tiv,christian,1,,1
+22,farmers,Terms pila,Zongo,ben,8165567277,male,35,tiv,christian,1,,1
+22,farmers,Innocent Iorkyaa,Zongo,ben,7068876219,male,56,tiv,christian,1,,1
+22,farmers,Liambee Solomon,Zongo,ben,8169212692,male,29,tiv,christian,1,0,1
+22,farmers,Ukor Bagu,Zongo,ben,8174533579,male,28,tiv,christian,1,,1
+22,farmers,Emmanuel Mbakuur,Zongo,ben,7064975059,male,30,tiv,christian,1,0,1
+22,farmers,Atom Tsegba,Zongo,ben,8174533579,male,21,tiv,christian,1,,1
+22,farmers,Aonduna tsebo,Zongo,ben,8130131725,female,50,tiv,christian,1,,1
+22,farmers,yadoo zendesha,Zongo,ben,9050784393,female,30,tiv,christian,1,,1
+22,farmers,Esther Nyiekaa,Zongo,ben,8166593219,female,30,tiv,christian,1,,1
+22,farmers,Utsegyor Audu,Zongo,ben,9050784393,female,35,tiv,christian,1,,1
+22,farmers,ROSELINE JACOB,Zongo,ben,7062166988,female,20,tiv,christian,1,,1
+22,farmers,laadi sunday,Zongo,ben,8170102743,female,25,tiv,christian,1,,1
+22,farmers,juliana ortese,Zongo,ben,8140406807,female,27,tiv,christian,1,,1
+22,farmers,Blessing Gbom,Zongo,ben,7067448568,female,27,tiv,christian,1,,1
+51,farmers,Dauda Akuba,Ashige,nas,8168763595,male,25,koro,christian,2,0,0
+51,farmers,Aguda Agidi,Ashige,nas,11111111111,male,90,migili(koro),other,2,,0
+51,farmers,Mathias Look Yakubu,Ashige,nas,8169691309,male,30,Koro,christian,2,,0
+51,farmers,Aje Iwa,Ashige,nas,1.11E+11,male,85,migili(koro),christian,2,0,0
+51,farmers,Fidelis E Delle,Ashige,nas,8163853157,male,38,Migili,christian,2,,0
+51,farmers,Danasabe Jacob,Ashige,nas,8166284834,male,32,Koro,christian,2,,0
+51,farmers,Sunday Elisha,Ashige,nas,12345678900,male,38,Migili,other,2,,0
+51,farmers,Paulina Godwin,Ashige,nas,8181094255,female,45,Koro,christian,2,0,0
+1,farmers,ILIYASU MOHAMMED,Rukubi,nas,8151225746,male,46,hausa,muslim,2,0,0
+1,farmers,Dauda Ambana,Rukubi,nas,8158062389,male,50,Angas,christian,2,,0
+1,farmers,musa sule Dan Asumi,Rukubi,nas,7059664532,male,26,agatu,muslim,2,,0
+1,farmers,Pius Madaki,Rukubi,nas,9050806220,male,60,Chiawe,christian,2,,0
+1,farmers,Isogah Osokwu,Rukubi,nas,9052422529,male,25,agatu,christian,2,,0
+1,farmers,Halima musa,Rukubi,nas,7051767798,female,30,idoma,muslim,2,0,0
+1,farmers,Safiya Adamu,Rukubi,nas,12345678900,female,40,agatu,muslim,2,0,0
+1,farmers,Hadiza jibril,Rukubi,nas,9051369261,female,45,agatu,muslim,2,0,0
+1,pastoralists,alhaji haruna,Rukubi,nas,11111111111,male,40,fulani,muslim,2,0,0
+1,pastoralists,Dejai Bairaje,Rukubi,nas,7093251780,female,25,fulani,muslim,2,0,0
+4,pastoralists,Idris mohammed,Tudun Adabu,nas,8172248107,male,32,fulani,muslim,2,0,0
+4,pastoralists,Husaini Bako,Tudun Adabu,nas,8.11E+11,male,25,fulani,muslim,2,0,0
+4,pastoralists,Adama Ibrahim,Tudun Adabu,nas,8.11E+11,female,30,fulani,muslim,2,0,0
+4,pastoralists,Aisha Lamido,Tudun Adabu,nas,81111111111,female,30,fulani,muslim,2,0,0
+4,pastoralists,halimatu usman,Tudun Adabu,nas,11111111111,female,27,fulani,muslim,2,,0
+21,farmers,Emberga Hanseza,Torkula,ben,8163947990,male,70,tiv,christian,2,,0
+21,farmers,Teryila,Torkula,ben,8062748994,male,29,tiv,christian,2,,0
+21,farmers,kaha james,Torkula,ben,8160635687,male,57,tiv,christian,2,,0
+21,farmers,terhungwa kaha,Torkula,ben,9038091137,male,32,tiv,christian,2,,0
+21,farmers,Atoor  Martins,Torkula,ben,8143013787,male,21,tiv,christian,2,,0
+21,farmers,Iortyom lazarus,Torkula,ben,8065496601,male,37,tiv,christian,2,,0
+21,farmers,Abigail Tsuah,Torkula,ben,1.11E+11,female,20,tiv,christian,2,,0
+21,farmers,Eunice uguma,Torkula,ben,8111441515,female,45,tiv,christian,2,,0
+21,farmers,Elizabeth Yua,Torkula,ben,9034985910,female,50,tiv,christian,2,,0
+21,farmers,MBADOON ANYIMEM,Torkula,ben,8111451515,female,70,tiv,christian,2,,0
+21,farmers,Rebecca songu.,Torkula,ben,8132523547,female,30,tiv,christian,2,,0
+21,farmers,Patricia Francis,Torkula,ben,8188328944,female,33,tiv,christian,2,,0
+21,farmers,kahemban usondu.,Torkula,ben,8111235670,female,45,tiv,christian,2,,0
+35,farmers,moses tswarga,Mbaku,ben,8127239467,male,40,tiv,christian,2,,0
+35,farmers,Sunday Tyotsu,Mbaku,ben,8175613838,male,35,tiv,christian,2,,0
+35,farmers,Orfe Iyo,Mbaku,ben,8174842591,male,25,tiv,christian,2,,0
+35,farmers,apiam daniel,Mbaku,ben,7080395238,male,40,tiv,christian,2,,0
+35,farmers,orkpe orshengev,Mbaku,ben,8106898609,male,45,tiv,christian,2,,0
+35,farmers,oliver agule,Mbaku,ben,8106898609,male,30,tiv,christian,2,0,0
+35,farmers,MLUMUN PHILIP,Mbaku,ben,8173655640,female,20,tiv,christian,2,,0
+22,farmers,Aondoaver Ikpum,Zongo,ben,7034875242,male,29,tiv,christian,2,,0
+22,farmers,abdulahi bagu,Zongo,ben,1111111111,male,38,tiv,christian,2,,0
+22,farmers,emma mbakwu,Zongo,ben,7064975059,male,42,tiv,christian,2,,0
+22,farmers,Michael Yar,Zongo,ben,9035437329,male,62,tiv,christian,2,0,0
+22,farmers,jacob tyo,Zongo,ben,7062166988,male,23,tiv,christian,2,,0
+22,farmers,Mbakuuv Godwin,Zongo,ben,9034443090,male,38,tiv,christian,2,,0
+22,farmers,Catherine Iyorfa,Zongo,ben,8146826684,female,30,tiv,christian,2,0,0
+22,farmers,Veronica Yongough,Zongo,ben,8061205957,female,45,tiv,christian,2,,0
+22,farmers,Dooyum Orbunde,Zongo,ben,7034875242,female,22,tiv,christian,2,,0
+22,pastoralists,Alhaji Shagari,Zongo,ben,8168291779,male,38,fulani,muslim,2,0,0
+22,pastoralists,ibrahim  musa,Zongo,ben,8158785896,male,21,fulani,muslim,2,,0
+22,pastoralists,MOHAMMED MOHAMMED,Zongo,ben,9054073082,male,19,fulani,muslim,2,,0
+22,pastoralists,Musa Dabo,Zongo,ben,7053331005,male,37,fulani,muslim,2,,0

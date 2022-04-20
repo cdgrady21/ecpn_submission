@@ -1,0 +1,594 @@
+---
+title: "ecpn_diff-in-diff plots"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../c_creating_dataframes/rand_df.Rdata")
+load("../b_creating_outcomes/f2-panelData.Rdata")
+
+
+#until I figure out insecurity, reverse it.
+ag.df$in_cw_base <- ag.df$in_cw_base*-1
+ag.df$in_cw_end <- ag.df$in_cw_end*-1
+panel.df$in_cw_y0 <- panel.df$in_cw_y0*-1
+panel.df$in_cw_y1 <- panel.df$in_cw_y1*-1
+
+ag.df$list_exp_base <- ag.df$list_exp_base*-1
+ag.df$list_exp_end <- ag.df$list_exp_end*-1
+
+##########
+# Plot functions - ggplot showing each community before and after, coloring by site.
+## Can also color by farmer-pastoralist, Nas/Ben, etc.
+##########
+
+#The vars to plot.
+ag.vars <- c('allTrust_cw', 'contactOnly_cw', "in_cw", 'pgp_amount_end', 'pgp_donate_end',
+                               'threat_cw', 'cohes1_cw', 'cohes2_cw',
+                               'bene_cw', 'clash_cw', "barg_cw",
+             'list_exp', 'rand_lm', 'rMean', 'end_exp')
+
+## need to reverse list exp so high is bad.  It just looks weird to have low be bad.
+#ag.df[,c("list_exp", "list_exp_base", "list_exp_end")] <- ag.df[,c("list_exp", "list_exp_base", "list_exp_end")]*-1
+
+## individual
+ind.vars <- c('allTrust_cw', 'contactOnly_cw', "in_cw", 'pgp_amount_y1', 'pgp_donate_y1',
+                               'threat_cw', 'cohes1_cw', 'cohes2_cw',
+                               'bene_cw', 'clash_cw', "barg_cw")
+
+#Aggregate Plot df
+base <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_base"), "treatment", "state", "psu", "comm")]
+names(base) <- sub("_base", "", names(base))
+base$survey <- "Baseline"
+end <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_end"), "treatment", "state", "psu", "comm")]
+names(end) <- sub("_end", "", names(end))
+end$survey <- "Endline"
+plot.df <- rbind(base,end)
+plot.df$comm <- gsub("\\.", "", plot.df$comm)
+
+# get mean and sd at site-level with dplyr
+plot.df$state <- as.character(plot.df$state) # save me trouble with dplyr later
+plot.df$psu <- as.numeric(as.character(plot.df$psu))
+plot1.df<-plot.df %>% 
+  dplyr::group_by(psu,survey) %>%  # chris: could add state here to differentiate nas from ben
+  dplyr::summarise_all(list(~mean(.), ~sd(.))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+plot.df$Treatment<-ifelse(plot.df$treatment %in% 1, "ECPN", "Non-ECPN")
+plot1.df$Treatment<-ifelse(plot1.df$treatment_mean %in% 1, "ECPN", "Non-ECPN")
+names(plot1.df) <- gsub("_mean", "", names(plot1.df))
+
+#plot.df$State <- ifelse(plot.df$state %in% "nas", "Nas", "Ben")
+#plot.df$plotID <- interaction(plot.df$Treatment, plot.df$State)
+
+
+# Individual Plot df
+base1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "community", "id_num")]
+names(base1) <- sub("_y0", "", names(base1))
+base1$survey <- "Baseline"
+end1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "community", "id_num")]
+names(end1) <- sub("_y1", "", names(end1))
+end1$survey <- "Endline"
+plot.df1 <- rbind(base1,end1)
+plot.df1$state <- as.character(plot.df1$state) # save me trouble with dplyr later
+plot.df1$community <- as.character(plot.df1$community)
+
+
+# Panel Plot df
+base2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "committee", "community", "id_num")]
+names(base2) <- sub("_y0", "", names(base2))
+base2$survey <- "Baseline"
+end2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "committee", "community", "id_num")]
+names(end2) <- sub("_y1", "", names(end2))
+end2$survey <- "Endline"
+plot.df2 <- rbind(base2,end2)
+plot.df2$Treatment <- interaction(plot.df2$treatment, plot.df2$committee)
+levels(plot.df2$Treatment) <- c("Control", "Non-Part", NA, "Part")
+plot.df2$Treatment <- ordered(plot.df2$Treatment, levels=c("Part", "Non-Part", "Control"))
+plot.df2$state <- as.character(plot.df2$state) # save me trouble with dplyr later
+plot.df2$community <- as.character(plot.df2$community)
+
+
+# Fixing colors
+grps <-c("ECPN","Non-ECPN","Part", "Non-Part", "Control")
+color.codes<-as.character(c("#FC8D59", "#00BFC4", "#FC8D59", "dark red", "#00BFC4"))
+#ECPN = "#FC8D59", Non-ECPN = "#00BFC4", Part="FC8D59", Non-Part="green", Control="#00BFC4")
+#plot.df$colors <- c("#00BFC4","#00BFC4","#FC8D59","#FC8D59")
+#plot.df1$colors <- c("#FC8D59","#FC8D59","#00BFC4","#00BFC4")
+#plot.df2$colors <- c("#FC8D59","#FC8D59", "green", "green", "#FFFFBF","#FFFFBF")
+
+# The main Plot function chris: still need to make SE errorbars same color as lines...
+# gg line plot
+plot.fun<-function(var, group, thedf, time, title, xlab, ylab, ymin, ymax){
+  ggplot(data=thedf, aes(x=thedf[[time]], y=thedf[[var]], group=thedf[[group]])) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  scale_colour_manual(values=setNames(color.codes, grps)) +
+  coord_cartesian(ylim = c(ymin, ymax)) +
+  #geom_errorbar(aes(ymin = thedf[[paste0(var, "_mean")]] - thedf[[paste0(var, "_se")]], 
+   #                ymax= thedf[[paste0(var, "_mean")]] + thedf[[paste0(var, "_se")]],
+  #                 color=Treatment), 
+  #      width=.2, position=position_dodge(0.03)) + 
+  ggtitle(title) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab(xlab) +
+  ylab(ylab)
+}
+```
+
+Plot.df is ag.df at community-level.
+
+Plot1.df is ag.df at site-level.
+
+Plot.df1 is panel.df at individual-level, collapsing TR and CO
+
+Plot.df2 is panel.df at individual-level, separating Part, Nonpart, Co.
+
+<!--Neither of these below are done. -->
+Plot.df3 is panel.df at community-level.
+
+Plot.df4 is panel.df at site-level.
+
+
+## Trust Index
+
+ECPN sites improed more on Outgroup Index than control sites.
+
+```{r}
+(trustComm.plot <- plot.fun(var='allTrust_cw', group='psu', thedf=plot1.df, time='survey', title="Trust - Community", 
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=-0.1, ymax=1.1))
+```
+
+```{r}
+(trustComm.plot <- plot.fun(var='allTrust_cw', group='comm', thedf=plot.df, time='survey', title="Trust - Community", 
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=-0.1, ymax=1.1))
+
+png(file="trustComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+trustComm.plot
+dev.off()
+```
+
+Part vs Non vs Con.  Part is blue and improves.  Non-part is green and gets a bit worse.  Control is red and gets much worse.
+
+```{r}
+(trustPan.plot <- plot.fun(var='allTrust_cw', group='id_num',  thedf=plot.df2, time='survey', title="Trust - Panel",
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=-0.1, ymax=1.1))
+
+png(file="trustPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+trustPan.plot
+dev.off()
+
+# why using these ugly colors instead of red green blue? have since fixed.
+#ggplot_build(outPan.plot)$data
+#ggplot_build(outComm.plot)$data
+```
+
+```{r, eval=F, include=F}
+# looking at indices on the same scale. Tell the same story: up for all, up more for treatment and participants.
+
+(outComm.plot <- plot.fun(var='x_index', thedf=plot.df, time='survey', title="Outgroup Attitudes - Community", 
+         xlab="Survey", ylab="Average Outgroup Index Score",
+         ymin=0, ymax=0.5))
+
+(outInd.plot <- plot.fun(var='x_index', thedf=plot.df1, time='survey', title="Outgroup Attitudes - Individual",
+         xlab="Survey", ylab="Average Outgroup Index Score",
+         ymin=-0.35, ymax=0.35))
+
+(outPan.plot <- plot.fun(var='x_index', thedf=plot.df2, time='survey', title="Outgroup Attitudes - Panel",
+         xlab="Survey", ylab="Average Outgroup Index Score",
+         ymin=0.3, ymax=0.7))
+```
+
+
+## Intergroup Contact Index
+
+ECPN sites decreased less on contact index than control sites.
+
+```{r}
+(conComm.plot <- plot.fun(var='contactOnly_cw', thedf=plot.df, time='survey', title="Intergroup Contact - Community", 
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="conComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conComm.plot
+dev.off()
+```
+
+Part improves, Non-part and Control both get worse at identical rate.
+
+```{r}
+(conPan.plot <- plot.fun(var='contactOnly_cw', thedf=plot.df2, time='survey', title="Intergroup Contact - Panel",
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.7))
+
+png(file="conPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conPan.plot
+dev.off()
+
+```
+
+
+```{r, eval=F}
+# index not cw
+(conComm.plot <- plot.fun(var='contactOnly_index', thedf=plot.df, time='survey', title="Contact Index - Community", 
+         xlab="Survey", ylab="Average Contact Index Score",
+         ymin=0.3, ymax=0.7))
+
+(conPan.plot <- plot.fun(var='contactOnly_index', thedf=plot.df2, time='survey', title="Contact Index - Panel",
+         xlab="Survey", ylab="Average Contact Index Score",
+         ymin=0.3, ymax=0.7))
+
+
+```
+
+## Perceptions of Security Index
+
+ECPN sites improved more on the security index than control sites.
+
+```{r}
+(inComm.plot <- plot.fun(var='in_cw', thedf=plot.df, time='survey', title="Perceptions of Insecurity - Community", 
+         xlab="Survey", ylab="Average Perceptions of Insecurity Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="inComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inComm.plot
+dev.off()
+```
+
+Control gets much worse, part gets a little worse and non-part gets a little better.
+
+```{r}
+(inPan.plot <- plot.fun(var='in_cw', thedf=plot.df2, time='survey', title="Perceptions of Insecurity - Panel",
+         xlab="Survey", ylab="Average Perceptions of Insecurity Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="inPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inPan.plot
+dev.off()
+```
+
+
+c('allTrust_cw', 'contactOnly_cw', "in_cw", 'pgp_amount_end', 'pgp_donate_end',
+                               'threat_cw', 'cohes1_cw', 'cohes2_cw',
+                               'bene_cw', 'clash_cw', "barg_cw",
+             'list_exp', 'rand_lm', 'rMean', 'end_exp')
+
+
+
+## Intergroup Cohesion Index
+
+ECPN sites improved on the social cohesion index.
+
+```{r}
+(cohComm.plot <- plot.fun(var='cohes_cw', thedf=plot.df, time='survey', title="Intergroup Cohesion - Community", 
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="cohComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+cohComm.plot
+dev.off()
+```
+
+Individuals in ECPN sites decreased less than individuals in control sites on the Cohesion Index
+
+```{r}
+(cohInd.plot <- plot.fun(var='cohes_cw', thedf= plot.df1, time='survey', title="Intergroup Cohesion - Individual", 
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0.3, ymax=0.7))
+
+```
+
+Part improves, Non-part a bit worse, Control MUCH worse.
+
+```{r}
+(cohPan.plot <- plot.fun(var='cohes_cw', thedf=plot.df2, time='survey', title="Intergroup Cohesion - Panel",
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0.3, ymax=0.7))
+
+```
+
+
+
+## List Experiment
+
+High values are bad here.
+
+ECPN sites decreased less than control sites on list experiment.  A measure of prejudice where high values mean a greater proportion of people expressing anger at "interacting with the outgroup in the market."
+
+<!--Lots of places have negative prejudice at endline (fewer angry with 4 item list than 3 item list).-->
+
+```{r}
+(listComm.plot <- plot.fun(var='list_exp', thedf=plot.df, time='survey', title="List Experiment", 
+         xlab="Survey", ylab="Average Difference Between 3 Item and 4 Item List",
+         ymin=-0.35, ymax=0.35))
+
+png(file="listComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+listComm.plot
+dev.off()
+
+```
+
+
+## Percent Experiment
+
+ECPN sites and control sites stayed the same on the percent experiment.  This percent experiment is a measure of prejudice where lower scores indicate less willingness to join a group/live in a community as the percentage of outgroup members in the community increase from 5/25/50/75 percent.
+
+```{r}
+(randComm.plot <- plot.fun(var='rand_lm', thedf=plot.df, time='survey', title="Percent Experiment", 
+         xlab="Survey", ylab="Average Change in Relationship Between % Outgroup Members and Joining Group/Living in Community",
+         ymin=-0.004, ymax=0.004))
+
+```
+
+Making a better graph by showing the 75% to 5% drop for TR and Co at baseline and endline (4 lines, each with 4 points).
+
+```{r}
+rand.df$tr2 <- ifelse(rand.df$treatment %in% 1, "Treatment", "Control")
+rand.df$treatmentSurvey <- interaction(rand.df$tr2, rand.df$survey)
+rand.df$tr2 <- NULL
+rand.df <- rand.df[!is.na(rand.df$rand_condition),] # remove ppl who refused to answer, so we don't get an NA category
+
+plot2.df <- rand.df %>% 
+  select(treatment,survey,treatmentSurvey, community, rand_outcome, rand_condition) %>%
+  dplyr::group_by(treatmentSurvey, rand_condition) %>%
+  dplyr::summarise(randOut=mean(rand_outcome, na.rm=T)) %>%
+  as.data.frame()
+levels(plot2.df$treatmentSurvey) <- c("Co-Base", "Tr-Base", "Co-End", "Tr-End")
+plot2.df$SurveyGroup <- ordered(plot2.df$treatmentSurvey, 
+                                    levels = c("Tr-Base", "Tr-End", "Co-Base", "Co-End"))
+
+(randComm.plot2 <- ggplot(data=plot2.df, aes(x=factor(rand_condition), y=randOut, group=SurveyGroup)) +
+  geom_line(aes(color=SurveyGroup))+
+  geom_point(aes(color=SurveyGroup))+
+  geom_text(aes(x=2.6, y=0.60, label="Tr-End"), color="firebrick4", size=3.5) + 
+  geom_text(aes(x=2.6, y=0.505, label="Co-End"), color="deepskyblue4", size=3.5) +
+  geom_text(aes(x=2.6, y=0.455, label="Tr-Base"), color="firebrick2", size=3.5) + 
+  geom_text(aes(x=2.6, y=0.395, label="Co-Base"), color="deepskyblue", size=3.5) + 
+  coord_cartesian(ylim = c(min(plot2.df['randOut'])-0.1, max(plot2.df['randOut'])+0.1)) +
+  ggtitle("Percent Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Percentage Outgroup Members") +
+  ylab("Percentage Subjects Willing to Join/Live") + 
+  scale_color_manual(values=c("firebrick2", "firebrick4", "deepskyblue", "deepskyblue4"), guide=F))
+
+png(file="randComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+randComm.plot2
+dev.off()
+
+```
+
+
+Maybe it's better to show the difference between baseline and endline at each proportion outgroup. So lines for Tr and Co at each % outgroup members.
+
+```{r}
+plot3.df <- rand.df %>% 
+  select(treatment,survey, community, rand_outcome, rand_condition) %>%
+  dplyr::group_by(treatment, rand_condition) %>%
+  dplyr::summarise(randOut_end=mean(rand_outcome[survey %in% 1], na.rm=T), 
+                   randOut_base=mean(rand_outcome[survey %in% 0]),
+                   randOut=randOut_end-randOut_base) %>%
+  as.data.frame()
+plot3.df$Treatment <- ifelse(plot3.df$treatment %in% 1, "Treatment", "Control")
+plot3.df$Treatment <- ordered(plot3.df$Treatment, levels=c("Treatment", "Control"))
+
+(randComm.plot3 <- ggplot(data=plot3.df, aes(x=factor(rand_condition), y=randOut, group=Treatment)) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  coord_cartesian(ylim = c(min(plot3.df['randOut'])-0.05, max(plot3.df['randOut'])+0.05)) +
+  ggtitle("Percent Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Percentage Outgroup Members") +
+  ylab("Percentage Subjects Willing to Join/Live"))
+```
+
+
+## Endorsement Experiment
+
+ECPN sites decreased less than control sites on the endorsement experiment.  This endorsement experiment is a measure of prejudice where respondents are asked their support for a public policy.  Half are asked their support when the policy is endorsed by the outgroup.  The greater the decrease in support due to the outgroup endorsement, the higher the prejudice.
+
+```{r}
+(endComm.plot <- plot.fun(var='end_exp', thedf=plot.df, time='survey', title="Endorsement Experiment", 
+         xlab="Survey", ylab="Average Change in Support for Policy Endorsed by Outgroup",
+         ymin=-0.6, ymax=0.2))
+
+```
+
+## Public Goods Game
+
+Not a before after plot, since this was just at endline.  Barplot for donate at all and donate amount.
+
+```{r}
+# want a plot that shows Tr/Co on X-axis with bars for each outcome (donate at all, donate amount), and Y-axis is percent for donate at all (0-1) & amount for donate amount (0-1000)
+
+## Make a df with obs that are comm-outcome, vars for community and value amount
+pgg.df <- ag.df %>% select(pgp_donate_end, pgp_amount_end, treatment)
+pgg.df <- reshape2::melt(pgg.df, id="treatment")
+pgg.df <- pgg.df %>% dplyr::group_by(treatment,variable) %>% 
+  summarise(Value=mean(value)) %>%
+  as.data.frame()
+
+#putting outcomes on same scale
+pgg.df[pgg.df$variable %in% "pgp_amount_end", 'Value'] <- pgg.df[pgg.df$variable %in% "pgp_amount_end", 'Value']/1000
+colnames(pgg.df)[colnames(pgg.df)=="variable"] <- "Outcome"
+levels(pgg.df$Outcome) <- c("Made Donation", "Donation Amount")
+pgg.df$Treatment <- as.factor(ifelse(pgg.df$treatment %in% 1, "ECPN", "Non-ECPN"))
+pgg.df$Treatment <- ordered(pgg.df$Treatment, levels = c("ECPN", "Non-ECPN"))
+
+(pggComm.plot <- ggplot(data=pgg.df, aes(x=Outcome, y=Value, fill=Treatment)) +
+  geom_bar(stat="identity", position="dodge")+
+  scale_fill_manual(values=setNames(color.codes, grps)) +
+  ggtitle("Public Goods Game") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("PGG Outcome") +
+  #ylab("Percent Donating") +
+  scale_y_continuous(
+    "Percent Donating", 
+    sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
+
+png(file="pggComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+pggComm.plot
+dev.off()
+
+# Individual
+
+
+# Panel
+## Make a df with obs that are comm-outcome, vars for community and value amount
+panel.df$tr2 <- droplevels(interaction(panel.df$treatment, panel.df$committee))
+pgg.df2 <- panel.df %>% select(pgp_donate_y1, pgp_amount_y1, tr2)
+pgg.df2 <- reshape2::melt(pgg.df2, id="tr2")
+pgg.df2 <- pgg.df2 %>% dplyr::group_by(tr2,variable) %>% 
+  summarise(Value=mean(value)) %>%
+  as.data.frame()
+
+##putting outcomes on same scale
+pgg.df2[pgg.df2$variable %in% "pgp_amount_y1", 'Value'] <- pgg.df2[pgg.df2$variable %in% "pgp_amount_y1", 'Value']/1000
+colnames(pgg.df2)[colnames(pgg.df2)=="variable"] <- "Outcome"
+levels(pgg.df2$Outcome) <- c("Made Donation", "Donation Amount")
+pgg.df2$tr2 <- as.factor(as.character(pgg.df2$tr2))
+levels(pgg.df2$tr2) <- c("Control", "Non-Part", "Part")
+pgg.df2$tr2 <- ordered(pgg.df2$tr2, levels = c("Part", "Non-Part", "Control"))
+pgg.df2$Treatment <- pgg.df2$tr2
+
+## Plot
+(pggPan.plot <- ggplot(data=pgg.df2, aes(x=Outcome, y=Value, fill=Treatment)) +
+  geom_bar(stat="identity", position="dodge")+
+  scale_fill_manual(values=setNames(color.codes, grps)) +
+  ggtitle("Public Goods Game") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("PGG Outcome") +
+  #ylab("Percent Donating") +
+  scale_y_continuous(
+    "Percent Donating", 
+    sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
+
+png(file="pggPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+pggPan.plot
+dev.off()
+```
+
+
+# Density Plots
+
+```{r}
+load("nullPs.Rdata")
+load("GlobP_un.Rdata")
+load("thep.Rdata")
+
+load("p_nullPs.Rdata")
+load("theGlobP_approx.Rdata")
+load("p_thep_approx.Rdata")
+
+```
+
+Community
+
+```{r}
+png(file="nullDist_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+
+plot(density(nullPs),
+     main="Null Distribution of p-values: Community Data")
+abline(v=GlobP_un)
+
+dev.off()
+
+# the corrected p
+thep
+
+```
+
+Panel
+
+```{r}
+png(file="p_nullDist_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+
+plot(density(p_nullPs),
+     main="Null Distribution of p-values: Panel Data")
+abline(v=theGlobP_approx)
+
+dev.off()
+
+# the corrected p
+p_thep_approx
+```
+
+# Save plots
+
+For use later.
+
+```{r}
+thing <- grep(".plot",names(.GlobalEnv),value=TRUE)
+#Pattern1_list<-do.call("list",mget(thing)) # show the graph of all objects
+
+
+save(endComm.plot,   randComm.plot,  conComm.plot,   outInd.plot,    shareInd.plot,  clashComm.plot, resComm.plot, 
+     outComm.plot,   listComm.plot,  inInd.plot,     clashInd.plot,  inComm.plot,    cohComm.plot,   cohInd.plot, 
+     resInd.plot, shareComm.plot, conInd.plot, randComm.plot2, randComm.plot3, pggComm.plot, 
+     clashPan.plot, resPan.plot, inPan.plot, sharePan.plot, conPan.plot, outPan.plot, cohPan.plot, pggPan.plot,
+     file='ecpn_plots.Rdata') # must be easier way to save objects that match a pattern...
+
+```
+
+
+```{r, eval=F, include=F}
+# save plot.dfs for rebecca ot see
+plot.df_share <- plot.df[,1:15]
+plot.df1_share <- plot.df1[,1:12]
+plot.df2_share <- plot.df2[,1:12]
+pgg.df
+pgg.df2
+
+save(plot.df_share, plot.df1_share, plot.df2_share,pgg.df, pgg.df2,
+     file='z-did_plot_dfs_share.Rdata')
+
+```
+

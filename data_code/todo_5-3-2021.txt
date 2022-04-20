@@ -1,0 +1,28 @@
+# c_obsDat_randInference Notes
+
+# Data Cleaning/Changes
+- all rankSep outcomes need to be SD scaled.
+	- right now, 54 obs at t0 and only 28 at t1, so everything at t1 seems lower.
+- DONE.  This gives us lower pvalues, which is good.  Also solves problem of repeating pvalues...somehow.
+
+
+Coefplots
+Put in paper
+Edit results section for new coefplots
+pastoralists would be higher
+Confirm events tells nothing.
+	- Reasons why: higher barrier, more error we cannot capture.
+
+
+# 8-9-2021
+1. Behavioral measures -- pvalue
+- bootstrap the behavioral outcomes
+
+2. Separate individual and community analyses
+- individual goes into mechanisms
+
+
+
+
+
+

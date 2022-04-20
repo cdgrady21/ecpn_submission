@@ -1,0 +1,512 @@
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment" & !(grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,paste0(var,"_y1")]~panel.df[,tr]+panel.df[,paste0(var,"_y0")]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,paste0(var,"_y1")]~rand.samp[,tr]+rand.samp[,paste0(var,"_y0")]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(!(grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,paste0(var,"_y1")]~panel.df[,tr]+panel.df[,paste0(var,"_y0")]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,paste0(var,"_y1")]~rand.samp[,'newtr']+rand.samp[,paste0(var,"_y0")]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(grepl("end", var) | grepl("y1", var) | grepl("rMean", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+thep <- mean(rand.coef>=thecoef)
+thedf <- data.frame(coef=thecoef,truep=thep)
+rownames(thedf) <- paste0(var, "~",tr)
+return(thedf)
+}
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var="pgp_amount_y1", tr='treatment')
+#true.fun(var="pgp_amount_y1", tr='bene_cw')
+load('../c_creating_dataframes/rand_df.Rdata') #load the rand.df, eventually combine with panel.df
+setwd("C:/Users/chris/Google Drive/Africa/Nigeria - Farmer-Pastoralist/ecpn_work/analysis/academicPaper/survey/b_creating_outcomes")
+# Chunk 1: setup
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("d-additiveIndices.Rdata")
+library(plyr)
+library(dplyr)
+library(estimatr)
+library(psych)
+# Chunk 2
+## from cyrus samii IC weighting
+# Function to standardize columns of a matrix
+# where you designate a standardization group
+# (e.g., the control group in an experiment)
+# with "sgroup", a logical vector.
+matStand <- function(x, sgroup = rep(TRUE, nrow(x))){
+for(j in 1:ncol(x)){
+x[,j] <- (x[,j] - mean(x[sgroup,j]))/sd(x[sgroup,j]) # chris: demeans outcome, but by control group mean, not x group mean?  Then divides by control group sd, which I get.  But why demean by control group mean even for tr group members?
+}
+return(x)
+}
+# Function that takes in data in matrix format and returns
+# (i) IC weights and (ii) ICW index.
+# Weights can be incorporated using the "wgts" argument.
+# The "revcols" argument takes a vector indicating which columns,
+# if any, should have values reversed (that is, standardized
+# values are multiplied by -1) prior to construction of the index.
+icwIndex <- function(	xmat,
+wgts=rep(1, nrow(xmat)),
+revcols = NULL,
+sgroup = rep(TRUE, nrow(xmat))){
+X <- matStand(xmat, sgroup)
+if(length(revcols)>0){
+X[,revcols] <-  -1*X[,revcols]
+}
+i.vec <- as.matrix(rep(1,ncol(xmat)))
+Sx <- cov.wt(X, wt=wgts)[[1]]
+weights <- solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)
+index <- t(solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)%*%t(X))
+return(list(weights = weights, index = index))
+}
+# Factor analysis function (R base does not have one. factanal() is MLE, which we don't want.)
+#source("http://www.stat.sc.edu/~habing/courses/530/fact.txt")
+# Chunk 3
+# first make rand.df to mess with
+rand.df <- df
+# then make var to indicate control group for ICW
+rand.df$control <- ifelse(rand.df$treatment == 1, 0, 1)
+# want separate baseline & endline indices
+rand.df1 <- rand.df[rand.df$survey %in% 0,]
+rand.df2 <- rand.df[rand.df$survey %in% 1,]
+# removing panel people/preselected from endline, since not randomly selected
+rand.df2 <- rand.df2[!rand.df2$pre_selected %in% 'pre',]
+# Chunk 7
+# both tr and co
+ic.fun1 <- function(vars, thedf)
+{
+x <- thedf[,vars]
+x <- zoo::na.aggregate(x)
+out_cw <- icwIndex(x)
+print(cor(x))
+print(out_cw$weights)
+return(as.vector(out_cw$index))
+}
+# just co
+ic.fun <- function(vars, thedf)
+{
+x <- thedf[,vars]
+x <- zoo::na.aggregate(x)
+out_cw <- icwIndex(xmat=x, sgroup=as.logical(thedf[,'control']))
+print(cor(x))
+print(out_cw$weights)
+return(as.vector(out_cw$index))
+}
+# Chunk 8
+# should loop but feeling braindead
+# Baseline
+rand.df1$trust_cw <- ic.fun(trustVars, rand.df1)
+rand.df1$dist_cw <- ic.fun(distVars, rand.df1)
+rand.df1$allTrust_cw <- ic.fun(allTrustVars, rand.df1)
+rand.df1$x_cw <- ic.fun(xVars, rand.df1)
+rand.df1$out_cw <- ic.fun(outVars, rand.df1)
+rand.df1$other_cw <- ic.fun(otherVars, rand.df1)
+#rand.df1$aware_cw <- ic.fun(awareVars, rand.df1) # just one variable
+rand.df1$clash_cw <- ic.fun(clashVars, rand.df1)
+rand.df1$contact_cw <- ic.fun(contactVars, rand.df1)
+rand.df1$contactOnly_cw <- ic.fun(contactVars[c(1:4,7)], rand.df1)
+rand.df1$bene_cw <- ic.fun(beneVarsPerc, rand.df1)
+rand.df1$threat_cw <- ic.fun(threatVars, rand.df1)
+rand.df1$in_cw <- ic.fun(inVars, rand.df1)
+rand.df1$cohes_cw <- ic.fun(cohesVars, rand.df1)
+rand.df1$cohes1_cw <- ic.fun(cohesVars1, rand.df1)
+rand.df1$cohes2_cw <- ic.fun(cohesVars2, rand.df1)
+rand.df1$dis_cw <- ic.fun(disVars, rand.df1)
+rand.df1$share_cw <- ic.fun(shareVars, rand.df1)
+rand.df1$numDis_cw <- ic.fun(numDisVars, rand.df1)
+rand.df1$resolve_cw <- ic.fun(resolveVars, rand.df1)
+rand.df1$barg_cw <- ic.fun(bargVars, rand.df1)
+rand.df1$disActor_cw <- ic.fun(disActorVars, rand.df1)
+rand.df1$vio_cw <- ic.fun(vioVars, rand.df1)
+rand.df1$vioExp_cw <- ic.fun(vioExpVars, rand.df1)
+rand.df1$persp_cw <- rand.df1$persp_index
+# Endline
+rand.df2$trust_cw <- ic.fun(trustVars, rand.df2)
+rand.df2$dist_cw <- ic.fun(distVars, rand.df2)
+rand.df2$allTrust_cw <- ic.fun(allTrustVars, rand.df2)
+rand.df2$x_cw <- ic.fun(xVars, rand.df2)
+rand.df2$out_cw <- ic.fun(outVars, rand.df2)
+rand.df2$other_cw <- ic.fun(otherVars, rand.df2)
+#rand.df2$aware_cw <- ic.fun(awareVars, rand.df2) # only one var
+rand.df2$clash_cw <- ic.fun(clashVars, rand.df2)
+rand.df2$contact_cw <- ic.fun(contactVars, rand.df2)
+rand.df2$contactOnly_cw <- ic.fun(contactVars[c(1:4,7)], rand.df2)
+rand.df2$bene_cw <- ic.fun(beneVarsPerc, rand.df2)
+rand.df2$threat_cw <- ic.fun(threatVars, rand.df2)
+rand.df2$in_cw <- ic.fun(inVars, rand.df2)
+rand.df2$cohes_cw <- ic.fun(cohesVars, rand.df2)
+rand.df2$cohes1_cw <- ic.fun(cohesVars1, rand.df2)
+rand.df2$cohes2_cw <- ic.fun(cohesVars2, rand.df2)
+rand.df2$dis_cw <- ic.fun(disVars, rand.df2)
+rand.df2$share_cw <- ic.fun(shareVars, rand.df2)
+rand.df2$numDis_cw <- ic.fun(numDisVars, rand.df2)
+rand.df2$resolve_cw <- ic.fun(resolveVars, rand.df2)
+rand.df2$barg_cw <- ic.fun(bargVars, rand.df2)
+rand.df2$disActor_cw <- ic.fun(disActorVars, rand.df2)
+rand.df2$vio_cw <- ic.fun(vioVars, rand.df2)
+rand.df2$vioExp_cw <- ic.fun(vioExpVars, rand.df2)
+rand.df2$persp_cw <- rand.df2$persp_index
+# Now scale as 0-1 so that we can easily discuss them as % increase/decrease for MC report. # not necessary until aggregated.
+#icVars <- names(rand.df1)[grepl("_cw", names(rand.df1))]
+#rand.df1[,icVars] <- reshape::rescaler(rand.df1[,icVars],type="range")
+#rand.df2[,icVars] <- reshape::rescaler(rand.df2[,icVars],type="range")
+# rebind
+rand.df <- rbind(rand.df1, rand.df2)
+save(rand.df, file="rand_df.Rdata")
+setwd("C:/Users/chris/Google Drive/Africa/Nigeria - Farmer-Pastoralist/ecpn_work/analysis/academicPaper/survey/d_analysis")
+# Chunk 1: setup
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(7867564)
+rm(list=ls())
+load("../b_creating_outcomes/f2-panelData.Rdata")
+library(NPC)
+library(estimatr)
+library(mosaic)
+library(coin)
+library(robustbase)
+#author: "Christopher Grady"
+#date: "`r format(Sys.Date(), "%B %d, %Y")`"
+# true pval function.  Might not be necessary for panel since we have a decent number of obs, but still few clusters.
+## for panel, might need the covar adjust version because possible confounders.
+## chris: should block here should be community? No, then treatment perfectly correlates with the block, washing out effect.
+true.fun1 <- function(var, tr)
+{
+if(grepl("resid", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr], data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1500)
+for(i in 1:1500){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
+tr.lm <- lm(tr_fmla,rand.samp)
+lm.tr_resid<-resid(tr.lm)
+rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment"){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else{
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+thep <- mean(rand.coef>=thecoef)
+thedf <- data.frame(coef=thecoef,truep=thep)
+rownames(thedf) <- paste0(var, "~",tr)
+return(thedf)
+}
+#true.fun1(var='cohes_cw', tr='treatment')
+#true.fun1(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun1(var='cohes_cw', tr='bene_cw')
+########## Samii Suggestion
+true.fun <- function(var, tr)
+{
+if(grepl("resid", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr], data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1500)
+for(i in 1:1500){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
+tr.lm <- lm(tr_fmla,rand.samp)
+lm.tr_resid<-resid(tr.lm)
+rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment" & (grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment" & !(grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,paste0(var,"_y1")]~panel.df[,tr]+panel.df[,paste0(var,"_y0")]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,paste0(var,"_y1")]~rand.samp[,tr]+rand.samp[,paste0(var,"_y0")]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(!(grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,paste0(var,"_y1")]~panel.df[,tr]+panel.df[,paste0(var,"_y0")]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,paste0(var,"_y1")]~rand.samp[,'newtr']+rand.samp[,paste0(var,"_y0")]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(grepl("end", var) | grepl("y1", var) | grepl("rMean", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+thep <- mean(rand.coef>=thecoef)
+thedf <- data.frame(coef=thecoef,truep=thep)
+rownames(thedf) <- paste0(var, "~",tr)
+return(thedf)
+}
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var="pgp_amount_y1", tr='treatment')
+#true.fun(var="pgp_amount_y1", tr='bene_cw')
+load('../c_creating_dataframes/rand_df.Rdata') #load the rand.df, eventually combine with panel.df
+setwd("C:/Users/chris/Google Drive/Africa/Nigeria - Farmer-Pastoralist/ecpn_work/analysis/academicPaper/survey/c_creating_dataframes")
+# Chunk 1: setup
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("../b_creating_outcomes/d-additiveIndices.Rdata")
+load("../b_creating_outcomes/rand_df.Rdata")
+library(plyr)
+library(dplyr)
+library(estimatr)
+# Chunk 2
+# stuff from above that needs to be run because above is now eval=F
+possCovars <- c('age', 'ethnic2', 'radio',
+'gender', 'income_month',
+'username', 'duration',
+"state"
+)
+rand.df$age <- as.numeric(as.character(rand.df$age))
+# fix/make numeric variables
+rand.df$ethnic2 <- as.factor(rand.df$ethnic2)
+rand.df <- cbind(rand.df,model.matrix(~ . + 0, data=rand.df['ethnic2'], contrasts.arg = lapply(rand.df['ethnic2'], contrasts, contrasts=FALSE))) #
+rand.df$psu <- as.numeric(as.character(rand.df$psu)) #for aggregation we want psu as a number
+rand.df$female <- ifelse(rand.df$gender %in% "female", 1, 0)
+possCovars <- c(possCovars[!possCovars %in% c("ethnic2", "username", "gender", "state")], "female")
+# aggregate vars
+listVars <- ls(pattern="Vars") # there is a way to do this just from this list of values, but idk how offhand.
+expVars <- names(rand.df)[grepl("^(...|....)_(exp[0-9])|^rand_", names(rand.df))]
+pgpVars <- names(rand.df)[grepl("pgp", names(rand.df))]
+ag.vars <- unique(c(names(rand.df)[grepl("index", names(rand.df))],
+names(rand.df)[grepl("cw", names(rand.df))],
+allTrustVars, beneVars, bargVars, clashVars,
+cohesVars, contactVars, conVioEffVars, dispVars,
+disVars, otherVars, vioVars, threatVars, vioExpVars,
+expVars, pgpVars, perspVars,
+'treatment', 'community', 'survey', "psu", #"tr_resid",
+possCovars,
+names(rand.df)[grepl("ethnic2[a-z]", names(rand.df))]))
+ag1 <- aggregate(rand.df[rand.df$survey %in% 0,ag.vars], by=list(comm=rand.df[rand.df$survey %in% 0,ag.vars]$community), mean,na.rm=T)
+ag2 <- aggregate(rand.df[rand.df$survey %in% 1,ag.vars], by=list(comm=rand.df[rand.df$survey %in% 1,ag.vars]$community), mean,na.rm=T)
+# warnings because "community" is factor and cannot be aggregated by itself...
+stopifnot(names(ag1)==names(ag2))
+names(ag1) <- paste0(names(ag1),"_base")
+names(ag2) <- paste0(names(ag2),"_end")
+# Chunk 3
+ag2[, c('treatment_end','psu_end', "comm_end")] <- NULL # remove things from ag2 that are also in ag1 so no useless duplicates
+ag.df<-as.data.frame(cbind(ag1,ag2))
+ag.df$state <- rand.df$state[match(ag.df$comm_base,rand.df$community)]
+ag.df$clash_index_end[is.na(ag.df$clash_in)] # if there is an NA in clash_index (no one even knew about conflict), make it 0
+stopifnot(mean(ag.df$clash_index_base)==mean(ag1$clash_index_base, na.rm=T))
+stopifnot(mean(ag.df$clash_index_end)==mean(ag2$clash_index_end, na.rm=T))
+names(ag.df)[names(ag.df) %in% c("comm_base", "treatment_base", "psu_base")] <- c("comm", "treatment","psu" )
+ag.df[,grepl("(survey|community)", names(ag.df))] <- NULL
+rm(ag1); rm(ag2)
+# Chunk 4
+## re-scale before DiD outcome.  It puts both baseline and endline on 0-1, then asks about movement on that 0-1.  Otherwise, max score at baseline/endline would look like a big change when they are supposed to be the same thing.
+icVars <- names(ag.df)[grepl("_cw", names(ag.df))]
+ag.df[,icVars] <- reshape::rescaler(ag.df[,icVars],type="range")
+ag.df[,icVars] <- reshape::rescaler(ag.df[,icVars],type="range")
+# Chunk 5
+# list exp
+ag.df$list_exp_base <- ag.df$list_exp1b_base - ag.df$list_exp1a_base
+ag.df$list_exp_end <- ag.df$list_exp1b_end - ag.df$list_exp1a_end
+ag.df[,names(ag.df)[grepl("list_exp1(a|b)", names(ag.df))]] <- NULL
+# end_exp: 1a goes to pastoralists, 1b goes to farmer's, 1c is generic.
+ag.df$end_expTR_end <- ifelse(is.na(ag.df$end_exp1a_end), ag.df$end_exp1b_end, ag.df$end_exp1a_end)
+ag.df$end_expTR_base <- ifelse(is.na(ag.df$end_exp1a_base), ag.df$end_exp1b_base, ag.df$end_exp1a_base)
+ag.df$end_exp_end <- ag.df$end_expTR_end - ag.df$end_exp1c_end
+ag.df$end_exp_base <- ag.df$end_expTR_base - ag.df$end_exp1c_base
+#ag.df[,c("comm",names(ag.df)[grepl("end_exp", names(ag.df))])]
+ag.df[,names(ag.df)[grepl("end_exp1(a|b)", names(ag.df))]] <- NULL
+# Chunk 6
+ag.df[,sub("_end$", "", names(ag.df)[grepl("_end$",names(ag.df))])] <- ag.df[,grepl("_end", names(ag.df))] - ag.df[,grepl("_base", names(ag.df))]
+# test that worked right
+ag.df$test <- ag.df$cohes_index_end - ag.df$cohes_index_base
+stopifnot(ag.df$test==ag.df$cohes_index)
+ag.df$test <- ag.df$list_exp_end - ag.df$list_exp_base
+stopifnot(ag.df$test==ag.df$list_exp)
+ag.df$test <- NULL
+# pgp is only at endline, so remove pgp base vars
+ag.df[,names(ag.df)[grepl("(pgp_.*_base|pgp_[[:alpha:]]*$)", names(ag.df))]] <- NULL
+# Chunk 7
+# aggregate to treatment/condition level, outcomes are (1) % who say yes in each condition at BASELINE and (2) the % who says yes in each condition at ENDLINE.
+table(rand.df$rand_condition, exclude=c())
+rand.df <- rand.df[!is.na(rand.df$rand_condition),]
+new.df <- rand.df %>%
+select(treatment,survey, community, rand_outcome, rand_condition, state, psu) %>%
+dplyr::group_by(community, treatment, rand_condition, state, psu) %>%
+dplyr::summarise(randOut_end=mean(rand_outcome[survey %in% 1], na.rm=T),
+randOut_base=mean(rand_outcome[survey %in% 0]),
+randOut=randOut_end-randOut_base) %>%
+as.data.frame()
+#summary(lm(randOut~treatment+factor(rand_condition)+state, new.df))
+# looks right, now to make it a randomization test
+#####
+# But how to do this in a way that lets me easily test it with NPC?  Not possible now, diff datasets.  Maybe if we collapse this into a comm-level with columns for: (1) increase at 5%, (2) increase at 25%, (3) increase at 50%, (4) increase at 75%, and (5) average increase.  Can then merge/cbind with ag.df.  Will be functionally identical to above, but at ag.df level!
+####
+merge.df <- new.df %>% dplyr::group_by(community) %>%
+summarise(r5=randOut[rand_condition %in% 5],
+r25=randOut[rand_condition %in% 25],
+r50=randOut[rand_condition %in% 50],
+r75=randOut[rand_condition %in% 75],
+r5_base=randOut_base[rand_condition %in% 5],
+r25_base=randOut_base[rand_condition %in% 25],
+r50_base=randOut_base[rand_condition %in% 50],
+r75_base=randOut_base[rand_condition %in% 75],
+r5_end=randOut_end[rand_condition %in% 5],
+r25_end=randOut_end[rand_condition %in% 25],
+r50_end=randOut_end[rand_condition %in% 50],
+r75_end=randOut_end[rand_condition %in% 75]
+) %>%
+as.data.frame()
+merge.df$rMean <- rowMeans(merge.df[c('r5','r25','r50','r75')])
+merge.df$rMean_base <- rowMeans(merge.df[c('r5_base','r25_base','r50_base','r75_base')])
+merge.df$rMean_end <- rowMeans(merge.df[c('r5_end','r25_end','r50_end','r75_end')])
+ag.df <- merge(ag.df, merge.df, all=T, by.x="comm", by.y="community")
+rm(new.df)
+rm(merge.df)
+# Chunk 8
+ag.df$psu <- as.factor(as.character(ag.df$psu))
+# need to reverse some cols so that HIGH is GOOD for all variables.  For these variables right now, HIGH is BAD.  This makes HIGH GOOD.
+revCols <- c("clash_index", "clash_cw", "clash_cw_base", "clash_cw_end",
+"threat_index", "threat_cw", "threat_cw_base", "threat_cw_end",
+"in_index", "in_cw", "in_cw_base", "in_cw_end",
+"list_exp", "list_exp_base", "list_exp_end")
+ag.df[,revCols] <- ag.df[,revCols]*-1
+# Chunk 9
+allIndices <- c("x_cw", "cohes_cw", "pgp_amount_end",
+"pgp_donate_end", "contactOnly_cw", "in_cw",
+"resolve_cw", "list_exp", "rMean", "end_exp")
+# chris: if we are comfortable, could replace rand_lm with rMean, the diff outcome of the rando_exp.  Or add it.
+matStand <- function(x, sgroup = rep(TRUE, nrow(x))){
+for(j in 1:ncol(x)){
+x[,j] <- (x[,j] - mean(x[sgroup,j]))/sd(x[sgroup,j])
+}
+return(x)
+}
+icwIndex <- function(	xmat,
+wgts=rep(1, nrow(xmat)),
+revcols = NULL,
+sgroup = rep(TRUE, nrow(xmat))){
+X <- matStand(xmat, sgroup)
+if(length(revcols)>0){
+X[,revcols] <-  -1*X[,revcols]
+}
+i.vec <- as.matrix(rep(1,ncol(xmat)))
+Sx <- cov.wt(X, wt=wgts)[[1]]
+weights <- solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)
+index <- t(solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)%*%t(X))
+return(list(weights = weights, index = index))
+}
+ag.df$control <- ifelse(ag.df$treatment == 1, 0, 1)
+ic2.fun <- function(vars)
+{
+x <- ag.df[,vars]
+x <- zoo::na.aggregate(x)
+out_cw <- icwIndex(xmat=x, sgroup=as.logical(ag.df$control))
+print(cor(x))
+print(out_cw$weights)
+return(as.vector(out_cw$index))
+}
+baseIndices <- c(paste0(allIndices[grepl("cw", allIndices)], "_base"), allIndices[!grepl("cw", allIndices)])
+endIndices <- sub("_base", "_end", baseIndices)
+ag.df$all_cw_base <- reshape::rescaler(ic2.fun(baseIndices), type="sd")
+ag.df$all_cw_end <- reshape::rescaler(ic2.fun(endIndices), type="sd")
+ag.df$all_cw <- ag.df$all_cw_end-ag.df$all_cw_base
+# no pgg
+ag.df$all2_cw <- ic2.fun(allIndices[-c(3,4)])
+# Chunk 10
+rankCols <- c(names(ag.df)[grepl("_cw", names(ag.df))],
+"pgp_amount_end", "pgp_donate_end",
+'list_exp', 'rMean', 'end_exp') # still more outcomes than I care about, but that's okay
+ag.df[,paste0(rankCols, "_rank")] <- sapply(ag.df[,rankCols], rank)

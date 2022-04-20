@@ -1,0 +1,339 @@
+---
+title: "ecpn_diff-in-diff plots"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load("f-aggregateData.Rdata")
+load("rand_df.Rdata")
+load("f2-panelData.Rdata")
+
+# Make var for farmer/pastoralist for separate graphs
+ag.df$farm_pastor <- ifelse(grepl("f", ag.df$comm), "Farm", "Past")
+## already exists in panel.df and rand.df, but need caps
+panel.df$farm_pastor <- ifelse(panel.df$farm_pastor %in% "farmers", "Farm", "Past")
+rand.df$farm_pastor <- ifelse(rand.df$farm_pastor %in% "farmers", "Farm", "Past")
+
+#other
+panel.df$tr_f <- droplevels(interaction(panel.df$treatment, panel.df$committee))
+
+##########
+# Plot functions - ggplot showing each group before and after.
+##########
+
+#The vars to plot.
+ag.vars <- c('x_cw', 'cohes_cw', 'pgp_amount_end', 'pgp_donate_end',
+                               'contactOnly_cw', 'in_cw', 'resolve_cw',
+                               'clash_cw', 'share_cw',
+             'list_exp', 'rand_lm', 'end_exp',
+             'x_index', 'contactOnly_index', 'in_index')
+
+## need to reverse list exp so high is bad.  It just looks weird to have low be bad.
+ag.df[,c("list_exp", "list_exp_base", "list_exp_end")] <- ag.df[,c("list_exp", "list_exp_base", "list_exp_end")]*-1
+
+## individual
+ind.vars <- c('x_cw', 'cohes_cw', 'pgp_amount_y1', 'pgp_donate_y1',
+                               'contactOnly_cw', 'in_cw', 'resolve_cw',
+                               'clash_cw', 'share_cw',
+              'x_index', 'contactOnly_index', 'in_index')
+
+
+
+#Aggregate Plot df - State & Farmer/Pastor
+base <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_base"), "treatment", "state", "psu", "farm_pastor")]
+names(base) <- sub("_base", "", names(base))
+base$survey <- "Baseline"
+end <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_end"), "treatment", "state", "psu", "farm_pastor")]
+names(end) <- sub("_end", "", names(end))
+end$survey <- "Endline"
+plot.df <- rbind(base,end)
+
+## want 4 groups: nas farm, ben farm, nas past, ben past. With Tr vs Co, that's 8 lines.
+## Will make plots with 4 lines: Nass Graph and Ben Graph (farmer and pastoralists, before and after).
+plot.df<-plot.df %>% 
+  dplyr::group_by(treatment,survey,state,farm_pastor) %>%  
+  dplyr::summarise_all(funs(mean(., na.rm = TRUE),sd(., na.rm=TRUE))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+stopifnot(nrow(plot.df)==16)
+plot.df$Treatment<-ifelse(plot.df$treatment %in% 1, "ECPN", "Non-ECPN")
+plot.df$State <- ifelse(plot.df$state %in% "nas", "Nas", "Ben")
+#plot.df$plotID <- interaction(plot.df$Treatment, plot.df$State)
+
+
+############################
+
+
+#Panel Plot df
+#base1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "community", "farm_pastor")]
+#names(base1) <- sub("_y0", "", names(base1))
+#base1$survey <- "Baseline"
+#end1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "community", "farm_pastor")]
+#names(end1) <- sub("_y1", "", names(end1))
+#end1$survey <- "Endline"
+#plot.df1 <- rbind(base1,end1)
+
+## need 4 groups: nas farm, nas past, ben farm, ben past, separate by tr/co and at both time points
+#plot.df1<-plot.df1 %>% 
+#  dplyr::group_by(treatment,survey,state,farm_pastor) %>% 
+#  dplyr::summarise_all(funs(mean(., na.rm = TRUE), sd(., na.rm=T))) %>% # warnings because cannot sumarise non-numeric
+#  as.data.frame()
+#stopifnot(nrow(plot.df1)==16)
+#plot.df1$Treatment<-ifelse(plot.df1$treatment %in% 1, "ECPN", "Non-ECPN")
+
+
+######################
+
+# Part-non-control Plot df
+base2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "committee", "farm_pastor")]
+names(base2) <- sub("_y0", "", names(base2))
+base2$survey <- "Baseline"
+end2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "committee", "farm_pastor")]
+names(end2) <- sub("_y1", "", names(end2))
+end2$survey <- "Endline"
+plot.df2 <- rbind(base2,end2)
+plot.df2$Treatment <- interaction(plot.df2$treatment, plot.df2$committee)
+levels(plot.df2$Treatment) <- c("Control", "Non-Part", NA, "Part")
+plot.df2$Treatment <- ordered(plot.df2$Treatment, levels=c("Part", "Non-Part", "Control"))
+
+## need 4 groups: nas farm, nas past, ben farm, ben past, separate by part/non/co and at both time points
+plot.df2<-plot.df2 %>% 
+  dplyr::group_by(Treatment,survey,state,farm_pastor) %>%  # chris: could add state here to differentiate nas from ben
+  dplyr::summarise_all(funs(mean(., na.rm = TRUE), sd(., na.rm=T))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+stopifnot(nrow(plot.df2)==24)
+
+
+#################################
+# Too many lines, need to separate states.
+plot.df$plotGroup <- paste0(plot.df$Treatment, ": ", plot.df$farm_pastor)
+plot.df$plotGroup <- factor(plot.df$plotGroup, levels = c("ECPN: Farm", "Non-ECPN: Farm", 
+                                                          "ECPN: Past", "Non-ECPN: Past"))
+nas.df1 <- plot.df[plot.df$state %in% "nas",]
+ben.df1 <- plot.df[plot.df$state %in% "ben",]
+
+
+# panel
+plot.df2$plotGroup <- paste0(plot.df2$Treatment, ": ", plot.df2$farm_pastor)
+plot.df2$plotGroup <- factor(plot.df2$plotGroup, levels = c("Part: Farm", "Non-Part: Farm", "Control: Farm",
+                                                            "Part: Past", "Non-Part: Past", "Control: Past"))
+nas.df2 <- plot.df2[plot.df2$state %in% "nas",]
+ben.df2 <- plot.df2[plot.df2$state %in% "ben",]
+
+#########################
+# Fixing colors
+grps <-c("ECPN: Farm","Non-ECPN: Farm", 
+         "ECPN: Past", "Non-ECPN: Past",
+         
+         "Part: Farm", "Part: Past",
+         "Non-Part: Farm", "Non-Part: Past",
+         "Control: Farm", "Control: Past")
+# Make farmers red and pastoralists blue.  Make TR dark colors and CO light colors, with non-part in middle
+color.codes<-as.character(c("red4", "pink",
+                            "blue4", "cyan",
+                            
+                            "red4", "blue4",
+                            "pink4", "cyan3", 
+                            "pink", "cyan"
+                            ))
+
+#ECPN = "#FC8D59", Non-ECPN = "#00BFC4", Part="FC8D59", Non-Part="green", Control="#00BFC4")
+#plot.df$colors <- c("#00BFC4","#00BFC4","#FC8D59","#FC8D59")
+#plot.df1$colors <- c("#FC8D59","#FC8D59","#00BFC4","#00BFC4")
+#plot.df2$colors <- c("#FC8D59","#FC8D59", "green", "green", "#FFFFBF","#FFFFBF")
+
+
+#####################
+
+# The main Plot function chris: still need to make SE errorbars same color as lines...
+# gg line plot
+plot.fun<-function(var, thedf, time, title, xlab, ylab, ymin, ymax){
+  ggplot(data=thedf, aes(x=thedf[[time]], y=thedf[[paste0(var, "_mean")]], group=plotGroup)) +
+  geom_line(aes(color=plotGroup))+
+  geom_point(aes(color=plotGroup))+
+  scale_colour_manual(values=setNames(color.codes, grps)) +
+  coord_cartesian(ylim = c(ymin, ymax)) +
+  #geom_errorbar(aes(ymin = thedf[[paste0(var, "_mean")]] - thedf[[paste0(var, "_se")]], 
+   #                ymax= thedf[[paste0(var, "_mean")]] + thedf[[paste0(var, "_se")]],
+  #                 color=Treatment), 
+  #      width=.2, position=position_dodge(0.03)) + 
+  ggtitle(title) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab(xlab) +
+  ylab(ylab)
+}
+```
+
+## Trust Index
+
+
+```{r}
+(outComm.plot_nas <- plot.fun(var='x_cw', thedf=nas.df1, time='survey', title="Nassarawa - Trust - Community", 
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=0.3, ymax=0.8))
+
+(outComm.plot_ben <- plot.fun(var='x_cw', thedf=ben.df1, time='survey', title="Benue - Trust - Community", 
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=0, ymax=0.5))
+
+
+#png(file="outComm_plot.png", bg="transparent", units="in",
+#   width=8, height=6, res=300)
+#par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+#outComm.plot
+#dev.off()
+```
+
+
+Part vs Non vs Con.
+
+```{r}
+(outPan.plot_nas <- plot.fun(var='x_cw', thedf=nas.df2, time='survey', title="Nas - Trust - Panel",
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=0.3, ymax=0.8))
+
+(outPan.plot_ben <- plot.fun(var='x_cw', thedf=ben.df2, time='survey', title="Ben - Trust - Panel",
+         xlab="Survey", ylab="Average Trust Index Score",
+         ymin=0, ymax=0.5))
+
+#lm(out_cw~tr_f*farm_pastor, panel.df[panel.df$state %in% "ben",])
+#lm(out_cw~tr_f*farm_pastor, panel.df[panel.df$state %in% "nas",])
+```
+
+
+
+## Intergroup Cohesion Index
+
+
+```{r}
+(cohComm.plot_nas <- plot.fun(var='cohes_cw', thedf=nas.df1, time='survey', title="Nas - Intergroup Cohesion - Community", 
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0.6, ymax=0.9))
+
+(cohComm.plot_ben <- plot.fun(var='cohes_cw', thedf=ben.df1, time='survey', title="Ben -Intergroup Cohesion - Community", 
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0, ymax=0.75))
+
+```
+
+Panel
+
+```{r}
+(cohPan.plot_nas <- plot.fun(var='cohes_cw', thedf=nas.df2, time='survey', title="Nas - Intergroup Cohesion - Panel",
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0.5, ymax=0.7))
+
+(cohPan.plot_nas <- plot.fun(var='cohes_cw', thedf=ben.df2, time='survey', title="Ben - Intergroup Cohesion - Panel",
+         xlab="Survey", ylab="Average Intergroup Cohesion Index Score",
+         ymin=0.3, ymax=0.6))
+
+```
+
+## Intergroup Contact Index
+
+
+```{r}
+(conComm.plot_nas <- plot.fun(var='contactOnly_cw', thedf=nas.df1, time='survey', title="Nas - Intergroup Contact - Community", 
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0.3, ymax=0.8))
+
+(conComm.plot_ben <- plot.fun(var='contactOnly_cw', thedf=ben.df1, time='survey', title="Ben - Intergroup Contact - Community", 
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.8))
+
+```
+
+Panel
+
+```{r}
+(conPan.plot_nas <- plot.fun(var='contactOnly_cw', thedf=nas.df2, time='survey', title="Nas - Intergroup Contact - Panel",
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0.1, ymax=0.6))
+
+(conPan.plot_nas <- plot.fun(var='contactOnly_cw', thedf=ben.df2, time='survey', title="Ben - Intergroup Contact - Panel",
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.4))
+
+```
+
+
+## Perceptions of Security Index
+
+
+
+```{r}
+(inComm.plot_nas <- plot.fun(var='in_cw', thedf=nas.df1, time='survey', title="Nas - Perceptions of Security - Community", 
+         xlab="Survey", ylab="Average Perceptions of Security Index Score",
+         ymin=0.5, ymax=1))
+
+(inComm.plot_ben <- plot.fun(var='in_cw', thedf=ben.df1, time='survey', title="Ben - Perceptions of Security - Community", 
+         xlab="Survey", ylab="Average Perceptions of Security Index Score",
+         ymin=0, ymax=0.6))
+
+```
+
+Panel
+
+```{r}
+(inPan.plot_nas <- plot.fun(var='in_cw', thedf=nas.df2, time='survey', title="Nas - Perceptions of Security - Panel",
+         xlab="Survey", ylab="Average Perceptions of Security Index Score",
+         ymin=0.4, ymax=0.7))
+
+(inPan.plot_ben <- plot.fun(var='in_cw', thedf=ben.df2, time='survey', title="Ben - Perceptions of Security - Panel",
+         xlab="Survey", ylab="Average Perceptions of Security Index Score",
+         ymin=0.2, ymax=0.6))
+
+```
+
+# PGG
+
+```{r, eval=F}
+## Make a df with obs that are comm-outcome, vars for community and value amount
+pgg.df <- ag.df %>% select(pgp_donate_end, pgp_amount_end, treatment,state,farm_pastor)
+pgg.df <- reshape2::melt(pgg.df, id=c("treatment","state","farm_pastor"))
+pgg.df <- pgg.df %>% dplyr::group_by(treatment,variable,state,farm_pastor) %>% 
+  summarise(Value=mean(value)) %>%
+  as.data.frame()
+
+pgg.df
+
+
+lm_robust(pgp_amount_end~treatment*state, clusters=psu, ag.df)
+lm_robust(pgp_amount_end~treatment*farm_pastor, clusters=psu, ag.df)
+lm_robust(pgp_amount_end~treatment*state*farm_pastor, clusters=psu, ag.df)
+
+
+lm_robust(pgp_donate_end~treatment*state, clusters=psu, ag.df)
+lm_robust(pgp_donate_end~treatment*farm_pastor, clusters=psu, ag.df)
+lm_robust(pgp_donate_end~treatment*state*farm_pastor, clusters=psu, ag.df)
+
+```
+
+<!--
+# Save plots
+
+For use later.
+
+```{r, eval=F}
+thing <- grep(".plot",names(.GlobalEnv),value=TRUE)
+#Pattern1_list<-do.call("list",mget(thing)) # show the graph of all objects
+
+
+save(endComm.plot,   randComm.plot,  conComm.plot,   outInd.plot,    shareInd.plot,  clashComm.plot, resComm.plot, 
+     outComm.plot,   listComm.plot,  inInd.plot,     clashInd.plot,  inComm.plot,    cohComm.plot,   cohInd.plot, 
+     resInd.plot, shareComm.plot, conInd.plot, randComm.plot2, randComm.plot3, pggComm.plot, 
+     clashPan.plot, resPan.plot, inPan.plot, sharePan.plot, conPan.plot, outPan.plot, cohPan.plot, pggPan.plot,
+     file='ecpn_plots.Rdata') # must be easier way to save objects that match a pattern...
+
+```
+-->

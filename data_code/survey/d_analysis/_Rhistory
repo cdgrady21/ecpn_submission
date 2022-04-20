@@ -1,0 +1,512 @@
+resolveVars <- names(df)[grepl("(farmland|pasture)_disputes_resolved|resolve_|persist", names(df))]
+summary(df[,resolveVars])
+df[,resolveVars] <- reshape::rescaler(df[,resolveVars],type="range")
+##dispute_persist: coded so high is good (never persist)
+##farmland/pasture disputes resolved coded so high is good (always resolved)
+##resolve_peace coded so that high is good (strongly agree resolved peacefully)
+df$resolve_index <- rowMeans(df[,resolveVars],na.rm=T)
+check.fun('resolve_index', resolveVars)
+table(df1$farmland_disputes_resolved)
+table(base$farmland_disputes_resolved)
+#lm(resolve_index~treatment*survey+state, data=df)
+# Chunk 8
+# Bargaining Index!
+## higher scores == more sharing land resources == bad
+## higher scores == less dispute == good.
+## higher scores == more resolved == good.
+df$barg_index_farm <- ifelse(df$share_farmland %in% 0, 1,
+ifelse(df$share_farmland_dispute %in% 1, 1,
+ifelse(!(df$share_farmland_dispute %in% 1), df$farmland_disputes_resolved, NA)))
+df$barg_index_past <- ifelse(df$share_pasture %in% 0, 1,
+ifelse(df$share_pasture_dispute %in% 1, 1,
+ifelse(!(df$share_pasture_dispute %in% 1), df$pasture_disputes_resolved, NA)))
+# index
+bargVars <- names(df)[grepl("barg_index", names(df))]
+summary(df[,bargVars])
+df$barg_index <- rowMeans(df[,bargVars],na.rm=T)
+check.fun('barg_index', bargVars)
+#lm(barg_index~treatment*survey*farm_pastor+state, data=df)
+# Chunk 9
+#violence_effect is not recoded yet
+table(df$violence_effect)
+df$vio1_bus <- ifelse(grepl("business", df$violence_effect), 1, 0)
+df$vio2_home <- ifelse(grepl("home", df$violence_effect), 1, 0)
+df$vio3_prop <- ifelse(grepl("property", df$violence_effect), 1, 0)
+df$vio4_inj <- ifelse(grepl("injured", df$violence_effect), 1, 0)
+df$vio5_kill <- ifelse(grepl("killed", df$violence_effect), 1, 0)
+df$violence_effect_num <- rowMeans(df[,grepl("^vio[0-9]_", names(df))], na.rm=T)
+vioExpVars <- names(df)[grepl("^vio[0-9]_", names(df))]
+df$vioNothing <- ifelse(grepl("^no$", df$violence_effect) | is.na(df$violence_effect), 1, 0)
+#table(df$vio5_kill, df$survey, df$state) # deaths go down in both states, but go down a lot more in Nassarawa.
+#table(df$vio4_inj, df$survey, df$state) # injuries go down in both states, but go down a lot more in Nassarawa.
+##lm(vio5_kill~treatment*survey*farm_pastor+state, data=df)
+##lm(vio4_inj~treatment*survey*farm_pastor+state, data=df)
+##lm(vioNothing~treatment*survey*farm_pastor+state, data=df)
+# is this just because treatment people were more aware?
+### yes, it was somewhat. All TR is less likely to be killed, pastoralists are less likely to be injured but farmers are more likely, and pastoralists are more likely to say "no" but farmers are more likely.
+#test <- df[df$clash_group.violence %in% 1,]
+##lm(vio5_kill~treatment*survey*farm_pastor+state, data=test)
+##lm(vio4_inj~treatment*survey*farm_pastor+state, data=test)
+##lm(vioNothing~treatment*survey*farm_pastor+state, data=test)
+# physical insecurity/conflict effect
+inVars <- names(df)[grepl("avoid|insecurity", names(df))] # also add "violence_work_effect" and "violence_effect_num"?
+df$insecurity_group.work_days <- reshape::rescaler(dense_rank(df$insecurity_group.work_days), type="range")
+## make "days could not work" 0 if respondent said working was not prevented.
+df[df$insecurity_group.working %in% 0, "insecurity_group.work_days"] <- 0
+## index can either use binary "affect work yes/no" or continuous "how many days work affected", but not both. Going with binary because other vars in index are binary.
+#inVars <- inVars[!inVars %in% "insecurity_group.work_days"]
+inVars <- inVars[!inVars %in% "insecurity_group.working"]
+##make index
+df$in_index <- rowMeans(df[,inVars], na.rm=T)
+#psych::alpha(df[,inVars]) #0.9
+#lm(in_index~treatment*survey+state, data=df)
+# all together-- actually meaningless because "vio_effect" vars only asked if know about violence.  TR group was more likely to know about violence.  Need to look at this only for people who knew about violence?  But that's weird about the insecurity group.
+conVioEffVars <- c(vioExpVars,inVars)
+df$conVioEff_index <- rowMeans(df[,conVioEffVars], na.rm=T)
+#psych::alpha(df[,conVioEffVars])
+# Chunk 10: clash
+# want: measure of respondents' awareness of conflict events
+awareVars <- names(df)[grepl("clash_group.violence$", names(df))] # just one variable now.
+summary(df[,awareVars])
+#lm(clash_group.violence~treatment*survey*farm_pastor+state, data=df)
+# old clashVars: report more or less violence overall.
+clashVars <- names(df)[grepl("clash", names(df))][-c(1:2)] # for the index, can only use things on both baseline & endline. No burned/injured.
+# the "violence_when" q is coded so that high scores (13 months/1) are GOOD.  Need to reverse so that high scores are BAD.
+df$clash_details_group.violence_when <- abs(df$clash_details_group.violence_when-max(df$clash_details_group.violence_when, na.rm=T))
+# handle the countvars by making it ranks - baseline and endline separately
+df[df$survey %in% 0,clashVars[c(1,2,4)]] <- sapply(df[df$survey %in% 0,clashVars[c(1,2,4)]], dense_rank)
+df[df$survey %in% 0,clashVars] <- sapply(df[df$survey %in% 0,clashVars], reshape::rescaler, type="range")
+##endline
+df[df$survey %in% 1,clashVars[c(1,2,4)]] <- sapply(df[df$survey %in% 1,clashVars[c(1,2,4)]], dense_rank)
+df[df$survey %in% 1,clashVars] <- sapply(df[df$survey %in% 1,clashVars], reshape::rescaler, type="range")
+#chris: what to do with people tied at 0?
+summary(df[,clashVars])
+# when people are not aware of violence, other vars should be NA. Otherwise just a "vio awareness index"
+#df[c(1:5, 150:155),clashVars] # correct
+# when people say there was no violence, need to make the other vars 0, not NA.
+df[df$clash_group.violence %in% 0, clashVars[c(1,2,4)]] <- 0
+# drop 3 because it's the screening question that determines if other questions get asked
+df$clash_index <- rowMeans(df[,clashVars[c(1,2,4)]],na.rm=T)
+#psych::alpha(df[,clashVars[c(1,2,4)]], na.rm=T) # great index
+# Chunk 11
+# donate yes/no
+df$pgp_donate <- ifelse(df$pgp_amount>0, 1, 0)
+# amount donated already as pgp_amount
+# Chunk 12: contact orig
+# the vars
+contactVars <- names(df)[grepl("(contact.*num|other|contact.*pos|contact_market)", names(df))]
+summary(df[,contactVars])
+#chris: note that these (num of contacts) has a ton of NA for when people don't have contact.  Need to use "x_at_market" and "contact_nonmarket" so the num of contacts is just 0 if people have no contact, not NA.
+## Use number of contacts if they say they have contact, otherwise use "yes/no if they had contact".
+## Only "contact_pos" and "contact_market_pos" should be left NA if they are NA.
+df[contactVars[c(1:4,7)]][is.na(df[contactVars[c(1:4,7)]])] <- 0
+# Count data, needs to be put into categories or ranks
+# ranks
+df[df$survey %in% 0,contactVars[c(2:4,7)]] <- sapply(df[df$survey %in% 0,contactVars[c(2:4,7)]], dense_rank)
+df[df$survey %in% 0,contactVars] <- sapply(df[df$survey %in% 0,contactVars], reshape::rescaler, type='range')
+##endline
+df[df$survey %in% 1,contactVars[c(2:4,7)]] <- sapply(df[df$survey %in% 1,contactVars[c(2:4,7)]], dense_rank)
+df[df$survey %in% 1,contactVars] <- sapply(df[df$survey %in% 1,contactVars], reshape::rescaler, type='range')
+# categories
+#df[df$survey %in% 0,contactVars[c(2:4,7)]] <- lapply(df[df$survey %in% 0,contactVars[c(2:4,7)]], countFun, cats=2)
+#df[df$survey %in% 0,contactVars[-c(2:4,7)]] <- lapply(df[df$survey %in% 0,contactVars[-c(2:4,7)]], reshape::rescaler, type='range')
+## endline
+#df[df$survey %in% 1,contactVars[c(2:4,7)]] <- lapply(df[df$survey %in% 1,contactVars[c(2:4,7)]], countFun, cats=2)
+#df[df$survey %in% 1,contactVars[-c(2:4,7)]] <- lapply(df[df$survey %in% 1,contactVars[-c(2:4,7)]], reshape::rescaler, type='range')
+# originally did not disaggregate baseline and endline
+#df[,contactVars[c(2:4,7)]] <- lapply(df[,contactVars[c(2:4,7)]], countFun, cats=2)
+#df[,contactVars[-c(2:4,7)]] <- lapply(df[,contactVars[-c(2:4,7)]], reshape::rescaler, type='range')
+# all the vars
+df$contact_index <- rowMeans(df[,contactVars], na.rm=T)
+#psych::alpha(df[,contactVars]) # 0.81
+# just the contact number vars
+df$contactOnly_index <- rowMeans(df[,contactVars[c(1:4,7)]], na.rm=T)
+#psych::alpha(df[,contactVars][c(2:4,7)]) # 0.79
+# Chunk 13
+summary(df[df$x_at_market %in% 1,contactVars[c(2:4,7)]])
+summary(df[df$contact_nonmarket %in% 1,contactVars[c(2:4,7)]])
+table(df[,contactVars[7]], df$x_at_market) # 384 "no" ppl for contact_market when say x is at market.
+table(df[,contactVars[2]], df$contact_nonmarket, exclude=c())
+table(df[,contactVars[4]], df$contact_nonmarket, exclude=c()) # basically no one says no to social contact when they say yes to contact nonmarket
+# Chunk 14
+df$rand_outcomeA <- rowSums(df[,grepl("rand_exp[0-9]a$", names(df))], na.rm=T)
+df$rand_outcomeB <- rowSums(df[,grepl("rand_exp[0-9]b$", names(df))], na.rm=T)
+df$rand_condition <- ifelse(!is.na(df$group5p.rand_exp1a) | !is.na(df$group5p.rand_exp1b), 5,
+ifelse(!is.na(df$group25p.rand_exp2a) | !is.na(df$group25p.rand_exp2b), 25,
+ifelse(!is.na(df$group50p.rand_exp3a) | !is.na(df$group50p.rand_exp3b), 50,
+ifelse(!is.na(df$group75p.rand_exp4a) | !is.na(df$group75p.rand_exp4b), 75, NA)))) # using both Qs in case someone refused one.
+# make an average rand_outcome for "join group" and "live in community"
+df$rand_outcome <- rowMeans(df[,grepl("rand_outcome", names(df))], na.rm=T)
+df[,c("rand_outcomeA", "rand_outcomeB")] <- NULL
+# showing that rand_outcomeA and B are basically the same outcome.
+#df[1:10,c("rand_outcomeA", "rand_outcomeB", "rand_outcome", "rand_condition", names(df)[grepl("rand_exp[0-9]a$", names(df))])]
+#prop.table(table(df$rand_outcomeB, df$gender),2)
+#cor(df$rand_outcomeA, df$rand_outcomeB)
+#summary(lm(rand_outcomeA ~ gender + farm_pastor + treatment + as.numeric(age), df)) # predicted by same things
+#summary(lm(rand_outcomeB ~ gender + farm_pastor + treatment + as.numeric(age), df))
+# Chunk 15
+# chris: only works if nothing is loaded except the packages and data of this .rmd?
+df <- df %>% dplyr::group_by(community, survey) %>%
+mutate(rand_lm = coef(lm(rand_outcome ~ rand_condition))[2]) %>%
+as.data.frame(.)
+stopifnot(coef(lm(rand_outcome ~ rand_condition, data=df[df$survey %in% 0 & df$community %in% "50.pastoralists",]))[2] ==
+mean(df$rand_lm[df$survey %in% 0 & df$community %in% "50.pastoralists"], na.rm=T))
+stopifnot(coef(lm(rand_outcome ~ rand_condition, data=df[df$survey %in% 1 & df$community %in% "22.farmers",]))[2] ==
+mean(df$rand_lm[df$survey %in% 1 & df$community %in% "22.farmers"], na.rm=T))
+# Chunk 16
+# Set vars
+threatVars <- names(df)[grepl("threat_group.threat", names(df))]
+df[,threatVars] <- reshape::rescaler(df[,threatVars],type="range")
+# Reverse code things that are not yet reversed -- all of them
+df[,c(threatVars)] <- df[,threatVars]*-1
+# Make Index about Psychological Threat
+summary(df[,threatVars])
+df$threat_index <- rowMeans(df[,threatVars],na.rm=T)
+#psych::alpha(df[,threatVars]) # 0.59, not great, Jim.
+# Chunk 17
+cohesVars <- names(df)[grepl("social_cohesion_group", names(df))]
+df[,cohesVars] <- reshape::rescaler(df[,cohesVars],type="range")
+summary(df[,cohesVars])
+df$cohes_index <- rowMeans(df[,cohesVars], na.rm=T)
+#psych::alpha(df[,cohesVars]) # 0.76
+# sc1 - abstract
+cohesVars1 <- cohesVars[1:5]
+df$cohes_index1 <- rowMeans(df[,cohesVars1], na.rm=T)
+#psych::alpha(df[,cohesVars1]) # 0.77
+# sc2 - concrete
+cohesVars2 <- cohesVars[6:10]
+df$cohes_index2 <- rowMeans(df[,cohesVars2], na.rm=T)
+#psych::alpha(df[,cohesVars2]) # 0.76
+# Chunk 18
+empVars <- "social_cohesion_group2.misfortune_x"
+perspVars <- "threat_group.x_responsible"
+df[,empVars] <- reshape::rescaler(df[,empVars],type="range")
+df[,perspVars] <- reshape::rescaler(df[,perspVars],type="range")
+summary(df[,empVars])
+df$emp_index <- df[,empVars]     #rowMeans(df[,empVars], na.rm=T)
+df$persp_index <- df[,perspVars]
+# Chunk 19
+table(df$econ_benefit_group.benefit_econ)
+beneVars <- names(df)[grepl("(econ|qip)", names(df))][-4]
+df[,beneVars] <- reshape::rescaler(df[,beneVars],type="range")
+summary(df[,beneVars])
+# all
+#table(df$econ_benefit_group.benefit_econ, df$econ_benefit_group.more_benefit, exclude=c()) # if agreed they benefit materially
+#table(df$econ_benefit_group.benefit_econ, df$econ_benefit_group.more_benefit_disagree, exclude=c()) # if disagreed they benefit
+df$bene_index <- rowMeans(df[,beneVars],na.rm=T)
+# perceptions only
+beneVarsPerc <- beneVars[1:3]
+df$bene_index_perc <- rowMeans(df[,beneVarsPerc],na.rm=T)
+# awareness/use only
+beneVarsReal <- beneVars[4:7]
+df$bene_index_real <- rowMeans(df[,beneVarsReal],na.rm=T)
+# best question only
+beneVar <- beneVars[1]
+df$bene_index1 <- df[,beneVar]
+# Chunk 20
+outVars <- names(df)[grepl("(comf|outgroup)", names(df))]
+df[,outVars] <- reshape::rescaler(df[,outVars],type="range")
+summary(df[,outVars])
+df$out_index <- rowMeans(df[,outVars],na.rm=T)
+psych::alpha(df[,outVars]) # 0.89
+# X specifically
+xVars <- names(df)[grepl("(comf|trust_x)", names(df))]
+summary(df[,xVars])
+df$x_index <- rowMeans(df[,xVars],na.rm=T)
+psych::alpha(df[,xVars]) # 0.89
+# other groups specifically
+otherVars <- setdiff(outVars,xVars)
+summary(df[,otherVars])
+df$other_index <- rowMeans(df[,otherVars],na.rm=T)
+psych::alpha(df[,otherVars]) # 0.89
+# Chunk 21
+# more sharing resources, fewer disputes, & better resolved disputes (this big index does not make sense. sharing farmland opens up qs about disputes.)
+shareVars <- names(df)[grepl("^share_[a-z]*$", names(df))]
+numDisVars <- names(df)[grepl("(dispute$|tension$)", names(df))]
+resolveVars <- names(df)[grepl("(resolve[^s]|persist)", names(df))]
+# if NO disputes (1=no), then give max for dispute resolution.
+df$farmland_disputes_resolved <- ifelse(df$share_farmland_dispute %in% 1 & is.na(df$farmland_disputes_resolved), max(df$farmland_disputes_resolved, na.rm=T),  df$farmland_disputes_resolved)
+df$pasture_disputes_resolved <- ifelse(df$share_pasture_dispute %in% 1 & is.na(df$pasture_disputes_resolved), max(df$pasture_disputes_resolved, na.rm=T),  df$pasture_disputes_resolved)
+df$market_disputes_resolved <- ifelse(df$share_market_dispute %in% 1 & is.na(df$market_disputes_resolved), max(df$market_disputes_resolved, na.rm=T),  df$market_disputes_resolved)
+disVars <- c(shareVars, numDisVars, resolveVars)
+df[,disVars] <- reshape::rescaler(df[,disVars],type="range")
+#summary(df[,disVars])
+df$dis_index <- rowMeans(df[,disVars], na.rm=T)
+#psych::alpha(df[,disVars]) # won't give an alpha? Something wrong with this as an index, perfect correlations.  Shared should not be a part of it.
+################################################
+# Individual parts of dispute resolution.
+################################################
+# better resolved
+df$resolve_index <- rowMeans(df[,resolveVars], na.rm=T)
+#summary(df[,resolveVars])
+#psych::alpha(df[,resolveVars]) #0.48
+# fewer disputes
+df$numDis_index <- rowMeans(df[,numDisVars], na.rm=T)
+#summary(df[,numDisVars])
+#psych::alpha(df[,numDisVars]) #0.78
+# shared resources
+df$share_index <- rowMeans(df[,shareVars], na.rm=T)
+#psych::alpha(df[,shareVars]) #0.39
+# Chunk 22
+disActorVars <- names(df)[grepl("dispute_resolution_group", names(df))]
+df[,disActorVars] <- reshape::rescaler(df[,disActorVars],type="range")
+#summary(df[,disActorVars])
+df$disActor_index <- rowMeans(df[,disActorVars], na.rm=T)
+#psych::alpha(df[,disActorVars]) #0.82
+# I don't want to code all of these.
+## local gov
+## rel leaders
+## sec officials
+## state gov
+## trad leader
+## women
+## youth
+# Chunk 23
+vioVars <- names(end)[grepl("violence_group", names(end))]
+df[,vioVars] <- reshape::rescaler(df[,vioVars],type="range")
+summary(df[,vioVars])
+df$vio_index <- rowMeans(df[,vioVars], na.rm=T)
+#psych::alpha(df[,vioVars]) # 0.83
+# Chunk 24
+levels(df$username)[levels(df$username) %in% "f.gbeyi"] <- "f.gbenyi"
+levels(df$username)[levels(df$username) %in% "f.onaja"] <- "f.onoja"
+levels(df$username)[levels(df$username) %in% "l.awule"] <- "l.aule"
+# Chunk 25
+save.image(file="d-additiveIndices.Rdata")
+setwd("C:/Users/chris/Google Drive/Africa/Nigeria - Farmer-Pastoralist/ecpn_work/analysis/academicPaper/survey/d_analysis")
+# Chunk 1: setup
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(7867564)
+rm(list=ls())
+load("../b_creating_outcomes/f2-panelData.Rdata")
+library(NPC)
+library(estimatr)
+library(mosaic)
+library(coin)
+library(robustbase)
+#author: "Christopher Grady"
+#date: "`r format(Sys.Date(), "%B %d, %Y")`"
+# true pval function.  Might not be necessary for panel since we have a decent number of obs, but still few clusters.
+## for panel, might need the covar adjust version because possible confounders.
+## chris: should block here should be community? No, then treatment perfectly correlates with the block, washing out effect.
+true.fun1 <- function(var, tr)
+{
+if(grepl("resid", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr], data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1500)
+for(i in 1:1500){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
+tr.lm <- lm(tr_fmla,rand.samp)
+lm.tr_resid<-resid(tr.lm)
+rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment"){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else{
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+thep <- mean(rand.coef>=thecoef)
+thedf <- data.frame(coef=thecoef,truep=thep)
+rownames(thedf) <- paste0(var, "~",tr)
+return(thedf)
+}
+#true.fun1(var='cohes_cw', tr='treatment')
+#true.fun1(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun1(var='cohes_cw', tr='bene_cw')
+########## Samii Suggestion
+true.fun <- function(var, tr)
+{
+if(grepl("resid", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr], data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1500)
+for(i in 1:1500){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
+tr.lm <- lm(tr_fmla,rand.samp)
+lm.tr_resid<-resid(tr.lm)
+rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment" & (grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(tr=="treatment" & !(grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,paste0(var,"_y1")]~panel.df[,tr]+panel.df[,paste0(var,"_y0")]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,2000)
+for(i in 1:2000){
+rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+rand <- c(as.character(rand.nas), as.character(rand.ben))
+rand.samp <- panel.df
+rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+lm.null <- lm(rand.samp[,paste0(var,"_y1")]~rand.samp[,tr]+rand.samp[,paste0(var,"_y0")]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(!(grepl("end", var) | grepl("y1", var) | grepl("rMean", var))){
+thelm <- lm(panel.df[,paste0(var,"_y1")]~panel.df[,tr]+panel.df[,paste0(var,"_y0")]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,paste0(var,"_y1")]~rand.samp[,'newtr']+rand.samp[,paste0(var,"_y0")]+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+else if(grepl("end", var) | grepl("y1", var) | grepl("rMean", var)){
+thelm <- lm(panel.df[,var]~panel.df[,tr]+state, data=panel.df)
+thecoef <-coef(thelm)[2]
+rand.coef = rep(NA,1000)
+for(i in 1:1000){
+rand.samp <- panel.df %>% dplyr::group_by(state) %>% # for ind~ind, null dist can assign value of anyone in same state.
+mutate(newtr = shuffle(.data[[tr]])) %>%
+as.data.frame(.)
+lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+}
+}
+thep <- mean(rand.coef>=thecoef)
+thedf <- data.frame(coef=thecoef,truep=thep)
+rownames(thedf) <- paste0(var, "~",tr)
+return(thedf)
+}
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var="pgp_amount_y1", tr='treatment')
+#true.fun(var="pgp_amount_y1", tr='bene_cw')
+# Chunk 2
+load('../c_creating_dataframes/rand_df.Rdata') #load the rand.df, eventually combine with panel.df
+rand.df <- rand.df[rand.df$survey %in% 0,] # only want baseline ppl
+# remove panel ppl from rand.df
+rand.df$merger <- paste0(rand.df$name.1, "-", rand.df$psu)
+stopifnot(length(intersect(rand.df$merger, panel.df$merger))==nrow(panel.df))
+rand.df <- rand.df[!rand.df$merger %in% panel.df$merger,] # removes 288 rows bcuz same name/community, should be same ppl
+# get same vars from baseline rand.df ppl and baseline panel.df ppl so can rbind a df of baseline non-contacted (from rand.df) and baseline recontacted (from panel.df)
+compVars <- c(names(rand.df)[grepl("_cw", names(rand.df))], "gender", "age", "community", "treatment") # for rand.df baseline ppl, "_cw" are index values at baseline
+compVars <- compVars[!compVars %in% "disActor_cw"] #disActor is not a part of any index and was, I think, actually created from a bunch of categorical variables where R randomly assigned numeric values to things like "traditional leader" and "religious leader" and "security forces"
+# get rand.df with baseline outcomes (comp.df1), then get panel.df with baseline outcomes (comp.df2)
+comp.df1 <- rand.df[,compVars]
+comp.df1$committee <- NA
+compVars2 <- c(paste0(compVars, "_y0")[-c(length(compVars), length(compVars)-1)],
+"community", "treatment", "committee")
+comp.df2 <- panel.df[,compVars2]
+# make names match.  Even though these just say "_cw", that are these outcomes at baseline.
+names(comp.df2) <- names(comp.df1)
+# bind with signifier
+comp.df1$ppl <- "non"
+comp.df2$ppl <- "pre"
+comp.df <- rbind(comp.df1, comp.df2)
+# compare
+## function that returns the coef for "pre", the p-value, and the effect size.
+coef.fun <- function(var)
+{
+the_fmla <- reformulate ("ppl", response=var)
+the_lm <- lm(the_fmla, data=comp.df)
+thecoef <- coef(the_lm)['pplpre']
+thep  <- summary(the_lm)$coefficients['pplpre',4]
+thesd <- sd(comp.df[,var], na.rm=T)
+size <- thecoef/thesd
+return(c(thecoef, thep, size))
+}
+#coef.fun(var='x_cw')
+comp.df$female <- ifelse(comp.df$gender %in% "female", 1, 0)
+compVars <- c(compVars[grepl("_cw", compVars)], "age", "female") # need to keep gender and age
+diffs1 <- matrix(NA, nrow=length(compVars), ncol=4)
+for(i in 1:length(compVars))
+{
+diffs1[i,1] <- compVars[i]
+diffs1[i,2:4] <- coef.fun(paste0(compVars)[i])
+}
+diffs1 <- as.data.frame(diffs1)
+diffs1[,2:4] <- sapply(diffs1[,2:4], function(x) {as.numeric(as.character(x))})
+#diffs
+posVars1 <- diffs1$V1[diffs1[,3]<0.05 & diffs1[,2]>0]
+negVars1 <- diffs1$V1[diffs1[,3]<0.05 & diffs1[,2]<0]
+sameVars1 <- diffs1$V1[diffs1[,3]>=0.05]
+# Chunk 3
+library(RItools)
+comp.df$panel_01 <- ifelse(comp.df$ppl %in% "pre", 1, 0)
+bal1 <- RItools::xBalance(panel_01 ~ allTrust_cw+x_cw+out_cw+other_cw+clash_cw+contactOnly_cw+bene_cw+threat_cw+conEff_cw+cohes1_cw+cohes2_cw+dis_cw+share_cw+vio_cw+vioExp_cw+age+female, report="all", data=comp.df)
+bal1$overall
+bal1$results[,c("panel_01=0","panel_01=1", "adj.diff", "p"),]
+plot(bal1)
+save(bal1,file="panel_balance1.rda")
+# Chunk 4
+# were recontacted people in treatment different from recontact ppl in control?
+## could have done this all in same function above, but alas, I did not.
+coef.fun <- function(var)
+{
+the_fmla <- reformulate ("ppl*treatment", response=var)
+the_lm <- lm(the_fmla, data=comp.df)
+thecoef <- coef(the_lm)['pplpre:treatment']
+thep  <- summary(the_lm)$coefficients['pplpre:treatment',4]
+thesd <- sd(comp.df[,var], na.rm=T)
+size <- thecoef/thesd
+return(c(thecoef, thep, size))
+}
+#coef.fun(var='x_cw')
+diffs2 <- matrix(NA, nrow=length(compVars), ncol=4)
+for(i in 1:length(compVars))
+{
+diffs2[i,1] <- compVars[i]
+diffs2[i,2:4] <- coef.fun(paste0(compVars)[i])
+}
+diffs2 <- as.data.frame(diffs2)
+diffs2[,2:4] <- sapply(diffs2[,2:4], function(x) {as.numeric(as.character(x))})
+#diffs
+TrCoPosVars2 <- diffs2$V1[diffs2[,3]<0.05 & diffs2[,2]>0] # disActor not even a real index
+TrCoNegVars2 <- diffs2$V1[diffs2[,3]<0.05 & diffs2[,2]<0] # above .05 for both, not even close if I adjused for mult tests
+TrCoSameVars2 <- diffs2$V1[diffs2[,3]>=0.05]
+comp.df2 <- comp.df[comp.df$panel_01 %in% 1, ]
+bal2 <- RItools::xBalance(treatment ~ allTrust_cw+out_cw+clash_cw+contactOnly_cw+bene_cw+threat_cw+in_cw+cohes1_cw+cohes2_cw+barg_cw+vio_cw+vioExp_cw+age+female, report="all", data=comp.df2)
+bal2$overall

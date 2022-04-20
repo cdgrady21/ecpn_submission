@@ -1,0 +1,146 @@
+---
+title: "obsDat"
+output:
+  pdf_document:
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+  word_document:
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("../clean/a_obsDat_clean.rda")
+library(dplyr)
+library(estimatr)
+
+```
+
+# Overview
+
+This shows summary statistics for the market and event observational data.  The outcomes are the raw number of people attending the market/event or engaging in some behavior at the market/event.  The outcome have been rank rescaled because of their skew.
+
+# Markets
+
+## Stuff to Look at
+
+What do we have?  How many observations for each community in the before (0) and after (1) time categories?
+
+```{r}
+(thetab1 <- as.matrix(table(markets$site, markets$time)))
+```
+
+Only use a community if it has at least 2 obs before and after?
+
+```{r, include=F, eval=F}
+sigh <- data.frame(comm = rownames(thetab1), bef = thetab1[,1], end = thetab1[,2])
+
+dropsies <- na.omit(ifelse(sigh$bef < 2 | sigh$end < 2, as.character(sigh$comm), NA))
+markets <- droplevels(markets[!markets$site %in% dropsies,])
+```
+
+
+### Summary Stats 
+
+By treatment and control average before/after intervention began.
+
+```{r, echo=F}
+summaryFun <- function(thevar)
+{
+  themin <- min(thevar, na.rm=T)
+  themed <- median(thevar, na.rm=T)
+  themean <- mean(thevar, na.rm=T)
+  themax <- max(thevar, na.rm=T)
+  thesd <- sd(thevar, na.rm=T)
+  
+  cbind(themin, themed, themean, themax, thesd)
+}
+
+sumFun <- function(thevar)
+{
+  conBase <- summaryFun(markets[markets$treatment %in% 0 & markets$time %in% 0,thevar])
+  conEnd <- summaryFun(markets[markets$treatment %in% 0 & markets$time %in% 1,thevar])
+  trBase <- summaryFun(markets[markets$treatment %in% 1 & markets$time %in% 0,thevar])
+  trEnd <- summaryFun(markets[markets$treatment %in% 1 & markets$time %in% 1,thevar])
+  thedf <- as.data.frame(rbind(conBase,conEnd,trBase,trEnd))
+  rownames(thedf) <- c("conBase", "conEnd", "trBase", "trEnd")
+  print(thevar)
+  print(thedf)
+}
+#sumFun("market_stalls_total")
+
+for(i in 1:length(outcomes))
+{
+  sumFun(outcomes[i])
+}
+```
+
+
+
+## Summary
+
+The data mildly suggest ECPN increased market interaction.  It looks like TR pastoralists, as we move from baseline to endline, were more likely to be in the markets than CO pastoralists.  This is important because the market is almost always in the farming community, so this represents pastoralists entering the farming community.
+
+An important caveat is that the control group started with much more market interaction than the treatment communities.  And the change is that the control group plummeted down to the level of treatment communities, whereas treatment communities stay the same.  That pattern corroborates findings from the survey that contact plummeted far more in control than in Treatment.  
+
+We should also keep in mind that these data are very messy.
+
+
+
+************************
+
+# Events
+
+This uses the same thing as the _Markets_ data: summary stats.
+
+## Stuff to look at
+
+What do we have?  How many observations per community before/after?
+
+```{r}
+(thetab <- as.matrix(table(events$Community.Name, events$time)))
+#table(events$Community.Name, events$time, events$treatment)
+```
+
+Again, only use a community if it has at least 2 obs before and after.
+
+```{r, include=F}
+sigh <- data.frame(comm = rownames(thetab), bef = thetab[,1], end = thetab[,2])
+
+dropsies <- na.omit(ifelse(sigh$bef < 2 | sigh$end < 2, as.character(sigh$comm), NA))
+events <- droplevels(events[!events$Community.Name %in% dropsies,])
+```
+
+
+Sum Stats
+
+```{r, echo=F}
+sumFun2 <- function(thevar)
+{
+  conBase <- summaryFun(events[events$treatment %in% 0 & events$time %in% 0,thevar])
+  conEnd <- summaryFun(events[events$treatment %in% 0 & events$time %in% 1,thevar])
+  trBase <- summaryFun(events[events$treatment %in% 1 & events$time %in% 0,thevar])
+  trEnd <- summaryFun(events[events$treatment %in% 1 & events$time %in% 1,thevar])
+  thedf <- as.data.frame(rbind(conBase,conEnd,trBase,trEnd))
+  rownames(thedf) <- c("conBase", "conEnd", "trBase", "trEnd")
+  print(thevar)
+  print(thedf)
+}
+#sumFun2(eventOutcomes[1])
+
+for(i in 1:length(eventOutcomes))
+{
+  sumFun2(eventOutcomes[i])
+}
+
+```
+
+
+## Summary
+
+It looks like ECPN had no effect on event attendance.  The data weakly suggest that more pastoralists showed up to and took food at farming events, but fewer farmers showed up to and took food at pastoralists events.  

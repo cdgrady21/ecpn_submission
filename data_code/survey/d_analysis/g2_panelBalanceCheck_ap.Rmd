@@ -1,0 +1,273 @@
+---
+title: "g2-panel balance check"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(7867564)
+rm(list=ls())
+load("../b_creating_outcomes/f2-panelData.Rdata")
+
+```
+
+
+# Differences between recontacted and not recontacted baseline respondents
+
+**Showing that the groups are comparable**
+
+First, we look at group-level means at baseline, to see if there were pre-existing differences.
+
+```{r}
+load('../c_creating_dataframes/rand_df.Rdata') #load the rand.df, eventually combine with panel.df
+rand.df <- rand.df[rand.df$survey %in% 0,] # only want baseline ppl
+ # remove panel ppl from rand.df
+rand.df$merger <- paste0(rand.df$name.1, "-", rand.df$psu)
+stopifnot(length(intersect(rand.df$merger, panel.df$merger))==nrow(panel.df))
+rand.df <- rand.df[!rand.df$merger %in% panel.df$merger,] # removes 288 rows bcuz same name/community, should be same ppl
+
+# get same vars from baseline rand.df ppl and baseline panel.df ppl so can rbind a df of baseline non-contacted (from rand.df) and baseline recontacted (from panel.df)
+compVars <- c(names(rand.df)[grepl("_cw", names(rand.df))], "gender", "age", "community", "treatment") # for rand.df baseline ppl, "_cw" are index values at baseline
+compVars <- compVars[!compVars %in% "disActor_cw"] #disActor is not a part of any index and was, I think, actually created from a bunch of categorical variables where R randomly assigned numeric values to things like "traditional leader" and "religious leader" and "security forces"
+
+# get rand.df with baseline outcomes (comp.df1), then get panel.df with baseline outcomes (comp.df2)
+comp.df1 <- rand.df[,compVars]
+comp.df1$committee <- NA
+comp.df1$full <- NA
+compVars2 <- c(paste0(compVars, "_y0")[-c(length(compVars), length(compVars)-1)], 
+               "community", "treatment", "committee", "full")
+comp.df2 <- panel.df[,compVars2]
+# make names match.  Even though these just say "_cw", that are these outcomes at baseline.
+names(comp.df2) <- names(comp.df1)
+
+# bind with signifier
+comp.df1$ppl <- "non"
+comp.df2$ppl <- "pre"
+comp.df <- rbind(comp.df1, comp.df2)
+
+# compare
+## function that returns the coef for "pre", the p-value, and the effect size.
+coef.fun <- function(var)
+{
+  the_fmla <- reformulate ("ppl", response=var)
+  the_lm <- lm(the_fmla, data=comp.df)
+  thecoef <- coef(the_lm)['pplpre']
+  thep  <- summary(the_lm)$coefficients['pplpre',4]
+  thesd <- sd(comp.df[,var], na.rm=T)
+  size <- thecoef/thesd
+  
+  return(c(thecoef, thep, size))
+}
+#coef.fun(var='x_cw')
+
+comp.df$female <- ifelse(comp.df$gender %in% "female", 1, 0)
+compVars <- c(compVars[grepl("_cw", compVars)], "age", "female") # need to keep gender and age
+diffs1 <- matrix(NA, nrow=length(compVars), ncol=4)
+for(i in 1:length(compVars))
+{
+  diffs1[i,1] <- compVars[i]
+  diffs1[i,2:4] <- coef.fun(paste0(compVars)[i])
+  
+}
+diffs1 <- as.data.frame(diffs1)
+diffs1[,2:4] <- sapply(diffs1[,2:4], function(x) {as.numeric(as.character(x))})
+#diffs
+posVars1 <- diffs1$V1[diffs1[,3]<0.05 & diffs1[,2]>0]
+negVars1 <- diffs1$V1[diffs1[,3]<0.05 & diffs1[,2]<0]
+sameVars1 <- diffs1$V1[diffs1[,3]>=0.05]
+```
+
+<!--Chris: update -->
+Compared to the average person surveyed at baseline, respondents we were able to recontact scored higher on `r paste(posVars1, collapse=", ")`.  These respondents scored lower on `r paste(negVars1, collapse=", ")`.  The preselected respondents scored the same on `r paste(sameVars1, collapse=", ")`.
+
+But what we really want to know is are they balanced across all of these traits. The answer is no.  These groups are definitely different.
+
+```{r}
+library(RItools)
+comp.df$panel_01 <- ifelse(comp.df$ppl %in% "pre", 1, 0)
+bal1 <- RItools::xBalance(panel_01 ~ allTrust_cw+other_cw+clash_cw+contactOnly_cw+bene_cw+threat_cw+in_cw+cohes1_cw+cohes2_cw+barg_cw+vio_cw+vioExp_cw+age+female, report="all", data=comp.df)
+
+bal1$overall
+bal1$results[,c("panel_01=0","panel_01=1", "adj.diff", "p"),]
+
+plot(bal1)
+dev.off()
+save(bal1,file="panel_balance1.rda")
+
+```
+
+**NEXT**
+
+We also want to know if recontacted respondents in treatment were different types of people than recontacted respondents in control.  That would make these groups poor comparisons for one another.
+
+```{r}
+# were recontacted people in treatment different from recontact ppl in control?
+## could have done this all in same function above, but alas, I did not.
+coef.fun <- function(var)
+{
+  the_fmla <- reformulate ("ppl*treatment", response=var)
+  the_lm <- lm(the_fmla, data=comp.df)
+  thecoef <- coef(the_lm)['pplpre:treatment']
+  thep  <- summary(the_lm)$coefficients['pplpre:treatment',4]
+  thesd <- sd(comp.df[,var], na.rm=T)
+  size <- thecoef/thesd
+  
+  return(c(thecoef, thep, size))
+}
+#coef.fun(var='x_cw')
+
+diffs2 <- matrix(NA, nrow=length(compVars), ncol=4)
+for(i in 1:length(compVars))
+{
+  diffs2[i,1] <- compVars[i]
+  diffs2[i,2:4] <- coef.fun(paste0(compVars)[i])
+  
+}
+diffs2 <- as.data.frame(diffs2)
+diffs2[,2:4] <- sapply(diffs2[,2:4], function(x) {as.numeric(as.character(x))})
+#diffs
+TrCoPosVars2 <- diffs2$V1[diffs2[,3]<0.05 & diffs2[,2]>0] # disActor not even a real index
+TrCoNegVars2 <- diffs2$V1[diffs2[,3]<0.05 & diffs2[,2]<0] # above .05 for both, not even close if I adjused for mult tests
+TrCoSameVars2 <- diffs2$V1[diffs2[,3]>=0.05]
+
+```
+
+Recontacted treatment respondents do not differ significantly from recontacted control respondents on any of these variables.
+
+But again, we really want to know: are panel respondents in TR comms the same as panel respondents in CO comms?  They aren't totally the same...
+
+```{r}
+comp.df2 <- comp.df[comp.df$panel_01 %in% 1, ]
+bal2 <- RItools::xBalance(treatment ~ allTrust_cw+other_cw+clash_cw+contactOnly_cw+bene_cw+threat_cw+in_cw+cohes1_cw+cohes2_cw+barg_cw+vio_cw+vioExp_cw+age+female, report="all", data=comp.df2)
+
+bal2$overall
+bal2$results[,c("treatment=0","treatment=1", "adj.diff", "p"),]
+
+plot(bal2)
+dev.off()
+save(bal2,file="panel_balance2.rda")
+
+```
+
+Okay, so at baseline panel respondents in TR were a bit different than panel respondents in CO.
+
+**NEXT**  Were TR site respondents who joined committees different than TR site respondents who did not?
+
+```{r}
+comp.df3 <- comp.df2[comp.df2$treatment %in% 1, ]
+comp.df3$tr_full <- ifelse(comp.df3$committee %in% 1, 1, 0)
+bal3 <- RItools::xBalance(tr_full ~ allTrust_cw+other_cw+clash_cw+contactOnly_cw+bene_cw+threat_cw+in_cw+cohes1_cw+cohes2_cw+barg_cw+vio_cw+vioExp_cw+age+female, report="all", data=comp.df3)
+
+bal3$overall
+bal3$results[,c("tr_full=0","tr_full=1", "adj.diff", "p"),]
+
+plot(bal3)
+
+save(bal3,file="panel_balance3.rda")
+
+```
+
+Participants are kinda different than nonparticipants.
+
+**NEXT**: Were the people we randomly assigned to committees at least a random sample?
+
+```{r}
+comp.df3$full <- ifelse(comp.df3$full %in% 1, 1, 0)
+bal4 <- RItools::xBalance(full ~ allTrust_cw+other_cw+clash_cw+contactOnly_cw+bene_cw+threat_cw+in_cw+cohes1_cw+cohes2_cw+barg_cw+vio_cw+vioExp_cw+age+female, report="all", data=comp.df3)
+
+bal4$overall
+bal4$results[,c("full=0","full=1", "adj.diff", "p"),]
+
+plot(bal4)
+
+save(bal4,file="panel_balance4.rda")
+
+```
+
+Keeping in mind that the baseline respondents we were able to contact differ systematically from the typical baseline respondent, and that treatment/control recontacted people were only marginally similar at baseline, and that full participants and nonparticipants were only marginally similar at baseline.  We can now check if the recontacted respondents in treatment areas changed more than recontacted respondents in control areas.
+
+
+## Baseline Differences Between Committee, Non-committee, and Control
+
+[chris: I think I did this better above.]
+
+Before we look at baseline-endline changes in each of these groups, we should look at see how similar these groups were at baseline.^[If the groups were not similar at baseline, then any changes we observe might be specific to the type of person in the sub-group that changed.  We can determine if only certain subgroups changed by looking at treatment effects within traits that are overrepresented in the Treatment group.  For instance, if the committee group had a higher proportion of females, we can check if females were more likely to change positively than males.]   
+
+```{r}
+# shown that recontacted ppl are not diff than not-contacted ppl.  
+# Shown that recontacted Tr are not more diff from nonRecontacted Tr than recontacted co are from nonRecontacted Co.  
+######## Above means: Recontacted in Tr and Co differ from noRecontacted in same way.
+# Now a diff question: were recontacted participants, non-participants, and controls all similar at baseline?
+
+
+## I feel bad that I did not make the initial function capable of diff things on right side of equation and am now too lazy!
+# now need pvals for: (1) part vs nonpart, (2) nonpart vs control, and (3) part vs control.
+p_coef.fun <- function(var)
+{
+  the_fmla <- reformulate ("committee+treatment", response=var)
+  the_lm <- lm(the_fmla, data=panel.df)
+  
+  #Non vs Co
+  theTrcoef <- coef(the_lm)['treatment']
+  theTrp  <- summary(the_lm)$coefficients['treatment',4]
+  thesd <- sd(panel.df[,var], na.rm=T)
+  Trsize <- theTrcoef/thesd
+  
+  #Comm vs Non
+  theComcoef <- coef(the_lm)['committee']
+  theComp  <- summary(the_lm)$coefficients['committee',4]
+  Comsize <- theComcoef/thesd
+  
+  #Comm vs Co
+  the_fmla2 <- reformulate ("committee", response=var)
+  the_lm2 <- lm(the_fmla2, data=panel.df[panel.df$committee %in% 1 | (panel.df$committee %in% 0 & panel.df$treatment %in% 0),])
+  theComCocoef <- coef(the_lm2)['committee']
+  theComCop <- summary(the_lm2)$coefficients['committee',4]
+  ComCosize <- theComCocoef/thesd
+  
+  return(c(Trsize, theTrp, Comsize, theComp, ComCosize, theComCop))
+}
+#p_coef.fun(var='x_cw_y0')
+#p_coef.fun(var="contactOnly_cw_y0")
+
+panel.df$female <- ifelse(panel.df$gender_y0 %in% "female", 1, 0)
+compVars2 <- c(compVars2[!compVars2 %in% "gender_y0"][grepl("_y0", compVars2[!compVars2 %in% "gender_y0"])], "female") # removing non-outcomes, removing gender_y0 for "female"
+diffs3 <- matrix(NA, nrow=length(compVars2), ncol=7) #compVars2 are the vars with _y0 after them
+for(i in 1:length(compVars2))
+{
+  diffs3[i,1] <- compVars2[i]
+  diffs3[i,2:7] <- p_coef.fun(paste0(compVars2)[i])
+  
+} 
+diffs3 <- as.data.frame(diffs3)
+diffs3[,2:7] <- sapply(diffs3[,2:7], function(x) {as.numeric(as.character(x))})
+names(diffs3) <- c("var", "NonCoCoef", "NonCoP", "ComNonCoef", "ComNonP", "ComCoCoef", "ComCoP")
+#diffs3
+##Non-Co
+NonCoPosVars <- diffs3$var[diffs3[,"NonCoP"]<0.05 & diffs3[,"NonCoCoef"]>0]
+NonCoNegVars <- diffs3$var[diffs3[,"NonCoP"]<0.05 & diffs3[,"NonCoCoef"]<0]
+NonCoSameVars <- diffs3$var[diffs3[,"NonCoP"]>.05]
+
+##Comm vs Non
+ComNonPosVars <- diffs3$var[diffs3[,"ComNonP"]<0.05 & diffs3[,"ComNonCoef"]>0]
+ComNonNegVars <- diffs3$var[diffs3[,"ComNonP"]<0.05 & diffs3[,"ComNonCoef"]<0]
+ComNonSameVars <- diffs3$var[diffs3[,"ComNonP"]>.05]
+
+##Comm vs Co
+CommCoPosVars <- diffs3$var[diffs3[,"ComCoP"]<0.05 & diffs3[,"ComCoCoef"]>0]
+CommCoNegVars <- diffs3$var[diffs3[,"ComCoP"]<0.05 & diffs3[,"ComCoCoef"]<0]
+CommCoSameVars <- diffs3$var[diffs3[,"ComCoP"]>.05]
+
+#plot(density(c(diffs3$NonCoP, diffs3$ComNonP, diffs3$ComCoP)))
+#hist(c(diffs3$NonCoP, diffs3$ComNonP, diffs3$ComCoP))
+```
+
+<!--Chris: get more specific -->In general these groups are all extremely similar.  The main difference -- and only difference that holds up to any multiple hypothesis adjustment -- is that the controls we were able to recontact had _more_  baseline contact with outgroup members relative to both treatment groups (Participants and Non-participants).

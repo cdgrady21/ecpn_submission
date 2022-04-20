@@ -1,0 +1,508 @@
+---
+title: "obsDat"
+output:
+  pdf_document:
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+  word_document:
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+events <- read.csv("ecpn_events.csv")
+markets <- read.csv("ecpn_markets.csv")
+library(lubridate)
+library(dplyr)
+library(estimatr)
+
+#author: "cdgrady21"
+#date: "`r format(Sys.Date(), "%B %d, %Y")`"
+
+```
+
+# Overview
+
+This is an analysis of the market and event observational data.  The outcomes are the raw number of people attending the market/event or engaging in some behavior at the market/event.  The outcome are rank rescaled because of their skew.
+
+The explanatory variable is treatment*time.  The "time" variable is coded 0 or 1, where 0 are "early" observations where the program should not yet have much effect and 1 are "late" observations where the program should have an effect.  I also use a model with a "month number" variable that is 1 for the first month of observation, 2 for the second, month, 3 for the third month, etc.  Using that model shows if treatment sites increased more than control sites over time.
+
+Results suggest a slighy increase in market interaction but no effect on event attendance in treatment communities relative to control communities.
+
+# Markets
+
+## Cleaning
+
+Fixing community names (ie making aguda and Agudu and agudu all the same thing).  Telling R that the outcomes are numeric.
+
+```{r, include=F} 
+# clean white space, make lower case
+markets$Community.Name <- trimws(tolower(markets$Community.Name))
+markets$site <- markets$Community.Name
+
+# make outcomes numeric
+outcomes <- names(markets)[grepl("(market|farm|past)", names(markets))]
+markets[,outcomes] <- sapply(markets[,outcomes], function(x) {as.numeric(as.character(x))}) # warning is fine, just making <NA> into NA.
+
+```
+
+## New Vars
+
+Making a 0-1 variable for if the observations are between July 2016 - Feb 2017 (0) or Sept 2017 - End of study (1).  Making a time variable that increases each month, and predicting that treatment areas get better over time wheres control stays the same.
+
+```{r, include=F}
+# dichotomous before/after
+##july 2016 - feb 2017
+## sept 2017 - end
+class(markets$date.of.observation..M.D.Y.)
+markets$date <- lubridate::mdy(markets$date.of.observation..M.D.Y.)
+markets$time <- ifelse(markets$date > "2017-03-01", 1, 0)
+
+# date as numeric with 0 as first day and max(days) as last day
+## make a "month" variable
+markets$month <- sub("-[0-9]*$", "", markets$date)
+table(markets$Community.Name, markets$month)
+markets$month_num <- car::recode(as.character(markets$month),
+                                 "'2016-07'=0;
+                                 '2016-08'=1;
+                                 '2016-09'=2;
+                                 '2016-10'=3;
+                                 '2016-11'=4;
+                                 '2016-12'=5;
+                                 '2017-01'=6;
+                                 '2017-02'=7;
+                                 '2017-09'=14;
+                                 '2017-10'=15;
+                                 '2017-11'=16;
+                                 '2017-12'=17")
+## make date numeric
+#sort(markets$date) # 0 should be 2016-07-09 and 2017-12-15 should be (last day)
+##chris: stopped trying to do this; leaving it with month_num
+
+
+
+# Rank-based outcomes since the normal outcomes are everywhere
+## combined
+rankOutcomes <- paste0(outcomes, "_rank")
+markets[, rankOutcomes] <- NA
+markets[,rankOutcomes] <- sapply(markets[,outcomes], dense_rank)
+
+## separate t1-t2 ranks
+rankOutcomesSep <- paste0(outcomes, "_rankSep")
+markets[, rankOutcomesSep] <- NA
+markets[markets$time %in% 0,rankOutcomesSep] <- sapply(markets[markets$time %in% 0,outcomes], dense_rank)
+markets[markets$time %in% 1,rankOutcomesSep] <- sapply(markets[markets$time %in% 1,outcomes], dense_rank)
+#summary(markets[,rankOutcomes])
+```
+
+## Stuff to Look at
+
+What do we have?  How many observations for each community in the before (0) and after (1) time categories?
+
+```{r}
+(thetab1 <- as.matrix(table(markets$site, markets$time)))
+```
+
+Only use a community if it has at least 2 obs before and after.
+
+```{r, include=F}
+sigh <- data.frame(comm = rownames(thetab1), bef = thetab1[,1], end = thetab1[,2])
+
+dropsies <- na.omit(ifelse(sigh$bef < 2 | sigh$end < 2, as.character(sigh$comm), NA))
+markets <- droplevels(markets[!markets$site %in% dropsies,])
+```
+
+
+### Summary Stats 
+
+By treatment and control average before/after intervention began.
+
+```{r, echo=F}
+summaryFun <- function(thevar)
+{
+  themin <- min(thevar, na.rm=T)
+  themed <- median(thevar, na.rm=T)
+  themean <- mean(thevar, na.rm=T)
+  themax <- max(thevar, na.rm=T)
+  thesd <- sd(thevar, na.rm=T)
+  
+  cbind(themin, themed, themean, themax, thesd)
+}
+
+sumFun <- function(thevar)
+{
+  conBase <- summaryFun(markets[markets$treatment %in% 0 & markets$time %in% 0,thevar])
+  conEnd <- summaryFun(markets[markets$treatment %in% 0 & markets$time %in% 1,thevar])
+  trBase <- summaryFun(markets[markets$treatment %in% 1 & markets$time %in% 0,thevar])
+  trEnd <- summaryFun(markets[markets$treatment %in% 1 & markets$time %in% 1,thevar])
+  thedf <- as.data.frame(rbind(conBase,conEnd,trBase,trEnd))
+  rownames(thedf) <- c("conBase", "conEnd", "trBase", "trEnd")
+  print(thevar)
+  print(thedf)
+}
+#sumFun("market_stalls_total")
+
+for(i in 1:length(outcomes))
+{
+  sumFun(outcomes[i])
+}
+```
+
+
+## Models
+
+### Mean changes (community fixed effects)
+
+Do treatment communities increase on these market variables more than control communities from "before" time to "after" time?  The coefficient is how much more the treatment communities changed than the control communities on average.  A coef of 100 means treatment communities increased 100 more than control communities from 0-1.  This can be because for multiple reasons: (1) the control communities did not change and the treatment communities changed 100, (2) the control communities changed 100 and the treatment communities changed 200, (3) the control communities changed -100 and the treatment communities stayed the same, etc...
+
+The coefficient is the average effect _within_ community.  This is a community fixed effect.  This prevents us from thinking the program had a positive effect just because we observed more high value treatment communities in the "after" stage than in the "before" stage.  Or from thinking the program had a negative effect just because we observed more low value treatment communities in the "after" stage than in the "before" stage.
+
+The outcomes are rank-scaled to fix strong right skew.  They are rank-scaled in two different ways for robustness.
+
+```{r, echo=F, include=F}
+# Before/After 
+# run regression for all outcomes
+marks.fun <- function(var)
+{
+  fmla1 <- reformulate(c("treatment*time+site+State"), response=var)
+  lm1 <- lm_robust(fmla1, data=markets, clusters=site)
+  thecoef <- coefficients(lm1)['treatment:time']
+  thep <- summary(lm1)$coefficients['treatment:time',3]
+  return(c(thecoef,thep))
+  
+}
+#marks.fun(var="market_stalls_total")
+
+## combined rank
+mark.thing <- t(sapply(rankOutcomes,marks.fun))
+colnames(mark.thing) <- c("coef", "p")
+
+## Separate rank
+#mark.thing2 <- t(sapply(rankOutcomesSep,marks.fun))
+#colnames(mark.thing2) <- c("coef", "p")
+#mark.thing2
+```
+```{r}
+mark.thing
+```
+```{r, eval=F, include=F}
+# rebecca wants effect sizes; variable is rank
+summary(markets$pastoralist_women_sell_fura_rank); sd(markets$pastoralist_women_sell_fura_rank, na.rm=T)
+summary(markets$pastoralist_women_sell_fura); sd(markets$pastoralist_women_sell_fura, na.rm=T)
+
+marks.fun(var="pastoralist_women_sell_fura_rank")[1]/sd(markets$pastoralist_women_sell_fura_rank, na.rm=T)
+marks.fun(var="pastoralist_sellers_rank")[1]/sd(markets$pastoralist_sellers_rank, na.rm=T)
+
+#thing <- mosaic::do(500)*lm(pastoralist_women_sell_fura_rank~sample(treatment)*time+site+State, markets)
+#mean(thing[["treatment.time"]]>=13)
+```
+
+And this checks the effect if we use the panel nature of the data.  Insead of 0-1, we now have 1 in the first month and 17 in the last month with other months in between.
+
+```{r, echo=F, include=F}
+####################
+# Panel
+marks.funP <- function(var)
+{
+  fmla1 <- reformulate(c("treatment*month_num+site+State"), response=var)
+  lm1 <- lm_robust(fmla1, data=markets, clusters=site)
+  thecoef <- coefficients(lm1)['treatment:month_num']
+  thep <- summary(lm1)$coefficients['treatment:month_num',3]
+  return(c(thecoef,thep))
+  
+}
+#marks.fun("market_stalls_total")
+
+#mark.thing <- t(sapply(outcomes,marks.fun))
+mark.thingP <- t(sapply(rankOutcomes,marks.funP))
+colnames(mark.thingP) <- c("coef", "p")
+```
+```{r}
+mark.thingP
+```
+
+## Summary
+
+The data mildly suggest a positive relationship between ECPN and more market interaction.  It looks like TR pastoralists, as we move from baseline to endline, were more likely to be in the markets than CO pastoralists.  This is important because the market is almost always in the farming community, so this represents pastoralists entering the farming community.  
+
+The evidence is not especially strong.  The p-values are below 0.10, but now below 0.05.  But these results should be interpreted in conjunction with the "Contact" results from the main analysis, which corroborates the idea that contact plummeted far more in control than in Treatment.  We should also keep in mind that these data are very messy.
+
+
+<!--
+### Median changes (within site correction)
+
+It looks like the median treatment group sites also reduced relative to the median control group site.
+
+```{r, eval=F}
+# run median regression for all outcomes
+library(quantreg)
+
+marksMed.fun <- function(var)
+{
+  fmla <- reformulate(c("treatment*time+site"), response=var)
+  lm1<-rq(fmla, data=markets, tau=0.5)
+  thecoef <- coefficients(lm1)['treatment:time']
+  lb <- summary(lm1)$coefficients['treatment:time',"lower bd"]
+  ub <- summary(lm1)$coefficients['treatment:time',"upper bd"]
+  return(c(thecoef,lb, ub))
+}
+
+markMed.thing <- t(sapply(outcomes,marksMed.fun))
+colnames(markMed.thing) <- c("coef", "lower", "upper")
+markMed.thing
+```
+
+-->
+
+************************
+
+# Events
+
+This uses the same analyses as the _Markets_ data: (i) a before-after analysis, and (ii) a panel analysis.
+
+## Cleaning
+
+Here we clean the data, tell R that outcomes are numeric, and collapse event types (i.e. all festivals as "festival" and wedding/marriage as "marriage").
+
+```{r, include=F}
+# get rid of nothing columns
+events <- events[,!grepl("^X", names(events))]
+
+#lower case all non-numerics
+typeList <- sapply(events, class)
+lowNames <- names(typeList)[!typeList %in% "integer"]
+events[,names(events) %in% lowNames] <- as.data.frame(sapply(events[,names(events) %in% lowNames], tolower))
+
+#trim white space
+events[,names(events) %in% lowNames] <- as.data.frame(sapply(events[,names(events) %in% lowNames], trimws))
+
+# chris: if events has "marriage" in the level, just make it "marriage"
+levels(events$event_type) <- c(NA, "festival", "marriage", "naming", 'other', "marriage")
+```
+
+
+## New Vars
+
+Making a 0-1 variable for if the observations are between July 2016 - Feb 2017 (0) or Sept 2017 - End of study (1).  Make a variable that is 0 in the first month of the study, 10 in the 10th month, 20 in the 20th, etc.
+
+```{r, include=F}
+# dichotomous before/after
+##july 2016 - feb 2017
+## sept 2017 - end
+class(events$date.of.observation..M.D.Y.)
+events$date <- lubridate::mdy(events$date.of.observation..M.D.Y.)
+events$time <- ifelse(events$date > "2017-03-01", 1, 0)
+
+# site
+events$site <- events$Community.Name
+
+# date as numeric with 0 as first month and max(month) as last month
+## make a "month" variable
+events$month <- sub("-[0-9]*$", "", events$date)
+table(events$Community.Name, events$month)
+events$month_num <- car::recode(as.character(events$month),
+                                 "'2016-07'=0;
+                                 '2016-08'=1;
+                                 '2016-09'=2;
+                                 '2016-10'=3;
+                                 '2016-11'=4;
+                                 '2016-12'=5;
+                                 '2017-01'=6;
+                                 '2017-02'=7;
+                                 '2017-09'=14;
+                                 '2017-10'=15;
+                                 '2017-11'=16;
+                                 '2017-12'=17")
+
+
+
+# make outcomes numeric
+eventOutcomes <- names(events)[grepl("(attend|eat)_", names(events))]
+events[,eventOutcomes] <- sapply(events[,eventOutcomes], function(x) {as.numeric(as.character(x))}) # i think is already integer
+
+# make percentage outcomes
+events[,paste0(eventOutcomes[2:3],"_presPerc")] <- events[,eventOutcomes[2:3]]/events[,eventOutcomes[1]]
+events[,paste0(eventOutcomes[5:6],"_eatPerc")] <- events[,eventOutcomes[5:6]]/events[,eventOutcomes[4]]
+
+# add %s to "eventOutcomes"
+eventOutcomes <- names(events)[grepl("(attend|eat)_", names(events))]
+
+#rank outcomes
+events[,paste0(eventOutcomes, "_rank")] <- sapply(events[,eventOutcomes], rank)
+rankEventOutcomes <- paste0(eventOutcomes, "_rank")
+
+summary(events[,eventOutcomes])
+```
+
+## Stuff to look at
+
+What do we have?  How many observations per community before/after?
+
+```{r}
+(thetab <- as.matrix(table(events$Community.Name, events$time)))
+#table(events$Community.Name, events$time, events$treatment)
+```
+
+Again, only use a community if it has at least 2 obs before and after.
+
+```{r, include=F}
+sigh <- data.frame(comm = rownames(thetab), bef = thetab[,1], end = thetab[,2])
+
+dropsies <- na.omit(ifelse(sigh$bef < 2 | sigh$end < 2, as.character(sigh$comm), NA))
+events <- droplevels(events[!events$Community.Name %in% dropsies,])
+```
+
+```{r, include=F, eval=F}
+#with(events[events$treatment %in% 0 & events$time %in% 0,], summary(Number.of.People..in.atttenddance))
+#with(events[events$treatment %in% 0 & events$time %in% 1,], summary(Number.of.People..in.atttenddance))
+
+#with(events[events$treatment %in% 1 & events$time %in% 0,], summary(Number.of.People..in.atttenddance))
+#with(events[events$treatment %in% 1 & events$time %in% 1,], summary(Number.of.People..in.atttenddance))
+
+# number of pppl in attendance has a huge mean for control at endline, but low median because some people had numbers in the thousands.
+##chris: changed var name after this because var names sooo long
+#events[events$treatment %in% 0 & events$time %in% 1, c('Number.of.People..in.atttenddance', "event_type", "Community.Name", "Observer.Name", "time")]
+
+#events[events$Observer.Name %in% "alayin apakhi moses", c('Number.of.People..in.atttenddance', "event_type", "Community.Name", "Observer.Name", "time")]
+#events[events$event_type %in% "festival", c('Number.of.People..in.atttenddance', "event_type", "Community.Name", "Observer.Name", "time")]
+
+```
+
+Sum Stats
+
+```{r, echo=F}
+sumFun2 <- function(thevar)
+{
+  conBase <- summaryFun(events[events$treatment %in% 0 & events$time %in% 0,thevar])
+  conEnd <- summaryFun(events[events$treatment %in% 0 & events$time %in% 1,thevar])
+  trBase <- summaryFun(events[events$treatment %in% 1 & events$time %in% 0,thevar])
+  trEnd <- summaryFun(events[events$treatment %in% 1 & events$time %in% 1,thevar])
+  thedf <- as.data.frame(rbind(conBase,conEnd,trBase,trEnd))
+  rownames(thedf) <- c("conBase", "conEnd", "trBase", "trEnd")
+  print(thevar)
+  print(thedf)
+}
+#sumFun2(eventOutcomes[1])
+
+for(i in 1:length(eventOutcomes))
+{
+  sumFun2(eventOutcomes[i])
+}
+
+```
+
+
+## Models
+
+### Mean Changes
+
+Do treatment communities increase on these event variables more than control communities from "before" time to "after" time?  Do treatment communities increase on the event variables more as time goes on?
+
+The interpretation is the same as for the market data.  The coefficient is how much more the treatment communities changed than the control communities on average.  A coef of 100 means treatment communities increased 100 more than control communities from 0-1.  This can be because for multiple reasons: (1) the control communities did not change and the treatment communities changed 100, (2) the control communities changed 100 and the treatment communities changed 200, (3) the control communities changed -100 and the treatment communities stayed the same, etc...
+
+The coefficient is the average effect _within_ community.  This is a community fixed effect.  This prevents us from thinking the program had a positive effect just because we observed more high value treatment communities in the "after" stage than in the "before" stage.  Or from thinking the program had a negative effect just because we observed more low value treatment communities in the "after" stage than in the "before" stage.
+
+
+First we look at the data from the before-after perspective.
+
+```{r, echo=F, include=F}
+#events$tr_time <- interaction(events$treatment, events$time)
+#library(mosaic)
+#mosaic::mean(events$Number.of.People..in.atttenddance~events$tr_time)
+#mosaic::mean(events$Number.of.People.who.eat.or.drink~events$tr_time, na.rm=T)
+
+# before/after
+events.fun <- function(var)
+{
+  fmla <- reformulate(c("treatment*time+site+State+Host.Community"), response=var)
+  lm1 <- lm(fmla, data=events)
+  thecoef <- coefficients(lm1)['treatment:time']
+  thep <- summary(lm1)$coefficients['treatment:time',4]
+  return(c(thecoef,thep))
+  
+}
+#events.fun('Number.of.People..in.atttenddance_rank')
+
+event.thing <- t(sapply(rankEventOutcomes,events.fun))
+colnames(event.thing) <- c("coef", "p")
+```
+```{r}
+event.thing
+```
+
+Now we look at the data from a panel perspective.
+
+```{r, echo=F, include=F}
+
+####################
+# Panel
+marks.funP <- function(var)
+{
+  fmla1 <- reformulate(c("treatment*month_num+site+State"), response=var)
+  lm1 <- lm_robust(fmla1, data=events, clusters=site)
+  thecoef <- coefficients(lm1)['treatment:month_num']
+  thep <- summary(lm1)$coefficients['treatment:month_num',3]
+  return(c(thecoef,thep))
+  
+}
+#marks.fun(var='attend_total')
+
+#mark.thing <- t(sapply(outcomes,marks.fun))
+event.thingP <- t(sapply(rankEventOutcomes,marks.funP))
+colnames(event.thingP) <- c("coef", "p")
+```
+```{r}
+event.thingP
+
+```
+
+```{r, eval=F, include=F}
+# events function separate for farmers and pastoralists?
+Fevents.fun <- function(var)
+{
+  fmla <- reformulate(c("treatment*time+site+State"), response=var)
+  #lm1<-robustbase::lmrob(fmla, data=events, control = robustbase::lmrob.control(setting="KS2014", max.it = 500))
+  lm1 <- lm(fmla, data=events[events$Host.Community %in% 'farmer',])
+  thecoef <- coefficients(lm1)['treatment:time']
+  thep <- summary(lm1)$coefficients['treatment:time',4]
+  return(c(thecoef,thep))
+  
+}
+#Fevents.fun('Number.of.People..in.atttenddance_rank', 'farmer')
+
+Fevent.thing <- t(sapply(rankEventOutcomes,Fevents.fun))
+colnames(Fevent.thing) <- c("coef", "p")
+Fevent.thing
+
+Pevents.fun <- function(var)
+{
+  fmla <- reformulate(c("treatment*time+site+State"), response=var)
+  #lm1<-robustbase::lmrob(fmla, data=events, control = robustbase::lmrob.control(setting="KS2014", max.it = 500))
+  lm1 <- lm(fmla, data=events[events$Host.Community %in% 'pastoralist',])
+  thecoef <- coefficients(lm1)['treatment:time']
+  thep <- summary(lm1)$coefficients['treatment:time',4]
+  return(c(thecoef,thep))
+  
+}
+
+Pevent.thing <- t(sapply(rankEventOutcomes,Pevents.fun))
+colnames(Pevent.thing) <- c("coef", "p")
+Pevent.thing
+
+```
+
+## Summary
+
+It looks like ECPN had no effect on event attendance.  The data weakly suggest that more pastoralists showed up to and took food at farming events, but fewer farmers showed up to and took food at pastoralists events.  
+
+# Overall Summary
+
+Some evidence that ECPN increased attendance to markets by pastoralists.  The data show an increase in pastoralist buyers and sellers in treatment markets, relative to control.  The effect is because the number of pastoralists in control markets drops whereas the number of pastoralists in treatment remains about the same.  The evidence is not especially strong on its own, but corroborates the main analysis results about intergroup contact.
+
+There is no difference between treatment and control in the social event data.

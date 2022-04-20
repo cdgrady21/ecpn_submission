@@ -1,0 +1,460 @@
+---
+title: "ecpn_diff-in-diff plots"
+output:
+  word_document: default
+  html_document: default
+---
+
+note: if want to convert to pdf:
+
+dev.copy(pdf,file="endComm_plot_nas.pdf")
+dev.off()
+
+pdf(file="endComm.plot_nas2.pdf", bg="transparent", width=7.8, height=6)
+endComm_plot_nas
+dev.off()
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../c_creating_dataframes/rand_df.Rdata")
+load("../b_creating_outcomes/f2-panelData.Rdata")
+load("../../obsDat/analysis/eventsMedian.Rdata")
+load("../../obsDat/analysis/marketMedian.Rdata")
+
+#until I figure out insecurity, reverse it.
+ag.df$in_cw_base <- abs(ag.df$in_cw_base+1)
+ag.df$in_cw_end <- abs(ag.df$in_cw_end+1)
+panel.df$in_cw_y0 <- abs(panel.df$in_cw_y0+1)
+panel.df$in_cw_y1 <- abs(panel.df$in_cw_y1+1)
+
+ag.df$list_exp_base <- ag.df$list_exp_base*-1
+ag.df$list_exp_end <- ag.df$list_exp_end*-1
+
+### violence is coded so high is "desirable" instead of high is "like violence more".  Making high=="like violence more"
+ag.df$vio_cw_base <- abs(ag.df$vio_cw_base-1)
+ag.df$vio_cw_end <- abs(ag.df$vio_cw_end-1)
+panel.df$vio_cw_y0 <- abs(panel.df$vio_cw_y0-1)
+panel.df$vio_cw_y1 <- abs(panel.df$vio_cw_y1-1)
+```
+
+Make plot data
+
+```{r}
+#The vars to plot.
+ag.vars <- c('allTrust_cw', 'contactOnly_cw', "in_cw",
+             'pgp_amount_end', 'pgp_donate_end',
+             'threat_cw','bene_cw', 'clash_cw', "barg_cw",
+             'list_exp', 'rand_lm', 'rMean', 'end_exp',
+             'vio_cw')
+
+## individual
+ind.vars <- c('allTrust_cw', 'contactOnly_cw', "in_cw",
+              'pgp_amount_y1', 'pgp_donate_y1',
+              'threat_cw','bene_cw', 'clash_cw', "barg_cw",
+              'vio_cw')
+
+# add additive index
+ag.vars <- c(ag.vars, setdiff(gsub("_cw", "_index", ag.vars), ag.vars))
+ind.vars <- c(ind.vars, setdiff(gsub("_cw", "_index", ind.vars), ind.vars))
+stopifnot(setdiff(ag.vars,names(ag.df))==0)
+stopifnot(setdiff(ind.vars,names(panel.df))==0)
+```
+
+Community-level data
+
+```{r}
+#Aggregate Plot df
+base <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_base"), "treatment", "state", "psu")]
+names(base) <- sub("_base", "", names(base))
+base$survey <- "Baseline"
+end <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_end"), "treatment", "state", "psu")]
+names(end) <- sub("_end", "", names(end))
+end$survey <- "Endline"
+plot.df <- rbind(base,end)
+
+# get mean and sd with dplyr
+plot.df$state <- as.character(plot.df$state) # save me trouble with dplyr later
+plot.df$psu <- as.numeric(as.character(plot.df$psu))
+plot.df<-plot.df %>% 
+  dplyr::group_by(treatment,survey,state) %>%
+  dplyr::summarise_all(list(~mean(.), ~sd(.))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+plot.df$Treatment<-ifelse(plot.df$treatment %in% 1, "ECPN", "Non-ECPN")
+plot.df$State <- ifelse(plot.df$state %in% "nas", "Nas", "Ben")
+#plot.df$plotID <- interaction(plot.df$Treatment, plot.df$State)
+```
+
+Now do same for individual-level data.
+
+```{r}
+#Panel Plot df
+base1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "community")]
+names(base1) <- sub("_y0", "", names(base1))
+base1$survey <- "Baseline"
+end1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "community")]
+names(end1) <- sub("_y1", "", names(end1))
+end1$survey <- "Endline"
+plot.df1 <- rbind(base1,end1)
+
+plot.df1$state <- as.character(plot.df1$state) # save me trouble with dplyr later
+plot.df1$community <- as.character(plot.df1$community)
+
+plot.df1<-plot.df1 %>% 
+  dplyr::group_by(treatment,survey,state) %>%
+  dplyr::summarise_all(funs(mean(., na.rm = TRUE), sd(., na.rm=T))) %>% # warnings because cannot sumarise non-numeric (like community)
+  as.data.frame()
+
+plot.df1$Treatment<-ifelse(plot.df1$treatment %in% 1, "ECPN", "Non-ECPN")
+```
+
+Now do same for individual-level data, separating Part-Non-Con
+
+```{r}
+# Part-non-control Plot df
+base2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "committee")]
+names(base2) <- sub("_y0", "", names(base2))
+base2$survey <- "Baseline"
+end2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "committee")]
+names(end2) <- sub("_y1", "", names(end2))
+end2$survey <- "Endline"
+plot.df2 <- rbind(base2,end2)
+plot.df2$Treatment <- interaction(plot.df2$treatment, plot.df2$committee)
+levels(plot.df2$Treatment) <- c("Control", "Non-Part", NA, "Part")
+plot.df2$Treatment <- ordered(plot.df2$Treatment, levels=c("Part", "Non-Part", "Control"))
+
+plot.df2$state <- as.character(plot.df2$state) # save me trouble with dplyr later
+plot.df2<-plot.df2 %>% 
+  dplyr::group_by(Treatment,survey,state) %>%  # chris: could add state here to differentiate nas from ben
+  dplyr::summarise_all(funs(mean(., na.rm = TRUE), sd(., na.rm=T))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+#rm(pattern="(se|sd|ess|icc)Vars") #chris: regex inside pattern not work?
+```
+
+
+Plot functions - ggplot showing each group before and after.
+
+```{r}
+# Fixing colors
+grps <-c("ECPN","Non-ECPN","Part", "Non-Part", "Control")
+color.codes<-as.character(c("#FC8D59", "#00BFC4", "#FC8D59", "dark red", "#00BFC4"))
+#ECPN = "#FC8D59", Non-ECPN = "#00BFC4", Part="FC8D59", Non-Part="green", Control="#00BFC4")
+#plot.df$colors <- c("#00BFC4","#00BFC4","#FC8D59","#FC8D59")
+#plot.df1$colors <- c("#FC8D59","#FC8D59","#00BFC4","#00BFC4")
+#plot.df2$colors <- c("#FC8D59","#FC8D59", "green", "green", "#FFFFBF","#FFFFBF")
+
+# The main Plot function chris: still need to make SE errorbars same color as lines...
+# gg line plot
+plot.fun<-function(var, thedf, time, title, xlab, ylab, ymin, ymax){
+  ggplot(data=thedf, aes(x=thedf[[time]], y=thedf[[paste0(var, "_mean")]], group=Treatment)) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  scale_colour_manual(values=setNames(color.codes, grps)) +
+  coord_cartesian(ylim = c(ymin, ymax)) +
+  #geom_errorbar(aes(ymin = thedf[[paste0(var, "_mean")]] - thedf[[paste0(var, "_se")]], 
+   #                ymax= thedf[[paste0(var, "_mean")]] + thedf[[paste0(var, "_se")]],
+  #                 color=Treatment), 
+  #      width=.2, position=position_dodge(0.03)) + 
+  ggtitle(title) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab(xlab) +
+  ylab(ylab)
+}
+
+# test
+
+```
+
+## Trust Index
+
+ECPN sites in both states improed more on Affect Index than control sites.
+
+Using index instead of ICW changes very little.
+
+```{r}
+# nas
+(affectComm.plot_nas <- plot.fun(var='allTrust_cw', thedf=plot.df[plot.df$state %in% "nas",], time='survey', title="Affect - Nassarawa Communities", 
+         xlab="Survey", ylab="Average Affect Index Score",
+         ymin=0.1, ymax=0.8))
+
+png(file="affectComm_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+affectComm.plot_nas
+dev.off()
+
+
+# ben
+(affectComm.plot_ben <- plot.fun(var='allTrust_cw', thedf=plot.df[plot.df$state %in% "ben",], time='survey', title="Affect - Benue Communities", 
+         xlab="Survey", ylab="Average Affect Index Score",
+         ymin=0.1, ymax=0.8))
+
+png(file="affectComm_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+affectComm.plot_ben
+dev.off()
+```
+
+Part vs Non vs Con.
+
+```{r}
+# nas
+(affectPan.plot_nas <- plot.fun(var='allTrust_cw', thedf=plot.df2[plot.df2$state %in% "nas",], time='survey', title="Affect - Nassarawa Individuals",
+         xlab="Survey", ylab="Average Affect Index Score",
+         ymin=0.4, ymax=0.8))
+
+png(file="affectPan_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+affectPan.plot_nas
+dev.off()
+
+
+# ben
+(affectPan.plot_ben <- plot.fun(var='allTrust_cw', thedf=plot.df2[plot.df2$state %in% "ben",], time='survey', title="Affect - Benue Individuals",
+         xlab="Survey", ylab="Average Affect Index Score",
+         ymin=0.4, ymax=0.8))
+
+png(file="affectPan_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+affectPan.plot_ben
+dev.off()
+# why using these ugly colors instead of red green blue? have since fixed.
+#ggplot_build(outPan.plot)$data
+#ggplot_build(outComm.plot)$data
+```
+
+
+## Intergroup Contact Index
+
+ECPN in Nas improve more than non-ECPN.  ECPN in Benue decrease less than non-ECPN.
+
+Using index instead of ICW brings all these lines closer together.
+
+```{r}
+# nas
+(conComm.plot_nas <- plot.fun(var='contactOnly_cw', thedf=plot.df[plot.df$state %in% "nas",], time='survey', title="Intergroup Contact - Nassarawa Communities", 
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.6))
+
+png(file="conComm_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conComm.plot_nas
+dev.off()
+
+# ben
+(conComm.plot_ben <- plot.fun(var='contactOnly_cw', thedf=plot.df[plot.df$state %in% "ben",], time='survey', title="Intergroup Contact - Benue Communities", 
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.6))
+
+png(file="conComm_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conComm.plot_ben
+dev.off()
+```
+
+In Nas: participants improve the most, non-participants and controls both improve at the same rate.  In Ben: participants stay flat, nonparticipants decrease a bit, and controls decrease the most.
+
+```{r}
+# nas
+(conPan.plot_nas <- plot.fun(var='contactOnly_cw', thedf=plot.df2[plot.df2$state %in% "nas",], time='survey', title="Intergroup Contact - Nassarawa Individuals",
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.4))
+
+png(file="conPan_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conPan.plot_nas
+dev.off()
+
+# benue
+(conPan.plot_ben <- plot.fun(var='contactOnly_cw', thedf=plot.df2[plot.df2$state %in% "ben",], time='survey', title="Intergroup Contact - Benue Individuals",
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.4))
+
+png(file="conPan_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conPan.plot_ben
+dev.off()
+
+```
+
+Floor and ceiling:  I think not.  
+
+```{r, eval=F}
+ceil <- plot.df[plot.df$state %in% "nas", c("contactOnly_cw_mean", "state", "survey")]
+ceil <- round(max(ceil$contactOnly_cw_mean),1)
+sum(ag.df$contactOnly_cw_end>ceil) #/30
+
+floor <- plot.df[plot.df$state %in% "ben", c("contactOnly_cw_mean", "state", "survey")]
+floor <- round(min(floor$contactOnly_cw_mean),2)
+sum(ag.df$contactOnly_cw_end<floor) # /30
+```
+
+## Perceptions of Security Index
+
+In Nas: Insecurity decreases in ECPN sites more than in non-ECPN, which stay about the same.  In Ben: both decrease insecurity, but ECPN sites drop a bit more.
+
+Using additive index instead of ICW, basically same but more muted differences.
+
+```{r}
+# nas
+(inComm.plot_nas <- plot.fun(var='in_cw', thedf=plot.df[plot.df$state %in% "nas",], time='survey', title="Perceptions of Physical Security - Nassarawa Communities", 
+         xlab="Survey", ylab="Average Perceptions of Physical Security Index Score",
+         ymin=0, ymax=1))
+
+png(file="inComm_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inComm.plot_nas
+dev.off()
+
+# ben
+(inComm.plot_ben <- plot.fun(var='in_cw', thedf=plot.df[plot.df$state %in% "ben",], time='survey', title="Perceptions of Physical Security - Benue Communities", 
+         xlab="Survey", ylab="Average Perceptions of Physical Security Index Score",
+         ymin=0, ymax=1))
+
+png(file="inComm_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inComm.plot_ben
+dev.off()
+```
+
+In Nas: insecurity decreases for all respondents in TR sites, but stays about the same in CO sites.  In Ben: insecurity decreases for everyone, but most for Participants in TR sites.  Nonpart/Co decrease at about same rate.
+
+```{r}
+# nas
+(inPan.plot_nas <- plot.fun(var='in_cw', thedf=plot.df2[plot.df2$state %in% "nas",], time='survey', title="Perceptions of Insecurity - Nassarawa Individuals",
+         xlab="Survey", ylab="Average Perceptions of Insecurity Index Score",
+         ymin=0.2, ymax=0.7))
+
+png(file="inPan_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inPan.plot_nas
+dev.off()
+
+# ben
+(inPan.plot_ben <- plot.fun(var='in_cw', thedf=plot.df2[plot.df2$state %in% "ben",], time='survey', title="Perceptions of Insecurity - Benue Individuals",
+         xlab="Survey", ylab="Average Perceptions of Insecurity Index Score",
+         ymin=0.2, ymax=0.7))
+
+png(file="inPan_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inPan.plot_ben
+dev.off()
+```
+
+
+## Violence Placebo
+
+In Nas: Violence accepting goes up a bit in TR, down a bit in CO.  In Ben: Tr stays exactly the same, Co becomes more accepting of violence.
+
+Additive index: scale is reversed, did not look at it.
+
+```{r}
+# nas
+(vioComm.plot_nas <- plot.fun(var='vio_cw', thedf=plot.df[plot.df$state %in% "nas",], time='survey', title="Attitudes towards Violence - Nassarawa Communities", 
+         xlab="Survey", ylab="Average Attitudes towards Violence Index Score",
+         ymin=0, ymax=1))
+
+png(file="vioComm_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+vioComm.plot_nas
+dev.off()
+
+# ben
+(vioComm.plot_ben <- plot.fun(var='vio_cw', thedf=plot.df[plot.df$state %in% "ben",], time='survey', title="Attitudes towards Violence - Benue Communities", 
+         xlab="Survey", ylab="Average Attitudes towards Violence Index Score",
+         ymin=0, ymax=1))
+
+png(file="vioComm_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+vioComm.plot_ben
+dev.off()
+```
+
+In Nas: Every group becomes less accepting of violence, with Control changing the most.  In Ben: violence acceptance decreases for everyone, but it decreases for Part/Nonpart a bit more than for Control.
+
+```{r}
+# nas
+(vioPan.plot_nas <- plot.fun(var='vio_cw', thedf=plot.df2[plot.df2$state %in% "nas",], time='survey', title="Attitudes towards Violence - Nassarawa Individuals",
+         xlab="Survey", ylab="Average Attitudes towards Violence Index Score",
+         ymin=0.1, ymax=0.6))
+
+png(file="vioPan_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+vioPan.plot_nas
+dev.off()
+
+# ben
+(vioPan.plot_ben <- plot.fun(var='vio_cw', thedf=plot.df2[plot.df2$state %in% "ben",], time='survey', title="Attitudes towards Violence - Benue Individuals",
+         xlab="Survey", ylab="Average Attitudes towards Violence Index Score",
+         ymin=0.1, ymax=0.6))
+
+png(file="vioPan_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+vioPan.plot_ben
+dev.off()
+```
+
+
+## Endorsement Experiment
+
+This endorsement experiment is a measure of prejudice where respondents are asked their support for a public policy.  Half are asked their support when the policy is endorsed by the outgroup.  The greater the decrease in support due to the outgroup endorsement, the higher the prejudice.
+
+In Nas: respondents didn't care about outgroup endorsement at baseline, but at endline control cared much more than treatment.  In Ben: lots of dislike towards outgroup at baseline in both TR & CO; at endline slightly worse in control group.
+
+```{r}
+# nas
+(endComm.plot_nas <- plot.fun(var='end_exp', thedf=plot.df[plot.df$state %in% "nas",], time='survey', title="Endorsement Experiment - Nassarawa Communities", 
+         xlab="Survey", ylab="Average Change in Support for Policy Endorsed by Outgroup",
+         ymin=0.1, ymax=-0.8))
+
+png(file="endComm_plot_nas.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+endComm.plot_nas
+dev.off()
+
+#dev.copy(pdf,file="endComm_plot_nas1.pdf")
+#dev.off()
+
+#pdf(file="endComm_plot_nas2.pdf", bg="transparent", width=7.8, height=6)
+#endComm.plot_nas
+#dev.off()
+
+
+# ben
+(endComm.plot_ben <- plot.fun(var='end_exp', thedf=plot.df[plot.df$state %in% "ben",], time='survey', title="Endorsement Experiment - Nassarawa Communities", 
+         xlab="Survey", ylab="Average Change in Support for Policy Endorsed by Outgroup",
+         ymin=0.1, ymax=-0.8))
+
+png(file="endComm_plot_ben.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+endComm.plot_ben
+dev.off()
+
+```

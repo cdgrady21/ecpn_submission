@@ -1,0 +1,610 @@
+---
+title: 'ObsDat coefficient plots: bstrap coefs'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("../clean/a_obsDat_clean.rda")
+
+library(tidyr)
+library(dplyr)
+library(broom)
+#library(HSPSUtils)
+
+# function to sample groups after dplyr::group_by
+sample_n_groups = function(tbl, size, replace = TRUE, weight = NULL) {
+  # regroup when done
+  grps = tbl %>% groups %>% lapply(as.character) %>% unlist
+  # check length of groups non-zero
+  keep = tbl %>% summarise() %>% ungroup() %>% sample_n(size, replace, weight)
+  keep$new_site <- paste0(keep$site, rownames(keep))
+  # keep only selected groups, regroup because joins change count.
+  # regrouping may be unnecessary but joins do something funky to grouping variable
+  tbl %>% inner_join(keep, by=grps) %>% group_by(.dots = grps)
+}
+```
+
+# Plan
+
+Cluster bootstrap.  SAMPLE SITES WITHIN STATES!!!  SAMPLE WITHIN TR AND CO.
+
+1. Calc coefficients
+2. Boostrap SEs
+3. Save
+
+When doing residual bootstrapping
+- resampling residuals (also doing within state & exp group)
+- check assumptions: residual distribution iid?
+
+
+# Code time
+
+## Markets
+
+### Case resampling
+
+case resample bootstrapping. The thing I know best, though slower (and safer from assumptions!) than residual bootstrap.
+    - get coef
+    - resamples sites within states; take all obs from those sites
+        - needs to mimic sampling: 9 in NAS, 6 in BEN
+            - actually only 5 in BEN because no observations in Adaka.
+            - Adaka was one of the 2 control sites in Benue...
+    - regress outcome on explantory vars for new sample
+    - repeat to make bootstrap distribution
+
+```{r, eval=F}
+set.seed(1234)
+
+# the lm to get the coefs
+#fit.star<-lm(pastoralists_index_rank~treatment*time + site, data=markets)
+fit.star<-lm(pastoralists_index_rank~treatment*time, data=markets)
+
+R<-500 # Number of Repetitions
+h<-matrix(NA, R, 1)
+for (i in 1:R){
+  # sample sites within states
+  nas_samp1 <- markets[markets$State %in% "nasarawa" & markets$treatment %in% 1,] %>% group_by(site) %>%
+    sample_n_groups(size=6) %>%
+    as.data.frame()
+  nas_samp0 <- markets[markets$State %in% "nasarawa" & markets$treatment %in% 0,] %>% group_by(site) %>%
+    sample_n_groups(size=3) %>%
+    as.data.frame()
+  ben_samp1 <- markets[markets$State %in% "benue" & markets$treatment %in% 1,] %>% group_by(site) %>%
+    sample_n_groups(size=4) %>%
+    as.data.frame()
+  ben_samp0 <- markets[markets$site %in% "sabon gida agan",]
+  ben_samp0$new_site <- "sabon gida agan"
+  markets1 <- rbind(nas_samp1, nas_samp0, ben_samp1, ben_samp0)
+ 
+  #b<-lm(pastoralists_index_rank~treatment*time + new_site, data=markets1)$coef["treatment:time"]
+  b<-lm(pastoralists_index_rank~treatment*time, data=markets1)$coef["treatment:time"]
+  h[i,] <- b
+}
+c1_treat1_ci_case<-quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+# vs canned
+estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, cluster = site, se="CR2")
+```
+
+#### Now repeat it for all Obs outcomes.
+
+Start by getting the coefs in a df
+
+```{r}
+# get coefs and SDs so coefplot can be effect size
+#marketVars <- names(markets)[c(grepl("index", names(markets)))]
+#outcomes <- names(markets)[grepl("(market|farm|past)", names(markets))] # already made in loaded .rda
+
+#get coefficient from ols and SD from data
+markCoefs <- matrix(NA, nrow=length(outcomes), ncol=3)
+for(i in 1:length(outcomes))
+{
+  #thecoef <- lm(markets[,outcomes[i]]~treatment*time + site + State, data=markets)$coefficients["treatment:time"]
+  thecoef <- lm(markets[,outcomes[i]]~treatment*time, data=markets)$coefficients["treatment:time"]
+  markCoefs[i,1] <- outcomes[i]
+  markCoefs[i,2] <- thecoef
+  markCoefs[i,3] <- sd(markets[,outcomes[i]], na.rm=T)
+  
+}
+markCoefs <- as.data.frame(markCoefs)
+names(markCoefs) <- c("var", "coef", "sd")
+markCoefs[,2:3] <- sapply(markCoefs[,2:3], function(x) {as.numeric(as.character(x))})
+
+```
+
+Now bootstrap the CIs
+
+```{r, eval=F}
+set.seed(1234)
+
+bsCIs.fun <- function(var, reps)
+{
+  R <- reps
+  h <- matrix(NA, R, 1)
+  for(i in 1:R)
+  {
+    # sample sites within states
+    nas_samp1 <- markets[markets$State %in% "nasarawa" & markets$treatment %in% 1,] %>% group_by(site) %>%
+      sample_n_groups(size=6) %>%
+      as.data.frame()
+    nas_samp0 <- markets[markets$State %in% "nasarawa" & markets$treatment %in% 0,] %>% group_by(site) %>%
+      sample_n_groups(size=3) %>%
+      as.data.frame()
+  ben_samp1 <- markets[markets$State %in% "benue" & markets$treatment %in% 1,] %>% group_by(site) %>%
+    sample_n_groups(size=4) %>%
+    as.data.frame()
+  ben_samp0 <- markets[markets$site %in% "sabon gida agan",]
+  ben_samp0$new_site <- "sabon gida agan"
+  markets1 <- rbind(nas_samp1, nas_samp0, ben_samp1, ben_samp0)
+  
+  #b<-lm(markets1[,var]~treatment*time + new_site, data=markets1)$coef["treatment:time"]
+  b<-lm(markets1[,var]~treatment*time, data=markets1)$coef["treatment:time"]
+  h[i,] <- b
+  }
+  # get bootstrap CIs from distribution of coefs
+  bs_CIs<-quantile(h[,1],c(0.025,0.975))
+  #c1_coefs <- thelm$coefficients['treatment:time']
+  
+  return(bs_CIs)
+}
+system.time(
+for(i in 1:length(outcomes))
+{
+  CIs <- bsCIs.fun(var=outcomes[i], reps=1000)
+  markCoefs[i, c("ll", "ul")] <- bsCIs.fun(var=outcomes[i], reps=1000)
+}
+)
+```
+
+Save.
+
+```{r, eval=F}
+#save(markCoefs, file="marketCoefs.rda") #with site and state FEs (biased)
+save(markCoefs, file="marketCoefs1.rda") # without FEs
+```
+
+Don't run that time-consuming code repeatedly, just load the output.
+
+```{r}
+load("marketCoefs.rda")
+```
+
+Looking to see why the bootstrap distirbution is bimodal: change over time in some places really different than others -- hugely negative in some CO sites.  When those control sites get bootstrapped in, the estimated treatment effect is pretty large.  When those control sites are not selected, the estimated effect is pretty small.
+```{r, eval=F}
+test <- markets %>% group_by(site) %>%
+  do(test=estimatr::lm_robust(pastoralist_sellers_rank~time, data=.))
+```
+
+### Residual bootstrap
+
+CHRIS: NOT DONE
+
+Resample residuals from *sites* within *states*.
+    - resample residuals the way we sampled (9 sites in Nas, 6 sites in Ben).
+        - actually 5 in Ben, since we didn't observe in Adaka.
+    - Then do lm(outcome~treatment) for each resample to make a distribution
+    - then take 2.5th quartile and 97.5th quartile from that distribution
+    - Repeat for every outcome; add to dataset (chris: not done)
+
+
+
+
+
+
+
+## Events
+
+### Case resampling
+
+case resample bootstrapping. The thing I know best, though slower (and safer from assumptions!) than residual bootstrap.
+    - get coef
+    - resamples sites within states; take all obs from those sites
+        - needs to mimic sampling: 9 in NAS, 6 in BEN
+            - no Adaka in Benue, no Gidan Buba in Nassarawa, so actually only 5 (4 treated, 1 control) in BEN and 8 (5 TR, 3 CO) in NAS.
+            - Adaka was one of the 2 control sites in Benue...
+    - regress outcome on explantory vars for new sample
+    - repeat to make bootstrap distribution
+
+```{r, eval=F}
+set.seed(1234)
+
+# the lm to get the coefs
+#fit.star<-lm(outgroup_index_rank~treatment*time + site, data=events)
+fit.star<-lm(outgroup_index_rank~treatment*time, data=events)
+
+R<-500 # Number of Repetitions
+h<-matrix(NA, R, 1)
+for (i in 1:R){
+  # sample sites within states
+  nas_samp1 <- events[events$State %in% "nasarawa" & events$treatment %in% 1,] %>% group_by(site) %>%
+    sample_n_groups(size=5) %>%
+    as.data.frame()
+  nas_samp0 <- events[events$State %in% "nasarawa" & events$treatment %in% 0,] %>% group_by(site) %>%
+    sample_n_groups(size=3) %>%
+    as.data.frame()
+  ben_samp1 <- events[events$State %in% "benue" & events$treatment %in% 1,] %>% group_by(site) %>%
+    sample_n_groups(size=4) %>%
+    as.data.frame()
+  ben_samp0 <- events[events$site %in% "sabon gida agan",]
+  ben_samp0$new_site <- "sabon gida agan"
+  events1 <- rbind(nas_samp1, nas_samp0, ben_samp1, ben_samp0)
+ 
+  #b<-lm(outgroup_index_rank~treatment*time + new_site, data=events1)$coef["treatment:time"]
+  b<-lm(outgroup_index_rank~treatment*time, data=events1)$coef["treatment:time"]
+  h[i,] <- b
+}
+c1_treat1_ci_case<-quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+# vs canned
+#estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=events, cluster = site, se="CR2")
+estimatr::lm_robust(pastoralists_index_rank ~ treatment*time, data=events, cluster = site, se="CR2")
+```
+
+#### Now repeat it for all Obs outcomes.
+
+Start by getting the coefs in a df
+
+```{r}
+# get coefs
+outgroupVars
+
+#get coefficient from ols
+eventCoefs <- matrix(NA, nrow=length(outgroupVars), ncol=3)
+for(i in 1:length(outgroupVars))
+{
+  #thecoef <- lm(events[,outgroupVars[i]]~treatment*time + site + State, data=events)$coefficients["treatment:time"]
+  thecoef <- lm(events[,outgroupVars[i]]~treatment*time, data=events)$coefficients["treatment:time"]
+  eventCoefs[i,1] <- outgroupVars[i]
+  eventCoefs[i,2] <- thecoef
+  eventCoefs[i,3] <- sd(events[,outgroupVars[i]], na.rm=T)
+  
+}
+eventCoefs <- as.data.frame(eventCoefs)
+names(eventCoefs) <- c("var", "coef", "sd")
+eventCoefs[,2:3] <- sapply(eventCoefs[,2:3], function(x) {as.numeric(as.character(x))})
+
+```
+
+Now bootstrap the CIs
+
+```{r}
+set.seed(1234)
+
+bsCIs.fun <- function(var, reps)
+{
+  R <- reps
+  h <- matrix(NA, R, 1)
+  for(i in 1:R)
+  {
+    # sample sites within states
+    nas_samp1 <- events[events$State %in% "nasarawa" & events$treatment %in% 1,] %>% group_by(site) %>%
+      sample_n_groups(size=6) %>%
+      as.data.frame()
+    nas_samp0 <- events[events$State %in% "nasarawa" & events$treatment %in% 0,] %>% group_by(site) %>%
+      sample_n_groups(size=3) %>%
+      as.data.frame()
+  ben_samp1 <- events[events$State %in% "benue" & events$treatment %in% 1,] %>% group_by(site) %>%
+    sample_n_groups(size=4) %>%
+    as.data.frame()
+  ben_samp0 <- events[events$site %in% "sabon gida agan",]
+  ben_samp0$new_site <- "sabon gida agan"
+  events1 <- rbind(nas_samp1, nas_samp0, ben_samp1, ben_samp0)
+  
+  #b<-lm(events1[,var]~treatment*time + new_site, data=events1)$coef["treatment:time"]
+  b<-lm(events1[,var]~treatment*time + new_site, data=events1)$coef["treatment:time"]
+  h[i,] <- b
+  }
+  # get bootstrap CIs from distribution of coefs
+  bs_CIs<-quantile(h[,1],c(0.025,0.975))
+  #c1_coefs <- thelm$coefficients['treatment:time']
+  
+  return(bs_CIs)
+}
+system.time(
+for(i in 1:length(outgroupVars))
+{
+  CIs <- bsCIs.fun(var=outgroupVars[i], reps=1000)
+  eventCoefs[i, c("ll", "ul")] <- bsCIs.fun(var=outgroupVars[i], reps=1000)
+}
+)
+```
+
+Save.
+
+```{r, eval=F}
+#save(eventCoefs, file="eventCoefs.rda") # with site/state FEs
+save(eventCoefs, file="eventCoefs1.rda") # without site/state FEs
+```
+
+********
+#############################################
+#############################################
+
+
+
+
+
+
+
+
+
+
+# OLD
+
+#### sample PSUs within state
+
+```{r, eval=F}
+set.seed(1234)
+#markets.cc <- markets[complete.cases(markets[,c("pastoralists_index_rank", "treatment", "time", "site", "State")]),]
+
+# regression
+fit.star<-lm(pastoralists_index_rank~treatment*time + site, data=markets.cc)
+
+# get fitted values and residuals
+markets$fit <- fit.star$fitted.values[match(rownames(markets), names(fit.star$fitted.values))]
+markets$resid<-fit.star$resid
+
+R<-1000 # Number of Repetitions
+h<-matrix(NA, R, 1)
+for (i in 1:R){
+  # sample residuals
+  ## randomly select sites within states, then resample all residuals from a site together, then assign them within that state
+  ### or should I assign them 
+  sites <- unique(markets$site)
+  index <- sample(1:length(sites), length(sites), replace=TRUE)
+  aa <- sites[index]
+  bb <- table(aa)
+  
+  markets <- markets %>% dplyr::group_by(State) %>%
+    mutate(new_y = fit + sample(resid, replace=TRUE)) %>%
+    as.data.frame()
+  
+  b<-lm(new_y~treatment*time+ site, data=markets)$coef["treatment:time"]
+  h[i,] <- b
+}
+c1_treat1_ci_site<-quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+# vs canned
+#estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, cluster = site, se="CR2")
+```
+
+
+
+## Make the plot
+
+```{r, eval=F}
+outcome <- c(c1_coefs, c1_treat1_ci_site)
+names(outcome) <- c("coef", "ll", "ul")
+outcome <- as.data.frame(outcome)
+outcome <- outcome/sd(markets.cc$pastoralists_index_rank)
+
+png(file="ecpn_obsDat.png")
+
+par(mar=c(5,10,5,2),oma=c(0,0,0,0),mgp=c(1.5,.5,0),mfrow=c(1,1))
+maxmods <- ncol(outcome)
+
+## observational data
+plot(range(0,2),c(0.5,maxmods),type="n",
+     axes=FALSE,ylab="",xlab="Est. Effect Size and 95% CI",
+     main="Observational outcomes: Pastoralists Index")
+axis(1)
+abline(v=0,col="gray",lwd=.5)
+points(outcome["coef",],maxmods,pch=19)
+segments(outcome["ll",],maxmods, outcome["ul",],maxmods)
+axis(2,at=maxmods,labels="Pastoralists Index",las=2)
+dev.off()
+  
+```
+
+Make simpler plot from lm
+
+```{r, eval=F}
+# run a regression compatible with tidy
+m1 <- estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, cluster = site, se="CR2")
+
+m1 <- broom::tidy(m1) %>%
+    filter(!grepl('site*', term))
+
+# draw a dot-and-whisker plot
+png(file="ecpn_obsDat_can.png")
+dwplot(m1)
+dev.off()
+```
+
+
+*******
+#########################################################
+#########################################################
+
+## Other versions
+
+No clustered/blocked resampling
+
+```{r, eval=F}
+set.seed(1234)
+fit.star<-lm(pastoralists_index_rank~treatment*time + site + State, data=markets)
+uhat<-fit.star$resid
+R<-10000 # Number of Repetitions
+h<-matrix(NA, 10000, 2)
+for (i in 1:R){
+  new_y<-fit.star$fit+sample(uhat,replace=TRUE)
+  b<-lm(new_y~markets.cc$treatment*markets.cc$time+markets.cc$site+markets.cc$State)$coef[c("(Intercept)", "markets.cc$treatment:markets.cc$time")]
+  h[i,] <- b
+}
+c1_int_ci_2<-quantile(h[,1],c(0.025,0.975))
+c1_treat1_ci_2 <- quantile(h[,2],c(0.025,0.975))
+c1_coefs_2 <- fit.star$coefficients
+
+```
+
+Resampling within state
+
+```{r, eval=F}
+set.seed(1234)
+# if NAs on any variable, then new_y will be diff length.
+## so complete.cases only.
+markets.cc <- markets[complete.cases(markets[,c("pastoralists_index_rank", "treatment", "time", "site", "State")]),]
+fit.star<-lm(pastoralists_index_rank~treatment*time + site + State, data=markets.cc)
+
+markets.cc$fit <- fit.star$fitted.values[match(rownames(markets.cc), names(fit.star$fitted.values))]
+markets.cc$resid<-fit.star$resid
+
+R<-10000 # Number of Repetitions
+h<-matrix(NA, R, 1) # instead of 1, could do this for mult outcomes
+for (i in 1:R){
+  # sample within state because randomization at state-level
+  markets.cc$new_y <- NA
+  markets.cc[markets.cc$State %in% "nasarawa", "new_y"] <- markets.cc[markets.cc$State %in% "nasarawa", "fit"] + sample(markets.cc[markets.cc$State %in% "nasarawa", "resid"], replace=TRUE)
+  markets.cc[markets.cc$State %in% "benue", "new_y"] <- markets.cc[markets.cc$State %in% "benue", "fit"] + sample(markets.cc[markets.cc$State %in% "benue", "resid"], replace=TRUE)
+  
+  b<-lm(new_y~treatment*time+ site + State, data=markets.cc)$coef["treatment:time"]
+  h[i,] <- b
+}
+#c1_int_ci<-quantile(h[,1],c(0.025,0.975))
+c1_treat1_ci <- quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+# vs canned
+estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, clusters = site)
+```
+
+Site-level resampling
+
+```{r, eval=F}
+set.seed(1234)
+# if NAs on any variable, then new_y will be diff length.
+## so complete.cases only.
+markets.cc <- markets[complete.cases(markets[,c("pastoralists_index_rank", "treatment", "time", "site", "State")]),]
+fit.star<-lm(pastoralists_index_rank~treatment*time + site, data=markets.cc)
+
+markets.cc$fit <- fit.star$fitted.values[match(rownames(markets.cc), names(fit.star$fitted.values))]
+markets.cc$resid<-fit.star$resid
+
+R<-10000 # Number of Repetitions
+h<-matrix(NA, R, 1)
+for (i in 1:R){
+  # sample within Site because that's lowest-level cluster
+  markets.cc <- markets.cc %>% dplyr::group_by(site) %>%
+    mutate(new_y = fit + sample(resid, replace=TRUE)) %>%
+    as.data.frame()
+  
+  b<-lm(new_y~treatment*time+ site, data=markets.cc)$coef["treatment:time"]
+  h[i,] <- b
+}
+c1_treat1_ci_site<-quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+# vs canned
+#estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, cluster = site, se="CR2")
+```
+
+Resampling within Site-time pair
+
+```{r, eval=F}
+set.seed(1234)
+# if NAs on any variable, then new_y will be diff length.
+## so complete.cases only.
+markets.cc <- markets[complete.cases(markets[,c("pastoralists_index_rank", "treatment", "time", "site", "State")]),]
+fit.star<-lm(pastoralists_index_rank~treatment*time + site + State, data=markets.cc)
+
+markets.cc$fit <- fit.star$fitted.values[match(rownames(markets.cc), names(fit.star$fitted.values))]
+markets.cc$resid<-fit.star$resid
+
+R<-10000 # Number of Repetitions
+h<-matrix(NA, R, 1)
+for (i in 1:R){
+  # sample within Site because that's lowest-level cluster
+  markets.cc <- markets.cc %>% dplyr::group_by(site,time) %>%
+    mutate(new_y = fit + sample(resid, replace=TRUE)) %>%
+    as.data.frame()
+  
+  b<-lm(new_y~treatment*time+ site, data=markets.cc)$coef["treatment:time"]
+  h[i,] <- b
+}
+c1_treat1_ci_time<-quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+```
+
+case resample bootstrapping. same but slow.
+
+```{r, eval=F}
+set.seed(1234)
+# if NAs on any variable, then new_y will be diff length.
+## so complete.cases only.
+markets.cc <- markets[complete.cases(markets[,c("pastoralists_index_rank", "treatment", "time", "site", "State")]),]
+fit.star<-lm(pastoralists_index_rank~treatment*time + site + State, data=markets.cc)
+R<-10000 # Number of Repetitions
+h<-matrix(NA, R, 1)
+for (i in 1:R){
+  # sample within Site because that's lowest-level cluster
+  markets.cc1 <- markets.cc %>% dplyr::group_by(site) %>%
+    mutate(num=n()) %>%
+    sample_n(size=num, replace=TRUE) %>%
+    as.data.frame()
+  
+  b<-lm(pastoralists_index_rank~treatment*time+ site, data=markets.cc1)$coef["treatment:time"]
+  h[i,] <- b
+}
+c1_treat1_ci_case<-quantile(h[,1],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients['treatment:time']
+
+# vs canned
+estimatr::lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, cluster = site, se="CR2")
+```
+
+### Other attempts to sample sites within states
+
+```{r, eval=F}
+
+  boot.nas2 <- markets[markets$State %in% "nasarawa",] %>% group_by(site) %>%
+    nest() %>%
+    sample_n(size=5, replace=T) %>%
+    unnest() %>%
+    as.data.frame(.)
+  boot.ben2 <- panel.df[panel.df$state %in% "ben",] %>% group_by(psu) %>%
+    nest() %>%
+    sample_n(size=6, replace=T) %>%
+    unnest() %>%
+    as.data.frame(.)
+  boot.samp2 <- rbind(boot.nas2, boot.ben2)
+  
+  nas_samp <- sample(unique(markets$site), replace=TRUE)
+  table(nas_samp)
+  
+  markets1 <- markets %>% dplyr::group_by(State) %>%
+    mutate(num=n()) %>%
+    sample_n(size=num, replace=TRUE) %>%
+    as.data.frame()
+
+```
+
+
+
+# Reference
+
+Nuole original residual bstrap.
+
+```{r, eval=F}
+# nuole original
+set.seed(1234)
+fit.star<-lm(consensus_dec1~as.factor(group_treat), data=analysis_dat_group)
+uhat<-fit.star$resid
+R<-10000 # Number of Repetitions
+h<-matrix(NA, 10000, 3)
+for (i in 1:R){
+  new_y<-fit.star$fit+sample(uhat,replace=TRUE)
+  b<-lm(new_y~as.factor(analysis_dat_group$group_treat))$coef
+  h[i,] <- b
+}
+c1_int_ci<-quantile(h[,1],c(0.025,0.975))
+c1_treat1_ci <- quantile(h[,2],c(0.025,0.975))
+c1_treat2_ci <- quantile(h[,3],c(0.025,0.975))
+c1_coefs <- fit.star$coefficients
+```
+
