@@ -1,0 +1,7 @@
+cd		change directory
+git clone	
+git status
+git pull
+git add --a
+git commit -m
+git push

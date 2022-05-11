@@ -1,0 +1,158 @@
+---
+title: "ecpn_appendix"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Appendices
+
+Desired appendices.
+
+- Explaining randomization inference and bootstrapping
+- Additive indices instead of ICW indices
+- Placebo analysis + components of placebo
+- Possible mechanisms?
+- Survey questions
+- Results with differencing method vs results with controlling-for method
+- Balance: TR vs CO for all baseline outcomes (Separate for svy and obs)
+- raw vs ranked variables to create the index
+
+
+## Appendix A: Randomization Inference and Bootstrapping
+
+Randomization inference and bootstrapping are nonparametric methods to generate $p$-values (randomization inference) and confidence intervals (bootstrapping).  With *randomization inference*, we first shuffle the treatment variable to break the relationship between treatment and outcomes.  Next we regress outcomes on treatment using our regression equation and store the resulting coefficient.  Lastly, we repeat that process 10,000 times to create the distribution of coefficients we would observe if treatment had no effect on outcomes -- the null hypothesis.  Our $p$-value is the proportion of the null distribution that is greater than or equal to our observed coefficient.  
+
+*Bootstrapping* for standard errors is similar, but instead of shuffling the treatment indicator we resample units with replacement.  By resampling with replacement, we create the empirical distribution of our data and the range of possible treatment effects we might observe if we repeated the experiment 10,000 times.  The treatment effect at the 2.5th percentile and at the 97.5th percentile are equivalent to a 95\% confidence interval [@efron1994introduction].
+
+In each of these procedures, we mimic our randomization process by randomizing/resampling the intervention to communities in site-level clusters and within state blocks. This means that both communities in an implementation site (farmers and pastoralists) will always be treated/sampled together and that assignment to the intervention and resampling are conducted separately in Nassarawa and Benue, just as the intervention was assigned in this study.  This procedure ensures that our null distribution (for $p$-values) is created by randomizing the intervention between exchangeable units and that our empirical distribution (for confidence intervals) is created by resampling units as they were sampled.
+
+## Appendix B: Results with Additive Indices
+
+These tables show results for self-report survey outcomes made with additive indices.  The tables include the coefficients and $p$-values with additive indices for community- and individual-level analyses.
+
+```{r, echo=F}
+load("paper1_files/add_ind_tab.Rdata")
+```
+
+\begin{table}[H]
+\begin{center}
+`r add_ind_tab`
+\caption{\label{tab:add_ind_tab}\textbf{Effect of ECPN on main outcomes with additive indices.} The first and second columns are coefficients and $p$-values for aggregate community-level analyses.  The third and fourth columns are coefficients and $p$-values for individual-level analyses.}
+\end{center}
+\end{table}
+
+## Appendix C: Mechanisms and Placebo Analysis
+
+These tables show results for mechanism and placebo outcomes using inverse-covariance weighted indices.  The tables include the coefficients and $p$-values for community- and individual-level analyses.
+
+```{r, echo=F}
+load("paper1_files/mech_ind_tab.Rdata")
+```
+
+\begin{table}[H]
+\begin{center}
+`r mech_ind_tab`
+\caption{\label{tab:mech_ind_tab}\textbf{Effect of ECPN on mechanism and placebo outcomes.} The first and second columns are coefficients and $p$-values for aggregate community-level analyses.  The third and fourth columns are coefficients and $p$-values for individual-level analyses.}
+\end{center}
+\end{table}
+
+
+## Appendix D: Survey Questions
+
+**Outgroup Affect**
+
+- With regards to someone from [X GROUP], would you feel comfortable:
+    - if they worked in your field?
+    - paying them to watch your animals?
+    - trading goods with them?
+    - sharing a meal with them?
+    - with a close relative marrying a person from [X GROUP]?
+- From 1-5, how much do you trust people from [X GROUP] in your area?
+- Now I’m going to ask you questions about your community here in Benue/Nassarawa, including [X GROUP].  Please tell me how strongly you agree/disagree with each of the following statements: People in this area can be trusted.
+
+**Contact**
+
+- Now I’m going to ask you questions about your contact with [X GROUP] in your area.
+    - Think of the market you go to most frequently. During the past month, have members of X GROUP gone to that market too?  In the past month, how many times did you interact with X group in the market?
+- In the past month, have you:
+    - Joined a member of X group for a social event outside the home?  How often?
+    - Hosted a member of X group for a ceremony in your home?  How often?
+    - Gone to the home of a member of X group for a ceremony?  How often?
+    - Have you interacted with members of X group in any other way in the past month?
+
+**Insecurity**
+
+- In the last year were there any areas that you avoided going to or through because of insecurity during the night? 
+- In the last year were there any areas that you avoided going to or through because of insecurity, during the day?
+- In the last year, did insecurity ever prevent you from: 
+    - Working when you wanted to work? About how many days were you unable to work?
+    - Going to the market?
+    - Getting water for the household?
+    - Going to your field/farm?
+    - Moving your animals to grazing areas?
+    - Moving your animals to water?
+    - Earning money or going to work?
+    - Going to school?
+
+**Endorsement Experiment**
+
+- Imagine that there is a proposal by [**the Farmer’s Cooperative Society**/**MACBAN**] for action to enhance access to clean water in rural areas.  Though expensive, the proposal aims to bring fresh, clean water to hundreds of areas without access to it, including this one.  If this were proposed, how would you feel about it?
+
+**Percent Experiemnt**
+
+- Think about groups that you might join in your leisure time.  Would you join a group that had **5/25/50/75**% X Group members?
+- Think about the community you live in.  Would you live in a community that had **5/25/50/75**% X Group members?
+
+
+**Violence Placebo**
+
+- Now I am going to ask you some questions about the use of violence.  Is it always, sometimes, rarely, or never justified to use violence to do each of the following:
+    - Retaliate against violence
+    - Defend one's group
+    - Maintain culture and traditions
+    - Defend one's religion
+    - Bring criminals to justice
+    - Force the government to change their policies
+
+
+**Threat**
+
+- Please tell me how strongly you agree/disagree with each of the following statements:
+    - You see X group as a threat to your community
+    - You think X group have too much influence on your community
+    - You think that people from X group have different morals than people from your group
+
+**Empathy and Perspective Taking**
+
+- Suppose something unfortunate happened to someone from X group in this community, such as a serious illness or the death of a parent. How likely is it that some people in the community from your group would get together to help them?
+- Suppose something unfortunate happened to someone from your group in this community, such as a serious illness or the death of a parent. How likely is it that some people in the community from X group would get together to help them?
+
+\smallskip
+
+- Some people say [X GROUP] is responsible for most of the violence in this community, while others say that both groups are responsible for the violence here.  Which is closer to your view?
+
+**Ingroup Expansion**
+
+- Now I’m going to ask you questions about your community here in Benue/Nassarawa, including X group. Please answer honestly and remember that your responses will remain confidential.  Please tell me how strongly you agree/disagree with each of the following statements:
+    - People in this area are willing to help their neighbors across ethnic and religious lines
+    - People in this area can be trusted
+    - People in this area generally do not get along together
+    - People in this area do not share the same morals
+    - People in this area see the benefits of working together to achieve common goals
+    - What proportion of your group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
+    - What proportion of X group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
+    - If there was a water supply problem in this community, how likely is it that people from your group and people from X group would cooperate to try to solve the problem?
+
+
+**Public Goods Game**
+
+"Thank you very much for participating in our survey.  Before I go, there is one last thing.  As you may have heard, we have development funds to use in this community.  We have randomly selected you as one of the 50 people to receive these funds.  These funds are not for a Mercy Corps project, but rather for you to keep personally or to donate to a community fund.   
+
+We have 1,000 Naira to give to you.  It is yours, and you can use it either way--for yourself or for a community good.
+
+Your community and [joint farmer/pastoralist community] have created a project committee to whom you can donate this money so that it may be used to help both communities.  The project committee has 4  people from each community.  We have found a donor that will match the funds that you all contribute to the project committee, so that if you donate 100 Naira the project committee receives 300 Naira, and if you donate all 1,000 Naira the project committee receives 3,000 Naira.  You are welcome to donate none, some, or all of the money to the project committee.
+
+These are your individual donation envelopes.  All the donations will be private -- only you will know how much money you donated. It essential that you keep how much you give private -- please do not tell anyone.  I have with me a donation envelope to collect donations.  Please go into your home, put however much of the 1,000 Naira you wish to donate to the project committee in the envelope, take whatever amount you want to keep for yourself, and come back to place your envelope in the donation envelope.  Remember, you are welcome to donate none, some, or all of the money to the project committee.  After that we are finished and you may continue your day.  We will come back and publicly announce how much money your community's project committee will receive."
