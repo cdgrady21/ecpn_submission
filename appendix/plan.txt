@@ -4,3 +4,6 @@ Question:
 Should Rfile from "data_code" folder create files here?
 OR
 Should Rfiles here grab data from the "data_code" folder?
+
+
+Lots of files are in data_and_code/survey_dat/d_analysis

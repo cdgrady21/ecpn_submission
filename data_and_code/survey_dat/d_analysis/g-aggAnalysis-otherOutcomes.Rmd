@@ -1,0 +1,420 @@
+---
+title: "g-aggAnalysis for academic paper"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+<!--Chris: notes
+
+Want to replace all lm() with lm_lin() but lm_lin() does not allow me to vary treatment in a function.-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(76465)
+rm(list=ls())
+load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../c_creating_dataframes/rand_df.Rdata")
+#load("f-aggregateData_together.Rdata")
+#load("rand_df_together.Rdata")
+
+library(NPC)
+library(dplyr)
+library(mosaic)
+library(estimatr)
+library(robustbase)
+library(quantreg)
+library(sandwich)
+library(clubSandwich)
+library(lmtest)
+library(coin)
+
+#author: "cdgrady21"
+#date: '`r format(Sys.Date(), "%B %d, %Y")`'
+
+
+#True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
+
+# Differencing
+true.fun1 <- function(var, tr, nsims=3000, dat=ag.df)
+{
+  if(grepl("resid", var)){
+    thelm <- lm(dat[,var]~dat[,tr], data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+      rand <- c(as.character(rand.nas), as.character(rand.ben))
+      rand.samp <- dat
+      rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
+      tr.lm <- lm(tr_fmla,rand.samp)
+      lm.tr_resid<-resid(tr.lm)
+      rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
+      
+      lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+    }
+  }
+  else if(tr=="treatment"){
+    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+      rand <- c(as.character(rand.nas), as.character(rand.ben))
+      rand.samp <- dat
+      rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+     
+      lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+      }
+  }
+  else{
+    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
+        mutate(newtr = shuffle(.data[[tr]])) %>%
+        as.data.frame(.)
+      
+      lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+    }
+  }
+  thep <- mean(rand.coef>thecoef)
+  thedf <- data.frame(coef=thecoef,truep=thep)
+  rownames(thedf) <- paste0(var, "~",tr)
+  return(thedf)
+}
+#true.fun(var='x_index', tr='treatment')
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var='x_cw_resid', tr='tr_resid') # doing this with resids #1 doesn't make sense to me, #2 doesn't change results, and #3 takes a long time.
+## would make sense if there was a confounder, but this is a randomized experiment so should not have confounders. Could maybe use error reduction.
+
+
+######## Controlling For
+true.fun <- function(var, tr, nsims=3000, dat=ag.df)
+{
+  if(grepl("resid", var)){
+    thelm <- lm(dat[,var]~dat[,tr], data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+      rand <- c(as.character(rand.nas), as.character(rand.ben))
+      rand.samp <- dat
+      rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
+      tr.lm <- lm(tr_fmla,rand.samp)
+      lm.tr_resid<-resid(tr.lm)
+      rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
+      
+      lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+    }
+  }
+  else if(tr=="treatment" & (grepl("end", var) | grepl("y1", var))){
+    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+      rand <- c(as.character(rand.nas), as.character(rand.ben))
+      rand.samp <- dat
+      rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+     
+      lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+      }
+  }
+  else if(tr=="treatment" & !(grepl("end", var) | grepl("y1", var))){
+    thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+      rand <- c(as.character(rand.nas), as.character(rand.ben))
+      rand.samp <- dat
+      rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+     
+      lm.null <- lm(rand.samp[,paste0(var,"_end")]~rand.samp[,tr]+dat[,paste0(var,"_base")]+state, data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+      }
+  }
+  else if(grepl("end", var) | grepl("y1", var)){
+    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
+        mutate(newtr = shuffle(.data[[tr]])) %>%
+        as.data.frame(.)
+      
+      lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+    }
+  }
+  else if(!grepl("end", var) | grepl("y1", var)){
+    thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
+    thecoef <-coef(thelm)[2]
+    
+    rand.coef = rep(NA,nsims)
+    for(i in 1:nsims){
+      rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
+        mutate(newtr = shuffle(.data[[tr]])) %>%
+        as.data.frame(.)
+      
+      lm.null <- lm(rand.samp[,paste0(var,"_end")]~rand.samp[,'newtr']+dat[,paste0(var,"_base")]+state, data=rand.samp)
+      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
+    }
+  }
+  
+  thep <- mean(rand.coef>thecoef)
+  thedf <- data.frame(coef=thecoef,truep=thep)
+  rownames(thedf) <- paste0(var, "~",tr)
+  return(thedf)
+}
+#true.fun(var='x_index', tr='treatment')
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var='x_cw_resid', tr='tr_resid') # doing this with resids #1 doesn't make sense, #2 doesn't change results, and #3 takes a long time.
+## would make sense if there was a confounder, but this is a randomized experiment so should not have confounders.
+#true.fun(var="pgp_amount_end", tr="treatment")
+#true.fun('pgp_donate_end', 'bene_cw')
+#true.fun('rMean', 'treatment')
+#true.fun1('rMean', 'treatment')
+
+
+
+# Which function to use?
+strat.fun <- function(var){
+  thesd <- sd(ag.df[[var]])*.2
+  thediff <- abs(mosaic::mean(ag.df[[var]]~ag.df$treatment)[1]-mosaic::mean(ag.df[[var]]~ag.df$treatment)[2])
+  thebal <- thediff-thesd
+  if(thebal<0){
+    return("Controlling-for: true.fun")
+  }
+  if(thebal>=0){
+    return("Difference: true.fun1")
+  }
+  else(return("Fail"))
+}
+#strat.fun("x_cw_base")
+
+```
+```{r, eval=F, include=F}
+# I prefer the SD method, but could also use lin hypothesis test or an equivalence test.
+## issue with these: we are super low powered, so no baseline differences will be stat sig.  And equivalence test will always say "not same, not diff"
+
+# Hypothesis test
+(x1_test <- lm_lin(x_cw_base~treatment, covariates= ~state, data=ag.df, clusters=psu))
+
+# equivalence
+TOSTtwo(m1=mean(ag.df$x_cw_base[ag.df$treatment %in% 0]), m2=mean(ag.df$x_cw_base[ag.df$treatment %in% 1]), 
+        sd1=sd(ag.df$x_cw_base[ag.df$treatment %in% 0]), sd2=sd(ag.df$x_cw_base[ag.df$treatment %in% 1]), 
+        n1=length(unique(ag.df$comm[ag.df$treatment %in% 0])), n2=length(unique(ag.df$comm[ag.df$treatment %in% 1])),
+        low_eqbound_d=-0.1, high_eqbound_d=0.1, alpha = 0.05)
+
+TOSTtwo(m1=mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0]), m2=mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1]), 
+        sd1=sd(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0]), sd2=sd(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1]), 
+        n1=length(unique(ag.df$comm[ag.df$treatment %in% 0])), n2=length(unique(ag.df$comm[ag.df$treatment %in% 1])),
+        low_eqbound_d=-0.01, high_eqbound_d=0.01, alpha = 0.05)
+```
+
+# Subsets
+
+Look at farmers and pastoralists separately.
+
+```{r}
+farmers <- ag.df[grepl(".farmers", ag.df$comm),]
+pastors <- ag.df[grepl(".pastor", ag.df$comm),]
+```
+
+Look at states separately.
+
+```{r}
+nas <- ag.df[ag.df$state %in% "nas",]
+ben <- ag.df[ag.df$state %in% "ben",]
+
+```
+
+# Variable list
+
+- bargaining: bargVars, 
+- Awareness: awareVars and/or clashVars, 
+- Threat: threatVars
+- Ingroup expansion: cohesVars1
+- Empathy: cohes2vars OR empVars and perspVars
+- benefit: beneVar OR beneVarsReal (endline only)
+
+# Testing Outcomes
+
+We will use the differencing strategy when treatment and control are not balanced at baseline.  We will use the controlling-for strategy when treatment and control are balanced at baseline.  We say the groups are balanced if they are within 0.2 SDs of eachother at baseline.
+
+true.fun1 is with differencing. true.fun is controlling-for. strat.fun tells us which to use.
+
+
+************
+
+
+## Awareness
+
+```{r}
+# select
+strat.fun("clash_cw_base")
+
+# true pvals
+(clash1 <- true.fun1('clash_cw', 'treatment'))
+
+#aware
+strat.fun("clash_group.violence_base")
+
+# true pvals
+(aware1 <- true.fun1('clash_group.violence', 'treatment'))
+
+```
+
+TR knows more about clashes.
+
+## Bargaining
+
+```{r}
+# select
+strat.fun("barg_cw_base")
+
+# true pvals
+(barg <- true.fun('barg_cw', 'treatment'))
+```
+
+
+******
+
+# Mechanisms
+
+Things that ECPN could work through.  If ECPN improves them,  Do they correlate with attitudes/contact/security?
+
+## Threat
+
+Variables: `r threatVars`
+
+```{r con}
+strat.fun("threat_cw_base")
+(threat1 <- true.fun('threat_cw', 'treatment'))
+#true.fun("threat_group.threat_dis_group.x_threat", 'treatment')
+
+true.fun('allTrust_cw', 'threat_cw')
+true.fun('contactOnly_cw', 'threat_cw')
+true.fun('in_cw', 'threat_cw')
+```
+
+Nothing.  Cannot work through reduced feelings of threat because ECPN does not correlate with feelings of threat.  The coefficient of `r round(threat1$coef,5)` is  `r round(threat1$coef/sd(ag.df$threat_cw),3)` standard deviations.
+
+Threat is negatively correlated with intergroup affect, though.
+
+
+## Empathy/Perspective-Taking
+
+```{r}
+# select
+strat.fun("emp_cw_base")
+
+# true pvals
+(emp1 <- true.fun1('emp_cw', 'treatment'))
+# true.fun1('emp_index', 'treatment') # confirm with index
+
+# empathy and outcomes
+(emp_trust <- true.fun('allTrust_cw', 'emp_cw'))
+(emp_contact <- true.fun('contactOnly_cw', 'emp_cw'))
+(emp_in <- true.fun('in_cw', 'emp_cw'))
+
+
+
+# select
+strat.fun("persp_cw_base")
+
+# true pvals persp
+(persp1 <- true.fun1('persp_cw', 'treatment'))
+#true.fun1('persp_cw', 'treatment') # diff coef because _cw is standardized 0-1
+#true.fun1('threat_group.x_responsible', 'treatment') #check to make sure identical
+
+# persp and outcomes
+(persp_trust <- true.fun('allTrust_cw', 'persp_cw'))
+(persp_contact <- true.fun('contactOnly_cw', 'persp_cw'))
+(persp_in <- true.fun('in_cw', 'persp_cw'))
+
+```
+
+ECPN maybe increases empathy increases, by these measures (Below 0.10 pvalue).  Empathy correlates with intergroup attitudes; some correlation with security.
+
+ECPN does not cause perspective-taking, but again only one question.  Perspective-taking does correlated with intergroup attitudes, contact, and somewhat security (p<.10).
+
+
+## Ingroup Expansion
+
+Variables: `r cohesVars1`
+
+```{r con}
+strat.fun("expand_cw_base")
+(expan1 <- true.fun('expand_cw', 'treatment'))
+
+# expansion and outcomes
+(expand_trust <- true.fun('allTrust_cw', 'expand_cw'))
+(expand_contact <- true.fun('contactOnly_cw', 'expand_cw'))
+(expand_in <- true.fun('in_cw', 'expand_cw'))
+```
+
+Nope, ECPN does not increase this.  But change here correlates with intergroup attitudes.
+
+
+## Benefit
+
+Variables: `r beneVars`
+
+```{r con}
+strat.fun("econ_benefit_group.benefit_econ_base")
+(bene1 <- true.fun('econ_benefit_group.benefit_econ', 'treatment'))
+
+
+strat.fun("bene_cw_base")
+(bene2 <- true.fun('bene_cw', 'treatment'))
+
+```
+
+Not more likely to say currently benefitting!
+
+```{r, eval=F}
+(bene2 <- true.fun1('x_cw', 'bene_cw'))
+(bene3 <- true.fun1('cohes_cw', 'bene_cw'))
+```
+
+
+# Save 
+
+For appendices.  chris: need to add con1.1 for alternative contact coding.
+
+```{r save3}
+save(trust_ind, in_ind, con_ind,
+     vio1,
+     threat1, emp1, persp1, expan1,
+     file="z_appendices_ag.Rdata")
+
+```
