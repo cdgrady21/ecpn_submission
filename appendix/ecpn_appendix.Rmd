@@ -12,13 +12,20 @@ knitr::opts_chunk$set(echo = TRUE)
 Desired appendices.
 
 - Explaining randomization inference and bootstrapping
-- Additive indices instead of ICW indices
-- Placebo analysis + components of placebo
-- Possible mechanisms?
 - Survey questions
-- Results with differencing method vs results with controlling-for method
-- Balance: TR vs CO for all baseline outcomes (Separate for svy and obs)
-- raw vs ranked variables to create the index
+- Robustness checks for analysis
+    - Additive indices instead of ICW indices
+    - Results with differencing method vs results with controlling-for method
+    - raw vs ranked variables to create the index
+- Placebo analysis + components of placebo
+- Balance: 
+    - Communities/site: TR vs CO within state & overall for all baseline outcomes (Separate for svy and obs)
+    - Individuals: Direct/indirect/control == unneeded because exploratory & no assumption of balance.
+- Panel analysis: big table of results (lower priority)
+    - Additive indices instead of ICW indices
+    - Results with differencing method vs results with controlling-for method
+    - raw vs ranked variables to create the index
+- State-level differences & farmer-pastoralist differences (ready for reviewers)
 
 
 ## Appendix A: Randomization Inference and Bootstrapping
