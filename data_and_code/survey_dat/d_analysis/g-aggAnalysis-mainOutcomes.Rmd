@@ -274,6 +274,41 @@ true.fun1 is with differencing. true.fun is controlling-for. strat.fun tells us 
 
 ************
 
+# Make a table of all outcomes with coefs and pvalues for the diff ways of making indices and estimating models.
+
+- index: inverse-covariance weights ("cw") or additive ("ind")
+- model: controlling-for ("cont") or differencing ("diff")
+
+```{r}
+analysis.fun <- function(var)
+{
+  var_cw_cont <- true.fun(paste0(var, "_cw"), 'treatment')
+  var_ind_cont <- true.fun(paste0(var, "_index"), 'treatment')
+  var_cw_diff <- true.fun1(paste0(var, "_cw"), 'treatment')
+  var_ind_diff <- true.fun1(paste0(var, "_index"), 'treatment')
+  
+  var_tab <- rbind(var_cw_cont, var_ind_cont, var_cw_diff, var_ind_diff)
+  var_tab <- cbind (var_tab, c("cw_cont", "ind_cont", "cw_diff", "ind_diff"))
+  names(var_tab)[3] <- "version"
+  strat.fun(paste0(var, "_cw_base"))
+  strat.fun(paste0(var, "_index_base"))
+  
+  return(var_tab)
+}
+
+trust_tab <- analysis.fun('allTrust')
+```
+
+
+
+```{r}
+# loop over all outcomes
+outcome_list <- ("allTrust", )
+```
+
+
+*****************
+
 # Intergroup Trust
 
 **allTrust**: `r paste(allTrustVars, collapse=", ")`
@@ -283,9 +318,15 @@ true.fun1 is with differencing. true.fun is controlling-for. strat.fun tells us 
 strat.fun("allTrust_cw_base")
 
 # true pvals
-(trust1 <- true.fun('allTrust_cw', 'treatment'))
-trust_ind <- true.fun('allTrust_index', 'treatment')
+## cont
+(trust_cw_cont <- true.fun('allTrust_cw', 'treatment'))
+trust_ind_cont <- true.fun('allTrust_index', 'treatment')
+## diff
+trust_cw_diff <- true.fun1('allTrust_cw', 'treatment')
+trust_ind_diff <- true.fun1('allTrust_index', 'treatment')
 
+```
+```{r, eval=F}
 # group
 (trust1_farm <- true.fun('allTrust_cw', 'treatment', dat=farmers))
 (trust1_past <- true.fun('allTrust_cw', 'treatment', dat=pastors))
