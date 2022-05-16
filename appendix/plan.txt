@@ -1,9 +1,5 @@
-put appendices here.
+put appendix here.  Just the appendix that will be send with the manuscript, not the code that does analyses for the appendix.
 
-Question:
-Should Rfile from "data_code" folder create files here?
-OR
-Should Rfiles here grab data from the "data_code" folder?
-
+Rfile from "data_code" should folder creates files here.
 
 Lots of files are in data_and_code/survey_dat/d_analysis
