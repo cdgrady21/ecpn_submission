@@ -1,2 +1,5 @@
 paper file goes here (Overleaf link)
 Bibliography goes here
+
+PNAS instructions: https://www.pnas.org/author-center/submitting-your-manuscript#initial-submissions
+https://www.pnas.org/pb-assets/authors/ifora-1651842692393.pdf

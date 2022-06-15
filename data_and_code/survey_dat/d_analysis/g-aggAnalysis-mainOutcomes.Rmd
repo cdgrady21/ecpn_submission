@@ -276,6 +276,8 @@ true.fun1 is with differencing. true.fun is controlling-for. strat.fun tells us 
 
 # Make a table of all outcomes with coefs and pvalues for the diff ways of making indices and estimating models.
 
+- Rows as outcomes; columns for CW-Cont, CW-diff, Ind-Cont, Ind-diff; each column shows coef & pvalue.
+
 - index: inverse-covariance weights ("cw") or additive ("ind")
 - model: controlling-for ("cont") or differencing ("diff")
 
@@ -297,14 +299,23 @@ analysis.fun <- function(var)
 }
 
 trust_tab <- analysis.fun('allTrust')
+in_tab <- analysis.fun('in')
 ```
 
 
 
 ```{r}
 # loop over all outcomes
-outcome_list <- ("allTrust", )
+outcome_list <- c("allTrust", "in", 'contactOnly',
+                  'rMean', 'end_exp',
+                  'vio')
 ```
+
+trust/distance: trustVars, distVars, 
+- Insecurity: vioExpVars, inVars, conVioEffVars, 
+- Coordination: pgp_donate, pgp_amount, 
+- Contact: contactOnly, randExp/percExp, market/social observation
+- Affect: list experiment, endorsement experiment
 
 
 *****************
