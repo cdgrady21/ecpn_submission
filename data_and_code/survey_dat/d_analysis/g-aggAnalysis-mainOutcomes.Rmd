@@ -42,7 +42,7 @@ library(coin)
 #True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
 
 # Differencing
-true.fun1 <- function(var, tr, nsims=3000, dat=ag.df)
+true.fun1 <- function(var, tr, nsims=300, dat=ag.df)
 {
   if(grepl("resid", var)){
     thelm <- lm(dat[,var]~dat[,tr], data=dat)
@@ -106,7 +106,7 @@ true.fun1 <- function(var, tr, nsims=3000, dat=ag.df)
 
 
 ######## Controlling For
-true.fun <- function(var, tr, nsims=3000, dat=ag.df)
+true.fun <- function(var, tr, nsims=300, dat=ag.df)
 {
   if(grepl("resid", var)){
     thelm <- lm(dat[,var]~dat[,tr], data=dat)
@@ -259,8 +259,10 @@ ben <- ag.df[ag.df$state %in% "ben",]
 
 # Variable list
 
-- trust/distance: trustVars, distVars, 
-- Insecurity: vioExpVars, inVars, conVioEffVars, 
+- Attitudes: allTrust
+    - trustVars, distVars
+- Insecurity: in
+    - vioExpVars, inVars, conVioEffVars, 
 - Coordination: pgp_donate, pgp_amount, 
 - Contact: contactOnly, randExp/percExp, market/social observation
 - Affect: list experiment, endorsement experiment
@@ -300,22 +302,30 @@ analysis.fun <- function(var)
 
 trust_tab <- analysis.fun('allTrust')
 in_tab <- analysis.fun('in')
+con_tab <- analysis.fun('contactOnly')
+r_tab <- analysis.fun('rMean')
+
+testList <- vector(mode="list", length=length(outcome_list))
+testList[[1]] <- trust_tab
+
 ```
 
-
-
+loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do ic2 and index.
 ```{r}
 # loop over all outcomes
 outcome_list <- c("allTrust", "in", 'contactOnly',
-                  'rMean', 'end_exp',
                   'vio')
+newList <- vector(mode="list", length=length(outcome_list))
+for(i in 1:length(outcome_list))
+{
+  newList[[i]] <- analysis.fun(outcome_list[i])
+}
+
+
+# add 'rMean', 'end_exp',
 ```
 
-trust/distance: trustVars, distVars, 
-- Insecurity: vioExpVars, inVars, conVioEffVars, 
-- Coordination: pgp_donate, pgp_amount, 
-- Contact: contactOnly, randExp/percExp, market/social observation
-- Affect: list experiment, endorsement experiment
+
 
 
 *****************
