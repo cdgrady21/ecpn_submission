@@ -17,12 +17,13 @@ Want to replace all lm() with lm_lin() but lm_lin() does not allow me to vary tr
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-set.seed(76465)
+set.seed(962022)
 rm(list=ls())
 load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
 load("../c_creating_dataframes/rand_df.Rdata")
-#load("f-aggregateData_together.Rdata")
-#load("rand_df_together.Rdata")
+
+#True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
+load("true_fun.rda")
 
 library(NPC)
 library(dplyr)
@@ -35,223 +36,13 @@ library(clubSandwich)
 library(lmtest)
 library(coin)
 
-#author: "cdgrady21"
-#date: '`r format(Sys.Date(), "%B %d, %Y")`'
-
-
-#True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
-
-# Differencing
-true.fun1 <- function(var, tr, nsims=300, dat=ag.df)
-{
-  if(grepl("resid", var)){
-    thelm <- lm(dat[,var]~dat[,tr], data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
-      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
-      rand <- c(as.character(rand.nas), as.character(rand.ben))
-      rand.samp <- dat
-      rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
-      tr.lm <- lm(tr_fmla,rand.samp)
-      lm.tr_resid<-resid(tr.lm)
-      rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
-      
-      lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-    }
-  }
-  else if(tr=="treatment"){
-    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
-      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
-      rand <- c(as.character(rand.nas), as.character(rand.ben))
-      rand.samp <- dat
-      rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
-     
-      lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-      }
-  }
-  else{
-    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
-        mutate(newtr = shuffle(.data[[tr]])) %>%
-        as.data.frame(.)
-      
-      lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-    }
-  }
-  thep <- mean(rand.coef>thecoef)
-  thedf <- data.frame(coef=thecoef,truep=thep)
-  rownames(thedf) <- paste0(var, "~",tr)
-  return(thedf)
-}
-#true.fun(var='x_index', tr='treatment')
-#true.fun(var='x_cw', tr='treatment')
-#true.fun(var='cohes_cw', tr='bene_cw')
-#true.fun(var='x_cw_resid', tr='tr_resid') # doing this with resids #1 doesn't make sense to me, #2 doesn't change results, and #3 takes a long time.
-## would make sense if there was a confounder, but this is a randomized experiment so should not have confounders. Could maybe use error reduction.
-
-
-######## Controlling For
-true.fun <- function(var, tr, nsims=300, dat=ag.df)
-{
-  if(grepl("resid", var)){
-    thelm <- lm(dat[,var]~dat[,tr], data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
-      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
-      rand <- c(as.character(rand.nas), as.character(rand.ben))
-      rand.samp <- dat
-      rand.samp$treatment <- ifelse(rand.samp$psu %in% rand, 1, 0)
-      tr.lm <- lm(tr_fmla,rand.samp)
-      lm.tr_resid<-resid(tr.lm)
-      rand.samp[names(lm.tr_resid),"tr_resid"]<-lm.tr_resid
-      
-      lm.null <- lm(rand.samp[,var]~rand.samp[,tr], data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-    }
-  }
-  else if(tr=="treatment" & (grepl("end", var) | grepl("y1", var))){
-    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
-      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
-      rand <- c(as.character(rand.nas), as.character(rand.ben))
-      rand.samp <- dat
-      rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
-     
-      lm.null <- lm(rand.samp[,var]~rand.samp[,tr]+state, data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-      }
-  }
-  else if(tr=="treatment" & !(grepl("end", var) | grepl("y1", var))){
-    thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
-      rand.ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
-      rand <- c(as.character(rand.nas), as.character(rand.ben))
-      rand.samp <- dat
-      rand.samp[,tr] <- ifelse(rand.samp$psu %in% rand, 1, 0)
-     
-      lm.null <- lm(rand.samp[,paste0(var,"_end")]~rand.samp[,tr]+dat[,paste0(var,"_base")]+state, data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-      }
-  }
-  else if(grepl("end", var) | grepl("y1", var)){
-    thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
-        mutate(newtr = shuffle(.data[[tr]])) %>%
-        as.data.frame(.)
-      
-      lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-    }
-  }
-  else if(!grepl("end", var) | grepl("y1", var)){
-    thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
-    thecoef <-coef(thelm)[2]
-    
-    rand.coef = rep(NA,nsims)
-    for(i in 1:nsims){
-      rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
-        mutate(newtr = shuffle(.data[[tr]])) %>%
-        as.data.frame(.)
-      
-      lm.null <- lm(rand.samp[,paste0(var,"_end")]~rand.samp[,'newtr']+dat[,paste0(var,"_base")]+state, data=rand.samp)
-      rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-    }
-  }
-  
-  thep <- mean(rand.coef>thecoef)
-  thedf <- data.frame(coef=thecoef,truep=thep)
-  rownames(thedf) <- paste0(var, "~",tr)
-  return(thedf)
-}
-#true.fun(var='x_index', tr='treatment')
-#true.fun(var='x_cw', tr='treatment')
-#true.fun(var='cohes_cw', tr='bene_cw')
-#true.fun(var='x_cw_resid', tr='tr_resid') # doing this with resids #1 doesn't make sense, #2 doesn't change results, and #3 takes a long time.
-## would make sense if there was a confounder, but this is a randomized experiment so should not have confounders.
-#true.fun(var="pgp_amount_end", tr="treatment")
-#true.fun('pgp_donate_end', 'bene_cw')
-#true.fun('rMean', 'treatment')
-#true.fun1('rMean', 'treatment')
-
-
-
-# Which function to use?
-strat.fun <- function(var){
-  thesd <- sd(ag.df[[var]])*.2
-  thediff <- abs(mosaic::mean(ag.df[[var]]~ag.df$treatment)[1]-mosaic::mean(ag.df[[var]]~ag.df$treatment)[2])
-  thebal <- thediff-thesd
-  if(thebal<0){
-    return("Controlling-for: true.fun")
-  }
-  if(thebal>=0){
-    return("Difference: true.fun1")
-  }
-  else(return("Fail"))
-}
-#strat.fun("x_cw_base")
-
-```
-```{r, eval=F, include=F}
-# I prefer the SD method, but could also use lin hypothesis test or an equivalence test.
-## issue with these: we are super low powered, so no baseline differences will be stat sig.  And equivalence test will always say "not same, not diff"
-
-# Hypothesis test
-(x1_test <- lm_lin(x_cw_base~treatment, covariates= ~state, data=ag.df, clusters=psu))
-
-# equivalence
-TOSTtwo(m1=mean(ag.df$x_cw_base[ag.df$treatment %in% 0]), m2=mean(ag.df$x_cw_base[ag.df$treatment %in% 1]), 
-        sd1=sd(ag.df$x_cw_base[ag.df$treatment %in% 0]), sd2=sd(ag.df$x_cw_base[ag.df$treatment %in% 1]), 
-        n1=length(unique(ag.df$comm[ag.df$treatment %in% 0])), n2=length(unique(ag.df$comm[ag.df$treatment %in% 1])),
-        low_eqbound_d=-0.1, high_eqbound_d=0.1, alpha = 0.05)
-
-TOSTtwo(m1=mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0]), m2=mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1]), 
-        sd1=sd(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0]), sd2=sd(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1]), 
-        n1=length(unique(ag.df$comm[ag.df$treatment %in% 0])), n2=length(unique(ag.df$comm[ag.df$treatment %in% 1])),
-        low_eqbound_d=-0.01, high_eqbound_d=0.01, alpha = 0.05)
-```
-
 # Subsets
+## Look at farmers and pastoralists separately.
 
-Look at farmers and pastoralists separately.
-
-```{r}
 farmers <- ag.df[grepl(".farmers", ag.df$comm),]
 pastors <- ag.df[grepl(".pastor", ag.df$comm),]
-```
 
-Look at states separately.
-
-```{r}
+## Look at states separately.
 nas <- ag.df[ag.df$state %in% "nas",]
 ben <- ag.df[ag.df$state %in% "ben",]
 
@@ -259,13 +50,11 @@ ben <- ag.df[ag.df$state %in% "ben",]
 
 # Variable list
 
-- Attitudes: allTrust
-    - trustVars, distVars
+- Attitudes: attitude
 - Insecurity: in
-    - vioExpVars, inVars, conVioEffVars, 
 - Coordination: pgp_donate, pgp_amount, 
 - Contact: contactOnly, randExp/percExp, market/social observation
-- Affect: list experiment, endorsement experiment
+- Affect: endorsement experiment
 
 # Testing Outcomes
 
@@ -286,68 +75,116 @@ true.fun1 is with differencing. true.fun is controlling-for. strat.fun tells us 
 ```{r}
 analysis.fun <- function(var)
 {
-  var_cw_cont <- true.fun(paste0(var, "_cw"), 'treatment')
-  var_ind_cont <- true.fun(paste0(var, "_index"), 'treatment')
-  var_cw_diff <- true.fun1(paste0(var, "_cw"), 'treatment')
-  var_ind_diff <- true.fun1(paste0(var, "_index"), 'treatment')
+  if(paste0(var, "_cw_end") %in% names(ag.df))
+  {
+    var_cw_cont <- true.fun(paste0(var, "_cw"), 'treatment')
+    var_ind_cont <- true.fun(paste0(var, "_index"), 'treatment')
+    var_cw_diff <- true.fun1(paste0(var, "_cw"), 'treatment')
+    var_ind_diff <- true.fun1(paste0(var, "_index"), 'treatment')
+    
+    which1 <- strat.fun(paste0(var, "_cw_base"))
+    thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
+  }
+  else if(grepl("pgp", var))
+  {
+    var_cw_cont <- true.fun(var, 'treatment')
+    var_ind_cont <- NA
+    var_cw_diff <- NA
+    var_ind_diff <- NA
+    which1 <- NA
+    thebase <- NA
+  }
+  else
+  {
+    var_cw_cont <- true.fun(var, 'treatment')
+    var_ind_cont <- NA
+    var_cw_diff <- true.fun1(var, 'treatment')
+    var_ind_diff <- NA
+    
+    which1 <- strat.fun(var)
+    thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
+  }
   
   var_tab <- rbind(var_cw_cont, var_ind_cont, var_cw_diff, var_ind_diff)
   var_tab <- cbind (var_tab, c("cw_cont", "ind_cont", "cw_diff", "ind_diff"))
-  names(var_tab)[3] <- "version"
-  strat.fun(paste0(var, "_cw_base"))
-  strat.fun(paste0(var, "_index_base"))
+  var_tab[4] <- thebase
+  colnames(var_tab)[3:4] <- c("version", "base")
+  var_tab[4] <- ifelse(var_tab[[4]] == var_tab[[3]], 1, 0)
   
   return(var_tab)
 }
 
-trust_tab <- analysis.fun('allTrust')
-in_tab <- analysis.fun('in')
-con_tab <- analysis.fun('contactOnly')
-r_tab <- analysis.fun('rMean')
-
-testList <- vector(mode="list", length=length(outcome_list))
-testList[[1]] <- trust_tab
+#(trust_tab <- analysis.fun(var='attitude'))
+#(in_tab <- analysis.fun('in'))
+#con_tab <- analysis.fun('contactOnly')
+#r_tab <- analysis.fun(var='rMean')
+#pgp_tab <- analysis.fun(var='pgp_amount_end')
 
 ```
 
-loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do ic2 and index.
+loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.
+
 ```{r}
 # loop over all outcomes
-outcome_list <- c("allTrust", "in", 'contactOnly',
-                  'vio')
+outcome_list <- c("attitude", "in", 'contactOnly',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
 newList <- vector(mode="list", length=length(outcome_list))
 for(i in 1:length(outcome_list))
 {
   newList[[i]] <- analysis.fun(outcome_list[i])
 }
-
-
-# add 'rMean', 'end_exp',
+save(newList, file="list_of_coefs_and_ps.Rda")
 ```
 
 
+****************
 
+Now do it for raw vs binary category vs ranked contact outcomes.
+
+```{r}
+table(ag.df$contactOnly_raw_cw)
+table(ag.df$contactOnly_cats_cw)
+table(ag.df$contactOnly_cw)
+
+var_cw_cont <- true.fun(paste0("contactOnly", "_cw"), 'treatment')
+var_cats_cont <- true.fun(paste0("contactOnly_cats", "_cw"), 'treatment')
+var_raw_cont <- true.fun(paste0("contactOnly_raw", "_cw"), 'treatment')
+
+var_cw_diff <- true.fun1(paste0("contactOnly", "_cw"), 'treatment')
+var_cats_diff <- true.fun1(paste0("contactOnly_cats", "_cw"), 'treatment')
+var_raw_diff <- true.fun1(paste0("contactOnly_raw", "_cw"), 'treatment')
+
+var_tab <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
+                 var_cw_diff, var_cats_diff, var_raw_diff)
+
+```
+
+
+Now NPC
+
+```{r}
+npc <- NPC::NPC(ag.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c("attitude_cw", "in_cw", 'contactOnly_cw',
+                  'rMean', "end_exp"), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=10000, seed=952022,
+             print.steps=FALSE)
+(combP <- npc$p.values['NPC']) # cumulative
+npc # all of them
+
+```
 
 *****************
 
 # Intergroup Trust
 
-**allTrust**: `r paste(allTrustVars, collapse=", ")`
+**attitude**: `r paste(attitudeVars, collapse=", ")`
 
-```{r}
-# select
-strat.fun("allTrust_cw_base")
-
-# true pvals
-## cont
-(trust_cw_cont <- true.fun('allTrust_cw', 'treatment'))
-trust_ind_cont <- true.fun('allTrust_index', 'treatment')
-## diff
-trust_cw_diff <- true.fun1('allTrust_cw', 'treatment')
-trust_ind_diff <- true.fun1('allTrust_index', 'treatment')
-
-```
 ```{r, eval=F}
+lm_robust(attitude_cw ~ treatment, clusters = psu, fixed_effects = state, data = ag.df)
+lm_robust(attitude_cw_end ~ treatment + attitude_cw_base, clusters = psu, fixed_effects = state, data = ag.df)
+
 # group
 (trust1_farm <- true.fun('allTrust_cw', 'treatment', dat=farmers))
 (trust1_past <- true.fun('allTrust_cw', 'treatment', dat=pastors))
@@ -363,96 +200,12 @@ lm_robust(allTrust_cw ~ treatment * state, clusters=psu, data=pastors)
 
 The coefficient of `r round(trust1$coef,5)` is  `r round(trust1$coef/sd(ag.df$allTrust_cw),3)` standard deviations.
 
-**trust only**: `r paste(trustVars, collapse=", ")`
-
-```{r}
-# select
-strat.fun("trust_cw_base")
-
-# true pvals
-#(trust2 <- true.fun('trust_cw', 'treatment'))
-(trust2 <- true.fun1('trust_cw', 'treatment'))
-#true.fun("outgroup_atts_group.trust_x", 'treatment') # one 
-#true.fun("social_cohesion_group.trust_area", 'treatment')
-```
-
-The coefficient of `r round(trust2$coef,5)` is  `r round(trust2$coef/sd(ag.df$trust_cw),3)` standard deviations.
-
-
-**social distance**: `r paste(distVars, collapse=", ")`
-
-```{r}
-# select
-strat.fun("dist_cw_base")
-
-# true pvals
-#(dist1 <- true.fun('dist_cw', 'treatment'))
-(dist1 <- true.fun1('dist_cw', 'treatment'))
-
-# strat.fun("dist_index_base")
-#(dist1 <- true.fun1('dist_index', 'treatment'))
-
-#true.fun1("comfort_group.field", 'treatment') # no effect
-#true.fun1("comfort_group.marry", 'treatment')
-#true.fun1("comfort_group.share_meal", 'treatment')
-#true.fun1("comfort_group.trade_goods", 'treatment')
-#true.fun1("comfort_group.watch_animals", 'treatment') # no effect
-
-#summary(ag.df[,c("comfort_group.field_base", "comfort_group.field_end", "comfort_group.field",
-#         "comfort_group.watch_animals_base", "comfort_group.watch_animals_end", "comfort_group.watch_animals",
-#         "comfort_group.share_meal_base", "comfort_group.share_meal_end", "comfort_group.share_meal")])
-```
-
-The coefficient of `r round(dist1$coef,5)` is  `r round(dist1$coef/sd(ag.df$dist_cw),3)` standard deviations.
-
-
-**allOutgroup**: `r paste(xVars, collapse=", ")`
-
-```{r}
-# select
-strat.fun("x_cw_base")
-
-# true pvals
-(x1 <- true.fun('x_cw', 'treatment'))
-```
-
-The coefficient of `r round(x1$coef,5)` is  `r round(x1$coef/sd(ag.df$x_cw),3)` standard deviations.
-
-```{r,eval=F}
-# look at trust alone
-strat.fun("outgroup_atts_group.trust_x_base")
-true.fun("outgroup_atts_group.trust_x", "treatment")
-
-strat.fun("social_cohesion_group.trust_area_base")
-true.fun("social_cohesion_group.trust_area", "treatment")
-
-# other trust
-strat.fun("outgroup_atts_group.trust_ethnic_base")
-true.fun("outgroup_atts_group.trust_ethnic", "treatment")
-
-strat.fun("outgroup_atts_group.trust_rel_base")
-true.fun1("outgroup_atts_group.trust_rel", "treatment")
-
-# Means
-mosaic::mean(ag.df$social_cohesion_group.trust_area_base~ag.df$treatment)
-mosaic::mean(ag.df$social_cohesion_group.trust_area_end~ag.df$treatment)
-
-mosaic::mean(ag.df$outgroup_atts_group.trust_x_base~ag.df$treatment)
-mosaic::mean(ag.df$outgroup_atts_group.trust_x_end~ag.df$treatment)
-
-mosaic::mean(ag.df$outgroup_atts_group.trust_ethnic_base~ag.df$treatment)
-mosaic::mean(ag.df$outgroup_atts_group.trust_ethnic_end~ag.df$treatment)
-
-mosaic::mean(ag.df$outgroup_atts_group.trust_rel_base~ag.df$treatment)
-mosaic::mean(ag.df$outgroup_atts_group.trust_rel_end~ag.df$treatment)
-```
-
-
 ## Insecurity/Violence Effects
 
 ```{r}
 # select
 strat.fun("in_cw_base")
+lm_robust(in_cw ~ treatment, clusters = psu, fixed_effects = state, data = ag.df)
 
 # true pvals
 (in1 <- true.fun1('in_cw', 'treatment'))
@@ -460,10 +213,6 @@ in_ind <- true.fun1('in_index', 'treatment')
 
 # select
 strat.fun("vioExp_cw_base")
-
-# true pvals
-(vioExp1 <- true.fun('vioExp_cw', 'treatment'))
-
 
 # both state/group
 lm_robust(in_cw ~ treatment * state, clusters=psu, data=farmers)
@@ -481,6 +230,7 @@ strat.fun("contactOnly_cw_base")
 strat.fun("contactOnly_index_base")
 con_ind <- true.fun1('contactOnly_index', 'treatment')
 
+lm_robust(contactOnly_cw ~ treatment, clusters = psu, fixed_effects = state, data = ag.df)
 
 # both state/group
 lm_robust(contactOnly_cw ~ treatment * state, clusters=psu, data=farmers)
@@ -522,18 +272,6 @@ Treatment sites donated less.
 
 These all relate to outgroup affect and would probably go somewhere in the outgroup affect category if we didn't include them on their own.
 
-## List Exp
-
-Here we look to see if treatment places changed more positively than control places on the list experiment.  Is the difference between the 3 item and the 4 item question SMALLER at endline than at baseline?
-
-To make "list_exp", we: (1) calculate the 4 item mean and the 3 item mean for each community at baseline and endline, (2) calculate the difference between the 4 item mean and the 3 item mean for each community at baseline and endline, (3) subtract that difference at endline from that difference at baseline.  Higher values good (fewer items "upset or anger" average treatment community members at endline than at baseline, relative to control).
-
-```{r list}
-strat.fun("list_exp_base")
-(list1 <- true.fun('list_exp', 'treatment'))
-```
-
-The coefficient of `r round(list1$coef,5)` is  `r round(list1$coef/sd(ag.df$list_exp),3)` standard deviations.
 
 ## Rand Exp
 
@@ -610,182 +348,4 @@ save(trust_ind, in_ind, con_ind,
      threat1, emp1, persp1, expan1,
      file="z_appendices_ag.Rdata")
 
-```
-************
-
-# Testing
-
-```{r, include=F, eval=F}
-lm(contactOnly_cw~treatment, ag.df)
-lm(contactOnly_cw_end~treatment+contactOnly_cw_base, ag.df)
-
-lm(x_cw~treatment, ag.df)
-lm(x_cw_end~treatment+x_cw_base, ag.df)
-
-
-mean(ag.df$contactOnly_cw[ag.df$treatment %in% 1])
-mean(ag.df$contactOnly_cw[ag.df$treatment %in% 0])
-
-mean(ag.df$contactOnly_cw_end[ag.df$treatment %in% 1])-mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1])
-
-mean(ag.df$contactOnly_cw_end[ag.df$treatment %in% 0])-mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0])
-
-# predict change vs predict end with base examples
-set.seed(264398)
-size <- 1000
-tau<- 0.01
-co_base <- 0.5
-tr_base <- 0
-
-testfun <- function(size, tau, co_base, tr_base){
-  tr <- c(rep(0,size), rep(1,size))
-  base <- c(rnorm(size,co_base,1), rnorm(size,tr_base,1))
-  t1_noise <- c(rnorm(size,0,0.5), rnorm(size,tau,0.5))
-  end <- base+t1_noise
-  delt <- end-base
-  test <- data.frame(tr=tr,base=base,end=end,delt=delt)
-  
-  # Method 1 -- predict the change
-  sum1 <- summary(lm(delt~tr,test))$coefficients
-  m1_coef <- sum1['tr',1]
-  m1_p <- sum1['tr',4]
-  #c(m1_coef,m1_p)
-  
-  # Method 2 -- predict t1
-  sum2 <- summary(lm(end~tr+base,test))$coefficients
-  m2_coef <- sum2['tr',1]
-  m2_p <- sum2['tr',4]
-  #c(m2_coef,m2_p)
-  
-  newdf <- data.frame(m1_coef=m1_coef,m1_p=m1_p,m2_coef=m2_coef,m2_p=m2_p)
-  
-  return(newdf)
-  #plot(density(m1_null$tr))
-  #plot(density(m2_null$tr))
-}
-
-testdf <- do(2000)*testfun(size=1000,tau=0.2,co_base=0,tr_base=0)
-testdf$v1_2_diff <- testdf$m1_coef-testdf$m2_coef
-summary(testdf$v1_2_diff)
-(v1a=summary(testdf$m1_coef))
-(v2a=summary(testdf$m2_coef))
-
-
-v1b=summary(testdf$m1_coef)
-v2b=summary(testdf$m2_coef)
-
-testdf$v1_2_p <- testdf$m1_p-testdf$m2_p
-summary(testdf$v1_2_p)
-summary(testdf$m1_p)
-summary(testdf$m2_p)
-
-##########
-
-# DAVE SIMULATIONS ABOUT DIFFERENCING VS CONTROLLING FOR
-b1 = b2 = double(1000) # store betas
-p1 = p2 = double(1000) # store p-values
-for (i in 1:1000) {
-    ## make fakedata
-    size <- 1000
-    tau<- 0.01
-    co_base <- 0.5
-    tr_base <- 0
-    tr <- c(rep(0,size), rep(1,size))
-    base <- c(rnorm(size,co_base,1), rnorm(size,tr_base,1))
-    t1_noise <- c(rnorm(size,0,0.5), rnorm(size,tau,0.5))
-    end <- base+t1_noise
-    delt <- end-base
-    test <- data.frame(tr=tr,base=base,end=end,delt=delt)
-
-    sum1 = summary(lm(delt~tr,test))$coefficients
-    sum2 = summary(lm(end~tr+base,test))$coefficients
-
-    b1[i] = sum1[2, 1]
-    p1[i] = sum1[2, 4]
-    b2[i] = sum2[2, 1]
-    p2[i] = sum2[2, 4]
-}
-
-summary(b1)
-summary(b2)
-summary(b1-b2)
-summary(p1)
-summary(p2)
-
-plot(density(b1))
-lines(density(b2), col = "red")
-
-plot(density(p1))
-lines(density(p2), col = "red")
-
-#######
-
-
-
-
-
-
-
-
-
-
-
-# normal
-summary(lm(contactOnly_cw_end~treatment+state+contactOnly_cw_base, ag.df))
-
-# Lin
-lm_lin(contactOnly_cw_end ~ treatment, covariates=~state+contactOnly_cw_base, data=ag.df)
-
-# Lin manual
-summary(lm(contactOnly_cw_end~treatment*(state+contactOnly_cw_base), ag.df))
-
-# Lin manual robust
-ag.df$con_base_md <- ag.df$contactOnly_cw_base - mean(ag.df$contactOnly_cw_base)
-ag.df$state_md <- ifelse(ag.df$state %in% "nas", 1, 0)
-ag.df$state_md <- ag.df$state_md - mean(ag.df$state_md)
-lm_robust(contactOnly_cw_end~treatment*(state_md+con_base_md), ag.df)
-
-
-# Lin method changes treatment slope?  is it the interaction?
-lm_robust(contactOnly_cw_end~treatment+state+contactOnly_cw_base, ag.df)
-lm_robust(contactOnly_cw_end~treatment*(state+contactOnly_cw_base), ag.df)
-
-lm_robust(contactOnly_cw_end~treatment+state_md+con_base_md, ag.df)
-lm_robust(contactOnly_cw_end~treatment*(state_md+con_base_md), ag.df)
-
-lm_lin(contactOnly_cw_end ~ treatment, covariates=~state+contactOnly_cw_base, data=ag.df)
-
-# Chris note: Need to mean-deviate covariates if going to use interaction terms, otherwise the covariate and its interaction terms are wildly collinear!
-```
-
-```{r, eval=F, include=F}
-# combined coef for MC report
-b1 <- x1$coef/sd(ag.df$x_cw)
-b2 <- cohes$coef/sd(ag.df$cohes_cw)
-b3 <- pgp1$coef/sd(ag.df$pgp_amount_end)
-b4 <- pgp2$coef/sd(ag.df$pgp_donate_end)
-b5 <- con1$coef/sd(ag.df$contactOnly_cw)
-b6 <- in1$coef/sd(ag.df$in_cw)
-b7 <- res1$coef/sd(ag.df$resolve_cw)
-allB <- b1+b2+b3+b4+b5+b6+b7
-
-```
-
-```{r, eval=F, include=F}
-# my own fisher prod fun, but it's so bad and slow.
-# Fisher Product Function
-f_prod.fun <- function(ps)
-{
-  log_ps <- rep(NA,length(ps)) # take natural log of each p
-  for(i in 1:length(ps)){
-    log_ps[i] <- log(ps[i])
-  }
-  chiP <- sum(log_ps)*-2 # sum the logged ps, multiply sum by 2
-  df <- length(ps)*2
-  newp = pchisq(chiP, df, lower.tail = FALSE)
-  return(data.frame(chi=chiP, globalp=newp, df=df))
-}
-system.time(do(1000)*f_prod.fun(fakePs))
-badPs <- rep(0.5,4)
-f_prod.fun(badPs)
 ```

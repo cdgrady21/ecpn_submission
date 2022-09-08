@@ -9,7 +9,6 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
 load("../b_creating_outcomes/d-additiveIndices.Rdata")
 load("../b_creating_outcomes/rand_df.Rdata")
-library(plyr)
 library(dplyr)
 library(estimatr)
 ```
@@ -41,8 +40,8 @@ expVars <- names(rand.df)[grepl("^(...|....)_(exp[0-9])|^rand_", names(rand.df))
 pgpVars <- names(rand.df)[grepl("pgp", names(rand.df))]
 ag.vars <- unique(c(names(rand.df)[grepl("index", names(rand.df))], 
              names(rand.df)[grepl("cw", names(rand.df))], 
-             allTrustVars, beneVars, bargVars, clashVars, 
-             cohesVars, contactVars, conVioEffVars, dispVars, 
+             attitudeVars, beneVars, bargVars, clashVars, 
+             cohesVars, contactVars, dispVars, 
              disVars, otherVars, vioVars, threatVars, vioExpVars,
              expVars, pgpVars, perspVars,
              'treatment', 'community', 'survey', "psu", #"tr_resid",
@@ -66,7 +65,7 @@ ag.df<-as.data.frame(cbind(ag1,ag2))
 ag.df$state <- rand.df$state[match(ag.df$comm_base,rand.df$community)]
 ag.df$clash_index_end[is.na(ag.df$clash_in)] # if there is an NA in clash_index (no one even knew about conflict), make it 0
 stopifnot(mean(ag.df$clash_index_base)==mean(ag1$clash_index_base, na.rm=T))
-stopifnot(mean(ag.df$clash_index_end)==mean(ag2$clash_index_end, na.rm=T))
+stopifnot(mean(ag.df$clash_index_end, na.rm=T)==mean(ag2$clash_index_end, na.rm=T))
 names(ag.df)[names(ag.df) %in% c("comm_base", "treatment_base", "psu_base")] <- c("comm", "treatment","psu" )
 ag.df[,grepl("(survey|community)", names(ag.df))] <- NULL
 rm(ag1); rm(ag2)
@@ -207,73 +206,13 @@ ag.df[,revCols] <- ag.df[,revCols]*-1
 ```
 
 
-# ADDED LATER - all_index with Inverse Covariance Weighting
+# ADDED LATER 
 
-What if we combined all the outcomes in ag.df using inverse covariance weighting?  Does that make sense?
+# rank-based outcomes
 
-Slightly difference than NPC.  NPC does not weight them, though it will account for their interdependence because really correlated things will be correlated in the null distribution, making extreme values on both less rare than if they were independent.
+Idea from Ekrem.
 
-Not sure how NPC and icw results should be interpreted differently...they should really tell the same story.
-
-Chris: Not sure this is right.
-Chris: NOT UPDATED FOR ACADEMIC PAPER.
-
-```{r}
-allIndices <- c("x_cw", "cohes_cw", "pgp_amount_end",
-                "pgp_donate_end", "contactOnly_cw", "in_cw",
-                "resolve_cw", "list_exp", "rMean", "end_exp")
-# chris: if we are comfortable, could replace rand_lm with rMean, the diff outcome of the rando_exp.  Or add it.
-
-matStand <- function(x, sgroup = rep(TRUE, nrow(x))){
-  for(j in 1:ncol(x)){
-    x[,j] <- (x[,j] - mean(x[sgroup,j]))/sd(x[sgroup,j])
-  }
-  return(x)
-}
-
-icwIndex <- function(	xmat,
-                      wgts=rep(1, nrow(xmat)),
-                      revcols = NULL,
-                      sgroup = rep(TRUE, nrow(xmat))){
-  X <- matStand(xmat, sgroup)
-  if(length(revcols)>0){
-    X[,revcols] <-  -1*X[,revcols]
-  }
-  i.vec <- as.matrix(rep(1,ncol(xmat)))
-  Sx <- cov.wt(X, wt=wgts)[[1]]
-  weights <- solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)
-  index <- t(solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)%*%t(X))
-  return(list(weights = weights, index = index))
-}
-
-ag.df$control <- ifelse(ag.df$treatment == 1, 0, 1)
-ic2.fun <- function(vars)
-{
-  x <- ag.df[,vars]
-  x <- zoo::na.aggregate(x)
-  out_cw <- icwIndex(xmat=x, sgroup=as.logical(ag.df$control))
-  print(cor(x))
-  print(out_cw$weights)
-  return(as.vector(out_cw$index))
-}
-
-baseIndices <- c(paste0(allIndices[grepl("cw", allIndices)], "_base"), allIndices[!grepl("cw", allIndices)])
-endIndices <- sub("_base", "_end", baseIndices)
-ag.df$all_cw_base <- reshape::rescaler(ic2.fun(baseIndices), type="sd")
-ag.df$all_cw_end <- reshape::rescaler(ic2.fun(endIndices), type="sd")
-ag.df$all_cw <- ag.df$all_cw_end-ag.df$all_cw_base
-
-
-# no pgg
-ag.df$all2_cw <- ic2.fun(allIndices[-c(3,4)])
-```
-
-
-# ADDED LATER - rank-based outcomes
-
-Idea from Ekrem.  Remember to thank him in paper.
-
-```{r}
+```{r, eval=F}
 rankCols <- c(names(ag.df)[grepl("_cw", names(ag.df))], 
               "pgp_amount_end", "pgp_donate_end", 
               'list_exp', 'rMean', 'end_exp') # still more outcomes than I care about, but that's okay

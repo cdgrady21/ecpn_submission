@@ -1,116 +1,177 @@
-}
-else if(grepl("end", var) | grepl("y1", var)){
-thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
-thecoef <-coef(thelm)[2]
-rand.coef = rep(NA,nsims)
-for(i in 1:nsims){
-rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
-mutate(newtr = shuffle(.data[[tr]])) %>%
-as.data.frame(.)
-lm.null <- lm(rand.samp[,var]~rand.samp[,'newtr']+state, data=rand.samp)
-rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-}
-}
-else if(!grepl("end", var) | grepl("y1", var)){
-thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
-thecoef <-coef(thelm)[2]
-rand.coef = rep(NA,nsims)
-for(i in 1:nsims){
-rand.samp <- dat %>% dplyr::group_by(state) %>% # for indices predicting indices, just shuffle within state.
-mutate(newtr = shuffle(.data[[tr]])) %>%
-as.data.frame(.)
-lm.null <- lm(rand.samp[,paste0(var,"_end")]~rand.samp[,'newtr']+dat[,paste0(var,"_base")]+state, data=rand.samp)
-rand.coef[i] <- summary(lm.null)$coefficients[2,1]
-}
-}
-thep <- mean(rand.coef>thecoef)
-thedf <- data.frame(coef=thecoef,truep=thep)
-rownames(thedf) <- paste0(var, "~",tr)
-return(thedf)
-}
-# Which function to use?
-strat.fun <- function(var){
-thesd <- sd(ag.df[[var]])*.2
-thediff <- abs(mosaic::mean(ag.df[[var]]~ag.df$treatment)[1]-mosaic::mean(ag.df[[var]]~ag.df$treatment)[2])
-thebal <- thediff-thesd
-if(thebal<0){
-return("Controlling-for: true.fun")
-}
-if(thebal>=0){
-return("Difference: true.fun1")
-}
-else(return("Fail"))
-}
-#save
-save.image(file="true_fun.rda")
-# I prefer the SD method, but could also use lin hypothesis test or an equivalence test.
-## issue with these: we are super low powered, so no baseline differences will be stat sig.  And equivalence test will always say "not same, not diff"
-# Hypothesis test
-#(x1_test <- lm_lin(x_cw_base~treatment, covariates= ~state, data=ag.df, clusters=psu))
-# equivalence
-#TOSTtwo(m1=mean(ag.df$x_cw_base[ag.df$treatment %in% 0]), m2=mean(ag.df$x_cw_base[ag.df$treatment %in% 1]),
-#        sd1=sd(ag.df$x_cw_base[ag.df$treatment %in% 0]), sd2=sd(ag.df$x_cw_base[ag.df$treatment %in% 1]),
-#        n1=length(unique(ag.df$comm[ag.df$treatment %in% 0])), n2=length(unique(ag.df$comm[ag.df$treatment %in% 1])),
-#        low_eqbound_d=-0.1, high_eqbound_d=0.1, alpha = 0.05)
-#TOSTtwo(m1=mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0]), m2=mean(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1]),
-#        sd1=sd(ag.df$contactOnly_cw_base[ag.df$treatment %in% 0]), sd2=sd(ag.df$contactOnly_cw_base[ag.df$treatment %in% 1]),
-#        n1=length(unique(ag.df$comm[ag.df$treatment %in% 0])), n2=length(unique(ag.df$comm[ag.df$treatment %in% 1])),
-#        low_eqbound_d=-0.01, high_eqbound_d=0.01, alpha = 0.05)
-setwd("D:/Repos/ecpn_submission/data_and_code/survey_dat/b_creating_outcomes")
-# Chunk 1: setup
+---
+title: "Scale variables and make additive indices"
+author: "Christopher Grady"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(estimatr)
 library(dplyr)
 rm(list=ls())
 load("../a_cleaning/c_dataCombine.Rdata")
 #load()
+
 # make usernames same on y0 and y1
 levels(df$username)[levels(df$username) %in% "f.gbeyi"] <- "f.gbenyi"
 levels(df$username)[levels(df$username) %in% "f.onaja"] <- "f.onoja"
 levels(df$username)[levels(df$username) %in% "l.awule"] <- "l.aule"
-# Chunk 2
+```
+
+# Goal
+
+- Scale variables (many count vars)
+- make additive indices since it's just rowMean of scaled vars
+
+# Decisions
+
+- range or SD scale variables before putting in index? SD for index, though range is more intuitive if presenting results for individual questions. Doesn't make much difference for estimating TR effects.
+
+# Functions
+
+<!--Note that inverse covariance weighting and factor analysis stuff has been moved to the "f" files.  IC weighting shouldn't combine these two data sets.  Weights should be dataset specific. -->
+
+Need to do something systematic about these count vars.
+(1) code these things into categories: 0s+3 quantiles?
+(2) *rank order these things so that ties are same value*
+(3) something else?
+
+Here is a function to code into categories, if I choose to do that.  This works for individual variables and can lapply it.
+
+```{r}
 #test <- df
+
 # chris: should have had it ignore vars with a max of 1 with an "if" statement. Right now, just not applying it to those vars.
 # this removes 0s and then make those their own category.
 countFun <- function(var, cats)
 {
-thing <- quantile(var[!var %in% 0], na.rm=T, prob=0:cats/cats)
-var_count <- cut(var, thing, include.lowest = T, labels=F)
-newvar <- as.vector(ifelse(var %in% 0, var, var_count))
-newvar <- reshape::rescaler(newvar, type="range")
-return(newvar)
+  thing <- quantile(var[!var %in% 0], na.rm=T, prob=0:cats/cats)
+  var_count <- cut(var, thing, include.lowest = T, labels=F)
+  newvar <- as.vector(ifelse(var %in% 0, var, var_count))
+  newvar <- reshape::rescaler(newvar, type="range")
+  return(newvar)
+  
 }
 #test$newvar <- countFun(var=test$clash_details_group.violence_when, cats=3)
 #table(df$clash_details_group.violence_when)
 #table(test$newvar)
+
 #test$newvar <- countFun(var=test$clash_details_group.violence_when1, cats=3)
 #table(df$clash_details_group.violence_when1)
 #table(test$newvar)
-# Chunk 3
+
+```
+
+# Outcomes
+
+Primary Outcomes
+- Attitudes
+    - index: direct trust questions + bogardus
+    - endorsement experiment
+- Contact
+    - index: contact in many situations
+    - randomization experiment (percent experiment)
+- Perceptions of Insecurity
+    - index: fear doing things in many situations
+- Public Goods Game
+    - % donated, amount donated
+
+Placebo
+- attitudes towards violence
+
+Other outcomes
+- Bargaining == shared resources, dispute resolution?
+    - note: do some type of mediation from trust --> bargaining --> conflict?
+- Knowledge about violent conflict
+
+Potential Mediators:
+    - Reduced threat/anxiety?
+    - Ingroup Expansion (superordinate identity?)
+    - empathy?
+    - Perceived Potential Benefit?
+
+Spillover Outcomes:
+    - Trust other groups (ethnic, religious)?
+
+
+# Make Indices & Fixing Variables in the indices
+
+First just making indices by adding things together.  Doing inverse covariance weighting in the next files (the "f" files) after separating the randomly selected people and the panel people.  Could also do factor analysis at that time.
+
+#########################################
+# Primary Outcomes
+########################################
+
+# Attitudes
+
+- Direct questions for Index
+    - trust_x:	From 1-5, how much do you trust people from X GROUP in your area?
+    - trust_area:	People in this area can be trusted
+    - Bogardus Social Distance Scale
+- Endorsement experiment
+
+*Direct Trust*
+
+```{r}
 trustVars <- names(df)[grepl("trust_(x|area)", names(df))]
+
 check.fun <- function(index,vars)
 {
-t1 <- summary(df[,index])
-t2 <- psych::alpha(df[,vars])
-return(list(t1,t2))
+  t1 <- summary(df[,index])
+  t2 <- psych::alpha(df[,vars])
+  return(list(t1,t2))
 }
-df[,trustVars] <- reshape::rescaler(df[,trustVars],type="sd")
-# Chunk 4
+
+df[,trustVars] <- reshape::rescaler(df[,trustVars],type="range")
+```
+
+*Social Distance*
+
+```{r}
 distVars <- names(df)[grepl("comfort_group", names(df))]
-df[,distVars] <- reshape::rescaler(df[,distVars],type="sd")
-# Chunk 5
+df[,distVars] <- reshape::rescaler(df[,distVars],type="range")
+```
+
+*Index of Attitudes Direct Survey Questions (Trust, Bogardus)*
+
+```{r}
 attitudeVars <- c(trustVars,distVars)
 df$attitude_index <- rowMeans(df[attitudeVars],na.rm=T)
 check.fun('attitude_index', attitudeVars)
-# Chunk 6
+```
+
+*Endorsement Experiment*
+
+Not an index, just one question. Nothing to do here.
+
+*************
+
+# Intergroup Contact other than ECPN
+
+direct Q, markets/social events, and hypothetical with percent/randomization experiment)
+
+## Contact Direct Survey Questions.
+
+```{r}
 # the vars
 contactVars <- names(df)[grepl("(contact.*num|other|contact.*pos|contact_market)", names(df))]
 summary(df[,contactVars])
-#chris: note that these (num of contacts) has a ton of NA for when people don't have contact.  Need to use "x_at_market" and "contact_nonmarket" so the num of contacts is just 0 if people have no contact, not NA.
+
+#chris: note that these (num of contacts) has a ton of NA for when people don't have contact.  Need to use "x_at_market" and "contact_nonmarket" so the num of contacts is just 0 if people have no contact, not NA.  
 ## Use number of contacts if they say they have contact, otherwise use "yes/no if they had contact".
 ## Only "contact_pos" and "contact_market_pos" should be left NA if they are NA. Those are not actual contact counts.
 df[contactVars[c(1:4,7)]][is.na(df[contactVars[c(1:4,7)]])] <- 0
-# Chunk 7
+
+```
+
+*Make the contact index.  Counts skewed to use dense_rank.*
+
+But first, raw and categories versions as robustness checks for appendix.
+
+Counts: Collapse into two categories: none, once or more.
+
+```{r}
 # categories
 df[,paste0(contactVars[c(1:4,7)], "_cats")] <- NA
 df[,paste0(contactVars[1], "_cats")] <- df[,contactVars[1]] ## already binary
@@ -118,18 +179,30 @@ df[,paste0(contactVars[1], "_cats")] <- df[,contactVars[1]] ## already binary
 df[df$survey %in% 0,paste0(contactVars[c(2:4,7)], "_cats")] <- lapply(df[df$survey %in% 0,contactVars[c(2:4,7)]], countFun, cats=1)
 ## endline
 df[df$survey %in% 1,paste0(contactVars[c(2:4,7)], "_cats")] <- lapply(df[df$survey %in% 1,contactVars[c(2:4,7)]], countFun, cats=1)
+
 # check
 #summary(df[,paste0(contactVars[c(2:4,7)], "_cats")])
+
 # just the contact number vars
 df$contactOnly_cats_index <- rowMeans(df[,paste0(contactVars[c(1:4,7)], "_cats")], na.rm=T)
 #psych::alpha(df[,paste0(contactVars[c(1:4,7)], "_cats")]) # 0.79
-# Chunk 8
+
+```
+
+Raw: using the numbers people gave us, slightly truncating extreme outliers that might be data entry errors.
+
+```{r}
 summary(df[,contactVars[c(1:4,7)]])
 df[df[contactVars[7]]>100,contactVars[7]] <- c(101,103,102)
 df[df[contactVars[3]]>100,contactVars[3]] <- 101
 df[,paste0(contactVars[c(1:4,7)], "_raw")] <- df[,contactVars[c(1:4,7)]]
 df$contactOnly_raw_index <- rowMeans(df[,contactVars[c(1:4,7)]], na.rm=T)
-# Chunk 9: contact
+
+```
+
+Ranked.
+
+```{r contact}
 # Count data skewed, needs to be ranked w/in base/end
 # ranks
 df[df$survey %in% 0,contactVars[c(2:4,7)]] <- sapply(df[df$survey %in% 0,contactVars[c(2:4,7)]], dense_rank)
@@ -137,38 +210,95 @@ df[df$survey %in% 0,contactVars] <- sapply(df[df$survey %in% 0,contactVars], res
 ##endline
 df[df$survey %in% 1,contactVars[c(2:4,7)]] <- sapply(df[df$survey %in% 1,contactVars[c(2:4,7)]], dense_rank)
 df[df$survey %in% 1,contactVars] <- sapply(df[df$survey %in% 1,contactVars], reshape::rescaler, type='range')
+
 # index (just the contact number vars)
 df$contactOnly_index <- rowMeans(df[,contactVars[c(1:4,7)]], na.rm=T)
 #psych::alpha(df[,contactVars][c(2:4,7)]) # 0.79
-# Chunk 10
+
+```
+
+
+## Hypothetical contact in percent/randomizaiton experiment
+
+rand_exp1a	select_one yes_no_dk	Think about groups that you might join in your leisure time.  Would you join a group that had 5% X Group members?
+rand_exp1b	select_one yes_no_dk	Think about the community you live in.  Would you live in a community that had 5% X Group members?
+
+High values good.
+
+Want: Measure of how willing the respondent is to interact with members of other group in hypothetical situations.  Want to know if treatment group becomes more willing from baseline to endline.
+
+### Percent Experiment Pt1
+
+See if relationship between % outgroup and saying "yes" changes.  Are respondents less willing to join groups as the % of outgroup members in the group increases?
+
+Need lm(randOutcome ~ randCondition) at baseline and endline for each community.  
+
+```{r}
 df$rand_outcomeA <- rowSums(df[,grepl("rand_exp[0-9]a$", names(df))], na.rm=T)
 df$rand_outcomeB <- rowSums(df[,grepl("rand_exp[0-9]b$", names(df))], na.rm=T)
-df$rand_condition <- ifelse(!is.na(df$group5p.rand_exp1a) | !is.na(df$group5p.rand_exp1b), 5,
-ifelse(!is.na(df$group25p.rand_exp2a) | !is.na(df$group25p.rand_exp2b), 25,
-ifelse(!is.na(df$group50p.rand_exp3a) | !is.na(df$group50p.rand_exp3b), 50,
-ifelse(!is.na(df$group75p.rand_exp4a) | !is.na(df$group75p.rand_exp4b), 75, NA)))) # using both Qs in case someone refused one.
+df$rand_condition <- ifelse(!is.na(df$group5p.rand_exp1a) | !is.na(df$group5p.rand_exp1b), 5, 
+                                     ifelse(!is.na(df$group25p.rand_exp2a) | !is.na(df$group25p.rand_exp2b), 25,
+                                            ifelse(!is.na(df$group50p.rand_exp3a) | !is.na(df$group50p.rand_exp3b), 50,
+                                                   ifelse(!is.na(df$group75p.rand_exp4a) | !is.na(df$group75p.rand_exp4b), 75, NA)))) # using both Qs in case someone refused one.
+
 # make an average rand_outcome for "join group" and "live in community"
 df$rand_outcome <- rowMeans(df[,grepl("rand_outcome", names(df))], na.rm=T)
 df[,c("rand_outcomeA", "rand_outcomeB")] <- NULL
+
 # showing that rand_outcomeA and B are basically the same outcome.
 #df[1:10,c("rand_outcomeA", "rand_outcomeB", "rand_outcome", "rand_condition", names(df)[grepl("rand_exp[0-9]a$", names(df))])]
 #prop.table(table(df$rand_outcomeB, df$gender),2)
+
 #cor(df$rand_outcomeA, df$rand_outcomeB)
 #summary(lm(rand_outcomeA ~ gender + farm_pastor + treatment + as.numeric(age), df)) # predicted by same things
 #summary(lm(rand_outcomeB ~ gender + farm_pastor + treatment + as.numeric(age), df))
-# Chunk 11
+```
+
+Each community needs to be assigned the value of lm(randOutcome ~ randCondition) for their community at baseline/endline.  Going to try to group_by(community, survey), run the lm model, and assign the coef to the entire group.
+
+```{r}
 # chris: only works if nothing is loaded except the packages and data of this .rmd?
 df <- df %>% dplyr::group_by(community, survey) %>%
-mutate(rand_lm = coef(lm(rand_outcome ~ rand_condition))[2]) %>%
-as.data.frame(.)
+  mutate(rand_lm = coef(lm(rand_outcome ~ rand_condition))[2]) %>%
+  as.data.frame(.)
+
 stopifnot(coef(lm(rand_outcome ~ rand_condition, data=df[df$survey %in% 0 & df$community %in% "50.pastoralists",]))[2] ==
-mean(df$rand_lm[df$survey %in% 0 & df$community %in% "50.pastoralists"], na.rm=T))
+            mean(df$rand_lm[df$survey %in% 0 & df$community %in% "50.pastoralists"], na.rm=T))
 stopifnot(coef(lm(rand_outcome ~ rand_condition, data=df[df$survey %in% 1 & df$community %in% "22.farmers",]))[2] ==
-mean(df$rand_lm[df$survey %in% 1 & df$community %in% "22.farmers"], na.rm=T))
-# Chunk 12
+            mean(df$rand_lm[df$survey %in% 1 & df$community %in% "22.farmers"], na.rm=T))
+```
+
+Note: Need to make sure it aggregates properly in aggregation file.
+
+Looking at it descriptively, treatment areas just say "yes" more to every category, from 5% to 75%, but especially 25% and 50%.  Can look at that at community-level with vars for: (1) increase at 5%, (2) increase at 25%, (3) increase at 50%, (4) increase at 75%, and (5) average increase.  Can then ask: did Treatment group increase more at every level, on average, than Control group?  That leads to "percent experiment pt2".
+
+### Percent Experiment pt2
+
+Instead of asking "did the relationship between % outgroup and saying yes change from baseline to endline?" Let's ask "Did more people say yes in the treatment group than the control group, across all categories?"  
+
+The reason for this: in Treatment, "yes" was higher for every % outgroup, which means the _relationship_ between X & Y did not change, but looks like a treatment effect.  Just doesn't work because the 5% outgroup condition is supposed to be a calibrate/everyone says yes condition, but it didn't work.
+
+**In aggregation file, the "rand_outcome" column can be made into a DiD outcome like all the others.  It will be the % of each community who said "yes" to the percent experiment at that time point, across all experimental conditions.**  In aggregation file, I also code the % who said yes in each experimental condition so we can make that plot.
+
+## Direct Observation of Behavior
+
+In the "obsDat" folder.
+
+
+# Perceptions of Insecurity from conflict 
+
+How much fear from violence prevented people from working, going out at night, getting water, etc.
+
+## Insecurity Group
+
+higher scores are _bad_ here.  Need to make them GOOD.
+
+The insecurity index.
+
+```{r}
 # physical insecurity/conflict effect
 inVars <- names(df)[grepl("avoid|insecurity", names(df))] # also add "violence_work_effect" and "violence_effect_num"?
-df$insecurity_group.work_days <- reshape::rescaler(dense_rank(df$insecurity_group.work_days), type="sd")
+df$insecurity_group.work_days <- reshape::rescaler(dense_rank(df$insecurity_group.work_days), type="range")
 ## make "days could not work" 0 if respondent said working was not prevented.
 df[df$insecurity_group.working %in% 0, "insecurity_group.work_days"] <- 0
 ## index can either use binary "affect work yes/no" or continuous "how many days work affected", but not both. Going with binary because other vars in index are binary.
@@ -177,89 +307,193 @@ inVars <- inVars[!inVars %in% "insecurity_group.working"]
 ##make index
 df$in_index <- rowMeans(df[,inVars], na.rm=T)
 #psych::alpha(df[,inVars]) #0.9
-# Chunk 13
+```
+
+
+# Public Goods Game (PGG/PGP)
+
+Want variables for if donated and how much donated
+
+```{r}
 # donate yes/no
 df$pgp_donate <- ifelse(df$pgp_amount>0, 1, 0)
 # amount donated already as pgp_amount
-# Chunk 14
+```
+
+
+## Violence Group
+
+We want to use this as a placebo, but field team thinks it might be affected by program.  So...I guess we are not using it as a placebo?  Nah, it's a placebo to check SDB.
+
+Edit: "peace_commit" question was not part of violence attitudes index, but it could have been:	You would personally commit to peace with X group, even if members of X group used violence against your group.
+    - add this? Decided against adding it so the placebo is just the stuff I apriori wanted as a placebo.
+
+```{r}
 vioVars <- names(end)[grepl("violence_group", names(end))]
-df[,vioVars] <- reshape::rescaler(df[,vioVars],type="sd")
+df[,vioVars] <- reshape::rescaler(df[,vioVars],type="range")
+
 summary(df[,vioVars])
 df$vio_index <- rowMeans(df[,vioVars], na.rm=T)
 #psych::alpha(df[,vioVars]) # 0.83
-# Chunk 15
+
+```
+
+
+
+
+*****************************
+
+
+
+######################
+# Secondary Outcomes
+#####################
+
+# Bargaining == shared resources, dispute resolution?
+
+- Main: Shared Resource Index. Less sharing of resources (less people trying to use same plot of land)
+    - share_farmland|pastureland|market
+- Additional outcomes: dispute resolution index.
+    - Where sharing, does it cause disputes/tension?
+
+*Shared Resources*
+
+Bargaining would mean less land resource sharing.
+
+```{r}
 # higher scores == more sharing land resources == bad
 shareVars <- names(df)[grepl("^share_(farmland|pasture)$", names(df))]
-df[,shareVars] <- reshape::rescaler(df[,shareVars],type="sd")
+df[,shareVars] <- reshape::rescaler(df[,shareVars],type="range")
 df$share_index <- rowMeans(df[,shareVars],na.rm=T)
 check.fun('share_index', shareVars)
+
 #lm(share_index~treatment*survey+state, data=df)
 #lm(share_farmland~treatment*survey+state, data=df)
 #lm(share_pasture~treatment*survey+state, data=df)
-# Chunk 16
+```
+
+*Dispute Resolution*
+
+want: when land resources are shared, are they causing disputes?
+want: are the disputes resolved?
+
+want: combined index.  Higher scores if disputes are not happening or if they are resolved peacefully?
+want: combined index. higher scores if land not shared.  If land is shared, higher score if not causing disputes.
+
+want: fully combined index. higher scores if land not shared.  If land is shared, higher score if not causing disputes.  If causing disputes, higher scores if disputes always resolved peacefully.
+
+
+```{r}
 # when land resources are shared, are they causing disputes? # higher scores == less disputes == good
 dispVars <- names(df)[grepl("(farmland|pasture)_(dispute$|tension$)", names(df))]
 summary(df[,dispVars])
 df$disp_index <- rowMeans(df[,dispVars],na.rm=T)
 check.fun('disp_index', dispVars)
+
 #table(df2$share_farmland_dispute)
 #table(end$share_farmland_dispute)
+
+
 #lm(disp_index~treatment*survey+state, data=df)
+
 ###########################
+
 # when they occur, are the disputes resolved? higher scores == more resolved == good.
 resolveVars <- names(df)[grepl("(farmland|pasture)_disputes_resolved|resolve_|persist", names(df))]
 summary(df[,resolveVars])
-df[,resolveVars] <- reshape::rescaler(df[,resolveVars],type="sd")
+df[,resolveVars] <- reshape::rescaler(df[,resolveVars],type="range")
 ##dispute_persist: coded so high is good (never persist)
 ##farmland/pasture disputes resolved coded so high is good (always resolved)
 ##resolve_peace coded so that high is good (strongly agree resolved peacefully)
 df$resolve_index <- rowMeans(df[,resolveVars],na.rm=T)
 check.fun('resolve_index', resolveVars)
+
 table(df1$farmland_disputes_resolved)
 table(base$farmland_disputes_resolved)
+
 #lm(resolve_index~treatment*survey+state, data=df)
-# Chunk 17
+
+```
+
+
+**fully combined Bargaining index**
+
+Bargaining Index: higher scores if land not shared.  If land is shared, higher score if not causing disputes.  If causing disputes, higher scores if disputes always resolved peacefully.
+
+```{r}
 # Bargaining Index!
 ## higher scores == more sharing land resources == bad
 ## higher scores == less dispute == good.
 ## higher scores == more resolved == good.
-df$barg_index_farm <- ifelse(df$share_farmland %in% 0, 1,
-ifelse(df$share_farmland_dispute %in% 1, 1,
-ifelse(!(df$share_farmland_dispute %in% 1), df$farmland_disputes_resolved, NA)))
-df$barg_index_past <- ifelse(df$share_pasture %in% 0, 1,
-ifelse(df$share_pasture_dispute %in% 1, 1,
-ifelse(!(df$share_pasture_dispute %in% 1), df$pasture_disputes_resolved, NA)))
+df$barg_index_farm <- ifelse(df$share_farmland %in% 0, 1, 
+                        ifelse(df$share_farmland_dispute %in% 1, 1,
+                               ifelse(!(df$share_farmland_dispute %in% 1), df$farmland_disputes_resolved, NA)))
+df$barg_index_past <- ifelse(df$share_pasture %in% 0, 1, 
+                        ifelse(df$share_pasture_dispute %in% 1, 1,
+                               ifelse(!(df$share_pasture_dispute %in% 1), df$pasture_disputes_resolved, NA)))
+
 # index
 bargVars <- names(df)[grepl("barg_index", names(df))]
 summary(df[,bargVars])
 df$barg_index <- rowMeans(df[,bargVars],na.rm=T)
 check.fun('barg_index', bargVars)
+
 #lm(barg_index~treatment*survey*farm_pastor+state, data=df)
-# Chunk 18: clash
+```
+
+# Knowledge/Awareness
+
+Want a variable measuring respondents' awareness of conflict events.  The actual amount of conflict events for each site will be different.  How to know actual amount of conflict?  Median?  Or this just becomes a binary yes/no to conflict within the past one year.
+
+
+NOTE: higher scores are BAD here for everything except "violence_when", where high values are GOOD (mean longer since violence).  Need to reverse.
+
+```{r clash}
 # want: measure of respondents' awareness of conflict events
 awareVars <- names(df)[grepl("clash_group.violence$", names(df))] # just one variable now.
 summary(df[,awareVars])
 #lm(clash_group.violence~treatment*survey*farm_pastor+state, data=df)
+
+
 # old clashVars: report more or less violence overall.
 clashVars <- names(df)[grepl("clash", names(df))][-c(1:2)] # for the index, can only use things on both baseline & endline. No burned/injured.
+
 # the "violence_when" q is coded so that high scores (13 months/1) are GOOD.  Need to reverse so that high scores are BAD.
-df$clash_details_group.violence_when <- abs(df$clash_details_group.violence_when-max(df$clash_details_group.violence_when, na.rm=T))
+df$clash_details_group.violence_when <- abs(df$clash_details_group.violence_when-max(df$clash_details_group.violence_when, na.rm=T)) 
+
 # handle the countvars by making it ranks - baseline and endline separately
 df[df$survey %in% 0,clashVars[c(1,2,4)]] <- sapply(df[df$survey %in% 0,clashVars[c(1,2,4)]], dense_rank)
-df[df$survey %in% 0,clashVars] <- sapply(df[df$survey %in% 0,clashVars], reshape::rescaler, type="sd")
+df[df$survey %in% 0,clashVars] <- sapply(df[df$survey %in% 0,clashVars], reshape::rescaler, type="range")
+
 ##endline
 df[df$survey %in% 1,clashVars[c(1,2,4)]] <- sapply(df[df$survey %in% 1,clashVars[c(1,2,4)]], dense_rank)
-df[df$survey %in% 1,clashVars] <- sapply(df[df$survey %in% 1,clashVars], reshape::rescaler, type="sd")
+df[df$survey %in% 1,clashVars] <- sapply(df[df$survey %in% 1,clashVars], reshape::rescaler, type="range")
 #chris: what to do with people tied at 0?
 summary(df[,clashVars])
+
+
 # when people are not aware of violence, other vars should be NA. Otherwise just a "vio awareness index"
 #df[c(1:5, 150:155),clashVars] # correct
+
 # when people say there was no violence, need to make the other vars 0, not NA.
 df[df$clash_group.violence %in% 0, clashVars[c(1,2,4)]] <- 0
+
 # drop 3 because it's the screening question that determines if other questions get asked
 df$clash_index <- rowMeans(df[,clashVars[c(1,2,4)]],na.rm=T)
 #psych::alpha(df[,clashVars[c(1,2,4)]], na.rm=T) # great index
-# Chunk 19
+
+```
+
+"In any clash that occurred in the last year, were you or anyone in your family negatively affected by an attack caused by X group? 
+
+Yes, my work/business was interrupted/closed
+Yes, I was forced to leave my home/migrate
+Yes, my property was damaged
+Yes, a family member was injured
+Yes, a family member was killed
+"
+
+```{r}
 #violence_effect is not recoded yet
 table(df$violence_effect)
 df$vio1_bus <- ifelse(grepl("business", df$violence_effect), 1, 0)
@@ -270,125 +504,250 @@ df$vio5_kill <- ifelse(grepl("killed", df$violence_effect), 1, 0)
 df$violence_effect_num <- rowMeans(df[,grepl("^vio[0-9]_", names(df))], na.rm=T)
 vioExpVars <- names(df)[grepl("^vio[0-9]_", names(df))]
 df$vioNothing <- ifelse(grepl("^no$", df$violence_effect) | is.na(df$violence_effect), 1, 0)
+
 #table(df$vio5_kill, df$survey, df$state) # deaths go down in both states, but go down a lot more in Nassarawa.
 #table(df$vio4_inj, df$survey, df$state) # injuries go down in both states, but go down a lot more in Nassarawa.
 ##lm(vio5_kill~treatment*survey*farm_pastor+state, data=df)
 ##lm(vio4_inj~treatment*survey*farm_pastor+state, data=df)
 ##lm(vioNothing~treatment*survey*farm_pastor+state, data=df)
+
 # is this just because treatment people were more aware?
 ### yes, it was somewhat. All TR is less likely to be killed, pastoralists are less likely to be injured but farmers are more likely, and pastoralists are more likely to say "no" but farmers are more likely.
 #test <- df[df$clash_group.violence %in% 1,]
 ##lm(vio5_kill~treatment*survey*farm_pastor+state, data=test)
 ##lm(vio4_inj~treatment*survey*farm_pastor+state, data=test)
 ##lm(vioNothing~treatment*survey*farm_pastor+state, data=test)
-# Chunk 20
+
+
+```
+
+
+##############################
+# Potential Mediators
+##############################
+
+Potential Mediators:
+    - Reduced threat
+    - Ingroup Expansion (superordinate identity?)
+    - Potential Benefit
+    - List Experiment (Intergroup Affect)
+
+Spillover Outcomes:
+    - Trust other groups (ethnic, religious).
+
+## Threat
+
+High numbers are BAD. Need to make them GOOD.
+
+```{r}
 # Set vars
 threatVars <- names(df)[grepl("threat_group.threat", names(df))]
-df[,threatVars] <- reshape::rescaler(df[,threatVars],type="sd")
+df[,threatVars] <- reshape::rescaler(df[,threatVars],type="range")
+
 # Reverse code things that are not yet reversed -- all of them
 df[,c(threatVars)] <- df[,threatVars]*-1
+
 # Make Index about Psychological Threat
 summary(df[,threatVars])
 df$threat_index <- rowMeans(df[,threatVars],na.rm=T)
 #psych::alpha(df[,threatVars]) # 0.59, not great, Jim.
-# Chunk 21
+```
+
+## Ingroup Expansion
+
+## Social Cohesion Group
+
+Note there are multiple concepts.
+
+- General/abstract things in sc1, and concrete/hypothetical things in sc2.
+- some empathy things (next code chunk)
+- some ingroup expansion things (here).
+
+```{r}
 cohesVars <- names(df)[grepl("social_cohesion_group", names(df))]
-df[,cohesVars] <- reshape::rescaler(df[,cohesVars],type="sd")
+df[,cohesVars] <- reshape::rescaler(df[,cohesVars],type="range")
 summary(df[,cohesVars])
 df$cohes_index <- rowMeans(df[,cohesVars], na.rm=T)
 #psych::alpha(df[,cohesVars]) # 0.75
+
 # sc1 - abstract
 cohesVars1 <- cohesVars[1:5]
 df$cohes_index1 <- rowMeans(df[,cohesVars1], na.rm=T)
 #psych::alpha(df[,cohesVars1]) # 0.77
+
 # sc2 - concrete
 cohesVars2 <- cohesVars[6:10]
 df$cohes_index2 <- rowMeans(df[,cohesVars2], na.rm=T)
 #psych::alpha(df[,cohesVars2]) # 0.76
+
 # empathy (chunk below)
+
 # expand
 expandVars <- cohesVars[1:8]
 df$expand_index <- rowMeans(df[,expandVars], na.rm=T)
 #psych::alpha(df[expandVars]) # 0.74
-# Chunk 22
+```
+
+
+## empathy
+
+Empathy == (helping other group in trouble) & Perspective-taking (who is responsible for violence)
+
+```{r}
 empVars <- c("social_cohesion_group2.misfortune_x", "social_cohesion_group2.misfortune_your")
 perspVars <- "threat_group.x_responsible"
-df[,empVars] <- reshape::rescaler(df[,empVars],type="sd")
-df[,perspVars] <- reshape::rescaler(df[,perspVars],type="sd")
+
+df[,empVars] <- reshape::rescaler(df[,empVars],type="range")
+df[,perspVars] <- reshape::rescaler(df[,perspVars],type="range")
+
 summary(df[,empVars])
 df$emp_index <- rowMeans(df[,empVars], na.rm=T)
 df$persp_index <- df[,perspVars]
 df$empPersp_index <- rowMeans(df[,c(empVars, perspVars)])
+
 #alpha
 #psych::alpha(df[,c(empVars, perspVars)])
-# Chunk 23
+```
+
+## Potential Benefit
+
+## Econ Benefit Group
+
+```{r}
 table(df$econ_benefit_group.benefit_econ)
 beneVars <- names(df)[grepl("(econ|qip)", names(df))][-4]
-df[,beneVars] <- reshape::rescaler(df[,beneVars],type="sd")
+df[,beneVars] <- reshape::rescaler(df[,beneVars],type="range")
 summary(df[,beneVars])
+
 # all
 #table(df$econ_benefit_group.benefit_econ, df$econ_benefit_group.more_benefit, exclude=c()) # if agreed they benefit materially
 #table(df$econ_benefit_group.benefit_econ, df$econ_benefit_group.more_benefit_disagree, exclude=c()) # if disagreed they benefit
 df$bene_index <- rowMeans(df[,beneVars],na.rm=T)
+
 # perceptions only
 beneVarsPerc <- beneVars[1:3]
 df$bene_index_perc <- rowMeans(df[,beneVarsPerc],na.rm=T)
+
 # awareness/use only
 beneVarsReal <- beneVars[4:7]
 df$bene_index_real <- rowMeans(df[,beneVarsReal],na.rm=T)
+
 # best question only
 beneVar <- beneVars[1]
 df$bene_index1 <- df[,beneVar]
-# Chunk 24
+```
+
+## List Experiment
+
+Failed experiment.
+
+# Spillover Outcomes:
+
+## Trust other groups (ethnic, religious).
+
+Outgroup & X Group
+
+```{r}
 outVars <- names(df)[grepl("(comf|outgroup)", names(df))]
-df[,outVars] <- reshape::rescaler(df[,outVars],type="sd")
+df[,outVars] <- reshape::rescaler(df[,outVars],type="range")
 summary(df[,outVars])
+
 df$out_index <- rowMeans(df[,outVars],na.rm=T)
 psych::alpha(df[,outVars]) # 0.89
+
+
 # X specifically
 xVars <- names(df)[grepl("(comf|trust_x)", names(df))]
 summary(df[,xVars])
+
 df$x_index <- rowMeans(df[,xVars],na.rm=T)
 psych::alpha(df[,xVars]) # 0.89
+
 # other groups specifically
 otherVars <- setdiff(outVars,xVars)
 summary(df[,otherVars])
+
 df$other_index <- rowMeans(df[,otherVars],na.rm=T)
 psych::alpha(df[,otherVars]) # 0.89
-# Chunk 25
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+**************************
+
+# Stuff from Policy Paper
+
+## Dispute Resolution Group
+
+high numbers are GOOD.  fewer disputes, better dispute resolution.  Sharing resources also included here.
+
+This one is hard.  'Resolve' is what we want, but it gives higher scores if tension/disputes are resolved peacefully.  Resolving peacefully can only happen if disputes occur, so people with no disputes score lower on this than they should.  To fix that, I am making the variables so that no disputes is equivalent to always peacefully resolved disputes.  Then making the index by putting these together for each resource (markets, farmland, pastures).  Then add in the "disputes generally resolved peacefully" var and the "disputes generally persist after attempts to resolve them" var.
+
+If people report not sharing a resource, they get NA for dispute/resolving.  That seems right, but the "no disputes" scoring low is definitely wrong.
+
+```{r}
 # more sharing resources, fewer disputes, & better resolved disputes (this big index does not make sense. sharing farmland opens up qs about disputes.)
 shareVars <- names(df)[grepl("^share_[a-z]*$", names(df))]
 numDisVars <- names(df)[grepl("(dispute$|tension$)", names(df))]
 resolveVars <- names(df)[grepl("(resolve[^s]|persist)", names(df))]
+
 # if NO disputes (1=no), then give max for dispute resolution.
 df$farmland_disputes_resolved <- ifelse(df$share_farmland_dispute %in% 1 & is.na(df$farmland_disputes_resolved), max(df$farmland_disputes_resolved, na.rm=T),  df$farmland_disputes_resolved)
 df$pasture_disputes_resolved <- ifelse(df$share_pasture_dispute %in% 1 & is.na(df$pasture_disputes_resolved), max(df$pasture_disputes_resolved, na.rm=T),  df$pasture_disputes_resolved)
 df$market_disputes_resolved <- ifelse(df$share_market_dispute %in% 1 & is.na(df$market_disputes_resolved), max(df$market_disputes_resolved, na.rm=T),  df$market_disputes_resolved)
+
 disVars <- c(shareVars, numDisVars, resolveVars)
-df[,disVars] <- reshape::rescaler(df[,disVars],type="sd")
+df[,disVars] <- reshape::rescaler(df[,disVars],type="range")
 #summary(df[,disVars])
 df$dis_index <- rowMeans(df[,disVars], na.rm=T)
 #psych::alpha(df[,disVars]) # won't give an alpha? Something wrong with this as an index, perfect correlations.  Shared should not be a part of it.
+
+
 ################################################
 # Individual parts of dispute resolution.
 ################################################
+
 # better resolved
 df$resolve_index <- rowMeans(df[,resolveVars], na.rm=T)
 #summary(df[,resolveVars])
 #psych::alpha(df[,resolveVars]) #0.48
+
 # fewer disputes
 df$numDis_index <- rowMeans(df[,numDisVars], na.rm=T)
 #summary(df[,numDisVars])
 #psych::alpha(df[,numDisVars]) #0.78
+
 # shared resources
 df$share_index <- rowMeans(df[,shareVars], na.rm=T)
 #psych::alpha(df[,shareVars]) #0.39
-# Chunk 26
+
+```
+
+### Dispute Actors
+
+This is the section of the PAP under "dispute resolution"....though it should have been the disputes over shared resources, immediately above.
+
+There are too many actors in this to make any sense of it.
+
+```{r}
 disActorVars <- names(df)[grepl("dispute_resolution_group", names(df))]
-df[,disActorVars] <- reshape::rescaler(df[,disActorVars],type="sd")
+
+df[,disActorVars] <- reshape::rescaler(df[,disActorVars],type="range")
 #summary(df[,disActorVars])
 df$disActor_index <- rowMeans(df[,disActorVars], na.rm=T)
 #psych::alpha(df[,disActorVars]) #0.82
+
 # I don't want to code all of these.
 ## local gov
 ## rel leaders
@@ -397,116 +756,16 @@ df$disActor_index <- rowMeans(df[,disActorVars], na.rm=T)
 ## trad leader
 ## women
 ## youth
-# Chunk 27
+```
+
+
+***************
+
+# Save
+
+```{r}
 save.image(file="d-additiveIndices.Rdata")
-# Chunk 1: setup
-knitr::opts_chunk$set(echo = TRUE)
-rm(list=ls())
-load("d-additiveIndices.Rdata")
-library(plyr)
-library(dplyr)
-library(estimatr)
-library(psych)
-# index functions
-## icw
-load(file="index_fun.rda")
-# icwIndex function
-# Chunk 2
-# first make rand.df to mess with
-rand.df <- df
-# then make var to indicate control group for ICW
-rand.df$control <- ifelse(rand.df$treatment == 1, 0, 1)
-# want separate baseline & endline indices
-rand.df1 <- rand.df[rand.df$survey %in% 0,]
-rand.df2 <- rand.df[rand.df$survey %in% 1,]
-# removing panel people/preselected from endline, since not randomly selected
-rand.df2 <- rand.df2[!rand.df2$pre_selected %in% 'pre',]
-# Chunk 3
-# both tr and co
-ic.fun1 <- function(vars, thedf)
-{
-x <- thedf[,vars]
-x <- zoo::na.aggregate(x)
-out_cw <- icwIndex(x)
-print(cor(x))
-print(out_cw$weights)
-return(as.vector(out_cw$index))
-}
-# just co
-ic.fun <- function(vars, thedf)
-{
-x <- thedf[,vars]
-x <- zoo::na.aggregate(x)
-out_cw <- icwIndex(xmat=x, sgroup=as.logical(thedf[,'control']))
-print(cor(x))
-print(out_cw$weights)
-return(as.vector(out_cw$index))
-}
-# Chunk 4
-# should loop but feeling braindead
-# Baseline
-rand.df1$trust_cw <- ic.fun(trustVars, rand.df1)
-rand.df1$dist_cw <- ic.fun(distVars, rand.df1)
-rand.df1$attitude_cw <- ic.fun(attitudeVars, rand.df1)
-rand.df1$x_cw <- ic.fun(xVars, rand.df1)
-rand.df1$out_cw <- ic.fun(outVars, rand.df1)
-rand.df1$other_cw <- ic.fun(otherVars, rand.df1)
-#rand.df1$aware_cw <- ic.fun(awareVars, rand.df1) # just one variable
-rand.df1$clash_cw <- ic.fun(clashVars, rand.df1)
-rand.df1$contactOnly_cw <- ic.fun(contactVars[c(1:4,7)], rand.df1)
-rand.df1$contactOnly_cats_cw <- ic.fun(paste0(contactVars[c(1:4,7)], "_cats"), rand.df1)
-rand.df1$contactOnly_raw_cw <- ic.fun(paste0(contactVars[c(1:4,7)], "_raw"), rand.df1)
-rand.df1$bene_cw <- ic.fun(beneVarsPerc, rand.df1)
-rand.df1$threat_cw <- ic.fun(threatVars, rand.df1)
-rand.df1$in_cw <- ic.fun(inVars, rand.df1)
-rand.df1$cohes_cw <- ic.fun(cohesVars, rand.df1)
-rand.df1$cohes1_cw <- ic.fun(cohesVars1, rand.df1)
-rand.df1$cohes2_cw <- ic.fun(cohesVars2, rand.df1)
-rand.df1$dis_cw <- ic.fun(disVars, rand.df1)
-rand.df1$share_cw <- ic.fun(shareVars, rand.df1)
-rand.df1$numDis_cw <- ic.fun(numDisVars, rand.df1)
-rand.df1$resolve_cw <- ic.fun(resolveVars, rand.df1)
-rand.df1$barg_cw <- ic.fun(bargVars, rand.df1)
-rand.df1$disActor_cw <- ic.fun(disActorVars, rand.df1)
-rand.df1$vio_cw <- ic.fun(vioVars, rand.df1)
-rand.df1$vioExp_cw <- ic.fun(vioExpVars, rand.df1)
-rand.df1$persp_cw <- rand.df1$persp_index
-rand.df1$emp_cw <- ic.fun(empVars, rand.df1)
-rand.df1$expand_cw <- ic.fun(expandVars, rand.df1)
-# Endline
-rand.df2$trust_cw <- ic.fun(trustVars, rand.df2)
-rand.df2$dist_cw <- ic.fun(distVars, rand.df2)
-rand.df2$attitude_cw <- ic.fun(attitudeVars, rand.df2)
-rand.df2$x_cw <- ic.fun(xVars, rand.df2)
-rand.df2$out_cw <- ic.fun(outVars, rand.df2)
-rand.df2$other_cw <- ic.fun(otherVars, rand.df2)
-#rand.df2$aware_cw <- ic.fun(awareVars, rand.df2) # only one var
-rand.df2$clash_cw <- ic.fun(clashVars, rand.df2)
-rand.df2$contactOnly_cw <- ic.fun(contactVars[c(1:4,7)], rand.df2)
-rand.df2$contactOnly_cats_cw <- ic.fun(paste0(contactVars[c(1:4,7)], "_cats"), rand.df2)
-rand.df2$contactOnly_raw_cw <- ic.fun(paste0(contactVars[c(1:4,7)], "_raw"), rand.df2)
-rand.df2$bene_cw <- ic.fun(beneVarsPerc, rand.df2)
-rand.df2$threat_cw <- ic.fun(threatVars, rand.df2)
-rand.df2$in_cw <- ic.fun(inVars, rand.df2)
-rand.df2$cohes_cw <- ic.fun(cohesVars, rand.df2)
-rand.df2$cohes1_cw <- ic.fun(cohesVars1, rand.df2)
-rand.df2$cohes2_cw <- ic.fun(cohesVars2, rand.df2)
-rand.df2$dis_cw <- ic.fun(disVars, rand.df2)
-rand.df2$share_cw <- ic.fun(shareVars, rand.df2)
-rand.df2$numDis_cw <- ic.fun(numDisVars, rand.df2)
-rand.df2$resolve_cw <- ic.fun(resolveVars, rand.df2)
-rand.df2$barg_cw <- ic.fun(bargVars, rand.df2)
-rand.df2$disActor_cw <- ic.fun(disActorVars, rand.df2)
-rand.df2$vio_cw <- ic.fun(vioVars, rand.df2)
-rand.df2$vioExp_cw <- ic.fun(vioExpVars, rand.df2)
-rand.df2$persp_cw <- rand.df2$persp_index
-rand.df2$emp_cw <- ic.fun(empVars, rand.df2)
-rand.df2$expand_cw <- ic.fun(expandVars, rand.df2)
-# Now scale as 0-1 so that we can easily discuss them as % increase/decrease for MC report. # not necessary until aggregated.
-#icVars <- names(rand.df1)[grepl("_cw", names(rand.df1))]
-#rand.df1[,icVars] <- reshape::rescaler(rand.df1[,icVars],type="range")
-#rand.df2[,icVars] <- reshape::rescaler(rand.df2[,icVars],type="range")
-# rebind
-rand.df <- rbind(rand.df1, rand.df2)
-# Chunk 5
-save(rand.df, file="rand_df.Rdata")
+
+```
+
+Next step is to separate preselected & randomly selected, aggregate randomly selected.

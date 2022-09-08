@@ -99,44 +99,7 @@ panel.df$control <- ifelse(panel.df$treatment_y0 == 1, 0,1)
 From Cyrus Samii for IC weighting and factor analysis.
 
 ```{r}
-## from cyrus samii IC weighting
-
-# Function to standardize columns of a matrix
-# where you designate a standardization group
-# (e.g., the control group in an experiment)
-# with "sgroup", a logical vector.
-
-matStand <- function(x, sgroup = rep(TRUE, nrow(x))){
-  for(j in 1:ncol(x)){
-    x[,j] <- (x[,j] - mean(x[sgroup,j]))/sd(x[sgroup,j])
-  }
-  return(x)
-}
-
-# Function that takes in data in matrix format and returns
-# (i) IC weights and (ii) ICW index.
-# Weights can be incorporated using the "wgts" argument.
-# The "revcols" argument takes a vector indicating which columns,
-# if any, should have values reversed (that is, standardized 
-# values are multiplied by -1) prior to construction of the index. 
-
-icwIndex <- function(	xmat,
-                      wgts=rep(1, nrow(xmat)),
-                      revcols = NULL,
-                      sgroup = rep(TRUE, nrow(xmat))){
-  X <- matStand(xmat, sgroup)
-  if(length(revcols)>0){
-    X[,revcols] <-  -1*X[,revcols]
-  }
-  i.vec <- as.matrix(rep(1,ncol(xmat)))
-  Sx <- cov.wt(X, wt=wgts)[[1]]
-  weights <- solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)
-  index <- t(solve(t(i.vec)%*%solve(Sx)%*%i.vec)%*%t(i.vec)%*%solve(Sx)%*%t(X))
-  return(list(weights = weights, index = index))
-}
-
-# Factor analysis function (R base does not have one. factanal() is MLE, which we don't want.) 
-#source("http://www.stat.sc.edu/~habing/courses/530/fact.txt")
+load(file="index_fun.Rda")
 ```
 
 
@@ -222,7 +185,7 @@ Doing.
 # outcomes at baseline -- should loop but feeling braindead
 panel.df$trust_cw_y0 <- ic.fun(vars=paste0(trustVars, "_y0"),thedf=panel.df)
 panel.df$dist_cw_y0 <- ic.fun(vars=paste0(distVars, "_y0"),thedf=panel.df) # dist
-panel.df$allTrust_cw_y0 <- ic.fun(vars=paste0(allTrustVars, "_y0"),thedf=panel.df) # allTrust
+panel.df$attitude_cw_y0 <- ic.fun(vars=paste0(attitudeVars, "_y0"),thedf=panel.df) # allTrust
 panel.df$other_cw_y0 <- ic.fun(vars=paste0(otherVars, "_y0"),thedf=panel.df) # others
 panel.df$threat_cw_y0 <- ic.fun(vars=paste0(threatVars, "_y0"),thedf=panel.df) #threat
 panel.df$in_cw_y0 <- ic.fun(vars=paste0(inVars, "_y0"),thedf=panel.df) # in
@@ -238,6 +201,7 @@ panel.df$clash_cw_y0 <- ic.fun(vars=paste0(clashVars[c(1,2,4)], "_y0"),thedf=pan
 panel.df$contact_cw_y0 <- ic.fun(vars=paste0(contactVars, "_y0"),thedf=panel.df)
 panel.df$contactOnly_cw_y0 <- ic.fun(vars=paste0(contactVars[c(1:4,7)], "_y0"),thedf=panel.df)
 panel.df$contactOnly_cats_cw_y0 <- ic.fun(vars=paste0(contactVars[c(1:4,7)], "_cats_y0"),thedf=panel.df)
+panel.df$contactOnly_raw_cw_y0 <- ic.fun(vars=paste0(contactVars[c(1:4,7)], "_raw_y0"),thedf=panel.df)
 
 panel.df$bene_cw_y0 <- ic.fun(vars=paste0(beneVarsPerc, "_y0"),thedf=panel.df)
 panel.df$cohes_cw_y0 <- ic.fun(vars=paste0(cohesVars, "_y0"),thedf=panel.df)
@@ -253,7 +217,7 @@ panel.df$vio_cw_y0 <- ic.fun(vars=paste0(vioVars, "_y0"),thedf=panel.df)
 # outcomes at endline
 panel.df$trust_cw_y1 <- ic.fun(vars=paste0(trustVars, "_y1"),thedf=panel.df)
 panel.df$dist_cw_y1 <- ic.fun(vars=paste0(distVars, "_y1"),thedf=panel.df) # dist
-panel.df$allTrust_cw_y1 <- ic.fun(vars=paste0(allTrustVars, "_y1"),thedf=panel.df) # allTrust
+panel.df$attitude_cw_y1 <- ic.fun(vars=paste0(attitudeVars, "_y1"),thedf=panel.df) # allTrust
 panel.df$other_cw_y1 <- ic.fun(vars=paste0(otherVars, "_y1"),thedf=panel.df) # others
 panel.df$threat_cw_y1 <- ic.fun(vars=paste0(threatVars, "_y1"),thedf=panel.df) #threat
 panel.df$in_cw_y1 <- ic.fun(vars=paste0(inVars, "_y1"),thedf=panel.df) # in
@@ -269,6 +233,7 @@ panel.df$clash_cw_y1 <- ic.fun(vars=paste0(clashVars[c(1,2,4)], "_y1"),thedf=pan
 panel.df$contact_cw_y1 <- ic.fun(vars=paste0(contactVars, "_y1"),thedf=panel.df)
 panel.df$contactOnly_cw_y1 <- ic.fun(vars=paste0(contactVars[c(1:4,7)], "_y1"),thedf=panel.df)
 panel.df$contactOnly_cats_cw_y1 <- ic.fun(vars=paste0(contactVars[c(1:4,7)], "_cats_y1"),thedf=panel.df)
+panel.df$contactOnly_raw_cw_y1 <- ic.fun(vars=paste0(contactVars[c(1:4,7)], "_raw_y1"),thedf=panel.df)
 
 panel.df$bene_cw_y1 <- ic.fun(vars=paste0(beneVarsPerc, "_y1"),thedf=panel.df)
 panel.df$cohes_cw_y1 <- ic.fun(vars=paste0(cohesVars, "_y1"),thedf=panel.df)
@@ -290,17 +255,7 @@ panel.df[,icVars] <- reshape::rescaler(panel.df[,icVars],type="range")
 # cor(na.omit(panel.df[,c("resolve_cw", "resolve_index")])) # 0.84 correlated.
 ```
 
-Factors
-
-chris: not yet done.
-
-```{r, eval=F}
-lambda <- fact(x,method="iter",maxfactors=1, niter=130)$loadings
-sigma <- cor(x)
-# This Thompson's method.
-z.fac <- matStand(x)%*%solve(sigma)%*%lambda
-```
-
+***********
 
 # Make DiD outcomes
 

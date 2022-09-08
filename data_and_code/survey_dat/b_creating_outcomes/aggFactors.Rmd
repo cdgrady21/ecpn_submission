@@ -1,0 +1,110 @@
+---
+title: "make factor indices"
+author: "cdgrady21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+load("d-additiveIndices.Rdata")
+library(plyr)
+library(dplyr)
+library(estimatr)
+library(psych)
+
+# index functions
+## icw
+load(file="index_fun.rda")
+# icwIndex function
+```
+
+# Note
+
+Was part of e-aggICW, but decided against factors and put here to keep that file clean.
+
+# Separate into baseline and endline
+
+```{r}
+# first make rand.df to mess with
+rand.df <- df
+
+# then make var to indicate control group for ICW
+rand.df$control <- ifelse(rand.df$treatment == 1, 0, 1)
+
+# want separate baseline & endline indices
+rand.df1 <- rand.df[rand.df$survey %in% 0,]
+rand.df2 <- rand.df[rand.df$survey %in% 1,]
+
+# removing panel people/preselected from endline, since not randomly selected
+rand.df2 <- rand.df2[!rand.df2$pre_selected %in% 'pre',]
+
+```
+
+
+# Factors
+
+chris: not yet done.  Really hard to do because some questions designed to be NA for some respondents (comfort watching animals).  Fill with overal mean.  Other problem: diff number of factors baseline/endline?
+
+Put every question into a factor analysis?  Put every _index into a factor analysis?
+
+```{r, eval=F}
+lambda <- fact(x,method="iter",maxfactors=1, niter=130)$loadings
+sigma <- cor(x)
+# This Thompson's method.
+z.fac <- matStand(x)%*%solve(sigma)%*%lambda
+```
+
+R-bloggers version.
+
+```{r, eval=F}
+# Make list of all vars to include in factor
+allVars <- ls()[grepl("Vars", ls(), ignore.case=FALSE)]
+allVars <- paste(allVars, collapse=",")
+rand.df1_f <- rand.df1[,c(allTrustVars,awareVars,bargVars,beneVarsPerc,
+                          cohesVars,inVars,
+                          contactVars,conVioEffVars,dispVars,
+                          disVars,numDisVars,outVars,resolveVars,shareVars,
+                          threatVars,vioExpVars,vioVars)]
+rand.df2_f <- rand.df2[,c(allTrustVars,awareVars,bargVars,beneVarsPerc,
+                          cohesVars,inVars,
+                          contactVars,conVioEffVars,dispVars,
+                          disVars,numDisVars,outVars,resolveVars,shareVars,
+                          threatVars,vioExpVars,vioVars)]
+remCols <- names(rand.df1_f)[grepl(".(1|2)", names(rand.df1_f))]
+rand.df1_f[,remCols] <- NULL
+rand.df2_f[,remCols] <- NULL
+#which(is.na(rand.df1_f), arr.ind=TRUE)
+
+#Replace NA with mean for column
+rand.df1_f <- zoo::na.aggregate(rand.df1_f)
+rand.df2_f <- zoo::na.aggregate(rand.df2_f)
+
+#Create the correlation matrix
+rand.df1_f_cor <- cor(rand.df1_f)
+rand.df2_f_cor <- cor(rand.df2_f)
+
+# Determine Number of Factors to Extract
+library(nFactors)
+ev1 <- eigen(rand.df1_f_cor) # get eigenvalues
+ap1 <- parallel(subject=nrow(rand.df1_f),var=ncol(rand.df1_f),
+  rep=100,cent=.05)
+nS1 <- nScree(x=ev1$values, aparallel=ap1$eigen$qevpea)
+plotnScree(nS1)
+
+ev2 <- eigen(rand.df2_f_cor) # get eigenvalues
+ap2 <- parallel(subject=nrow(rand.df2_f),var=ncol(rand.df2_f),
+  rep=100,cent=.05)
+nS2 <- nScree(x=ev2$values, aparallel=ap2$eigen$qevpea)
+plotnScree(nS2)
+
+#Factor analysis of the data
+factors_df1 <- fa(r = rand.df1_f_cor, nfactors = 4)
+factors_df2 <- fa(r = rand.df2_f_cor, nfactors = 4)
+
+#Getting the factor loadings and model analysis
+factors_df1
+factors_df2
+```
+
+

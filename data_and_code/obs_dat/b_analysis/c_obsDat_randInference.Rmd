@@ -15,7 +15,7 @@ rm(list=ls())
 #load("marketMedian.Rdata")
 
 # data from data cleaning file
-load("../clean/a_obsDat_clean.rda")
+load("../a_clean/a_obsDat_clean.rda")
 
 events <- events[!events[,"eat_past"] %in% NA | !events$eat_farm %in% NA,] # remove the bad observation
 
