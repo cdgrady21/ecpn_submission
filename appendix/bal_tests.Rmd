@@ -7,10 +7,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
 library(RItools)
+library(dplyr)
 
 load("../data_and_code/survey_dat/c_creating_dataframes/f-aggregateComms_ap.Rdata")
 load("../data_and_code/obs_dat/a_clean/a_obsDat_clean.rda")
-
 
 ```
 
@@ -32,6 +32,28 @@ xBalance(bal_fmla, strata = factor(ag.df$state), data=ag.df,
 Obs dat balance tests
 
 ```{r}
+event_list <- c("treatment", "State", "pastoralists_index_rank", "farmers_index_rank")
+event_list1 <- c("treatment", "State", "pastoralists_index", "farmers_index")
+events_df <- events[events$time %in% 0,] %>% group_by(site, State) %>%
+  select(event_list1) %>%
+  summarise_all(mean, na.rm=T)
+names(events_df)[-c(1:3)] <- paste0(names(events_df)[-c(1:3)], "_events")
 
+markets_list <- c("treatment", "State", "pastoralists_index_rank", "farmers_index_rank")
+markets_list1 <- c("treatment", "State", "pastoralists_index_raw", "farmers_index_raw")
+markets_df <- markets[markets$time %in% 0,] %>% group_by(site, State) %>%
+  select(markets_list1) %>%
+  summarise_all(mean, na.rm=T)
+names(markets_df)[-c(1:3)] <- paste0(names(markets_df)[-c(1:3)], "_markets")
+
+obs_df <- merge(events_df, markets_df, by=c("site", "treatment", "State"))
+
+obs_fmla <- formula(treatment ~ pastoralists_index_rank_events + farmers_index_rank_events
+                    + pastoralists_index_rank_markets + farmers_index_rank_markets)
+obs_fmla1 <- formula(treatment ~ pastoralists_index_events + farmers_index_events
+                    + pastoralists_index_raw_markets + farmers_index_raw_markets)
+
+xBalance(obs_fmla1, strata = factor(obs_df$State), data=obs_df,
+         report=c("all"))
 
 ```
