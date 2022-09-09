@@ -1,0 +1,37 @@
+---
+title: "Balance Tests"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(RItools)
+
+load("../data_and_code/survey_dat/c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../data_and_code/obs_dat/a_clean/a_obsDat_clean.rda")
+
+
+```
+
+Survey dat balance tests: ag.df
+
+```{r}
+outcome_list <- c("attitude_cw_base", "in_cw_base", 'contactOnly_cw_base',
+                  'rand_lm_base', "rand_outcome_base", "end_exp_base")
+demos_list <- c("age_base", "end_expTR_base", "rand_condition_base")
+
+bal_fmla <- formula(treatment ~ attitude_cw_base + in_cw_base + contactOnly_cw_base + rand_lm_base + rand_outcome_base + end_exp_base)
+#bal_fmla1 <- formula(treatment ~ attitude_index_base + in_index_base + contactOnly_index_base + rand_lm_base + rand_outcome_base + end_exp_base)
+
+xBalance(bal_fmla, strata = factor(ag.df$state), data=ag.df,
+         report=c("all"))
+
+```
+
+Obs dat balance tests
+
+```{r}
+
+
+```
