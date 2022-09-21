@@ -69,7 +69,7 @@ Survey Outcomes:
 
 ***************
 
-Aggregate Survey outcomes
+2. Aggregate + observational outcomes
 
 Order: Contact, Perceptions Security, Attitudes, PGG.
 
@@ -84,32 +84,6 @@ outcome$var <- c("Self-reported Attitudes", "Self-reported Contact",
                  "Contact Willingness", "Endorsement Experiment")
 outcome$outcome_type <- c("atts", "con", "in","pgg", "pgg", "con", "atts")
 
-svy_coefplot <- ggplot(outcome, aes(y=coef_sd, x = var)) +
-  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
-  geom_point(aes(shape=outcome_type, size=4)) +
-  scale_shape_manual(values=c("atts"=19, "con"=18, "in"=17))+
-  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0)) +
-  #scale_linetype_manual(values = c("dotted", "solid")) +
-  labs(x = "Outcome", y = "Est. Effect Size and 95% CI") +
-  scale_y_continuous(limits=c(-1, 2),
-                     n.breaks=7)+
-  guides(shape=F) +
-  theme_classic()+
-  theme(text = element_text(size=15),
-        legend.position="none") +
-  coord_flip()
-
-pdf(file="svy_coefplot.pdf",bg="transparent", width=10, height=7)
-svy_coefplot
-dev.off()
-  
-```
-
-2. Aggregate + observational outcomes
-
-Order: Contact, Perceptions Security, Attitudes, PGG.
-
-```{r}
 outcome2$outcome_type <- "con"
 outcome2$Data <- "Behavior"
 outcome2$var <- c("Pastoralists in Market",
@@ -117,6 +91,7 @@ outcome2$var <- c("Pastoralists in Market",
                   "Outgroup Event Attendance")
 outcome2$df <- NULL
 outcome$Data <- "Survey"
+outcome$Data[outcome$outcome_type %in% "pgg"] <- "Behavior"
 svyObs_outcomes <- rbind(outcome, outcome2)
 svyObs_outcomes$hypothesis <- c("Attitudes", "Contact", "Insecurity", 
                                 "Cooperation", "Cooperation", "Contact",
@@ -149,20 +124,16 @@ ggplot(data = res, aes(x = varF, y = coef_sd, color = Data)) +
 ggsave("coef1.png", height=6)
 
 
-
-
-
-
-########
-
-svyObs_coefplot <- ggplot(svyObs_outcomes, aes(y=coef_sd, x = var)) +
+```
+```{r, eval=F}
+svy_coefplot <- ggplot(outcome, aes(y=coef_sd, x = var)) +
   geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
-  geom_point(aes(shape=hypothesis, size=4)) +
-  scale_shape_manual(values=c("Attitudes"=19, "Contact"=17, "Insecurity"=18))+
-  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0, linetype=df)) +
-  scale_linetype_manual(values = c("dotted", "solid")) +
+  geom_point(aes(shape=outcome_type, size=4)) +
+  #scale_shape_manual(values=c("atts"=19, "con"=18, "in"=17))+
+  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0)) +
+  #scale_linetype_manual(values = c("dotted", "solid")) +
   labs(x = "Outcome", y = "Est. Effect Size and 95% CI") +
-  scale_y_continuous(limits=c(-1, 2),
+  scale_y_continuous(limits=c(-1.5, 2),
                      n.breaks=7)+
   guides(shape=F) +
   theme_classic()+
@@ -170,13 +141,49 @@ svyObs_coefplot <- ggplot(svyObs_outcomes, aes(y=coef_sd, x = var)) +
         legend.position="none") +
   coord_flip()
 
-pdf(file="svyObs_coefplot.pdf",bg="transparent", width=10, height=7)
-svyObs_coefplot
+pdf(file="svy_coefplot.pdf",bg="transparent", width=10, height=7)
+svy_coefplot
 dev.off()
+  
+```
+```{r, eval=F}
+# example of coefplot for USAID
+res <- res[res$Data %in% "Survey",]
+res$varF <- c("Political Participation", "Political Discussions",
+              "Gender Equity Index", "Feelings of Empowerment",
+              "Social Norms")
+res[res$varF %in% "Political Discussions" | res$varF %in% "Social Norms",c("coef_sd", "ll_sd", "ul_sd")] <- res[res$varF %in% "Political Discussions" | res$varF %in% "Social Norms",c("coef_sd", "ll_sd", "ul_sd")] *-1
 
-png(file="svyObs_coefplot.png",bg="transparent")
-svyObs_coefplot
-dev.off()
+res[res$varF %in% "Political Participation","ll_sd"] <- res[res$varF %in% "Political Participation","ll_sd"]+0.05
+res[res$varF %in% "Political Participation","ul_sd"] <- res[res$varF %in% "Political Participation","ul_sd"]-0.05
+
+res[res$varF %in% "Political Discussions","ll_sd"] <- res[res$varF %in% "Political Discussions","ll_sd"]-0.04
+#res[res$varF %in% "Political Discussions","ul_sd"] <- res[res$varF %in% "Political Discussions","ul_sd"]
+res[res$varF %in% "Social Norms","ul_sd"] <- res[res$varF %in% "Social Norms","ul_sd"]-0.05
+res[res$varF %in% "Political Participation","coef_sd"] <- res[res$varF %in% "Political Participation","coef_sd"]+0.03
+res[res$varF %in% "Gender Equity Index","coef_sd"] <- res[res$varF %in% "Gender Equity Index","coef_sd"]-0.03
+
+res$varF <- factor(res$varF, 
+                   levels=
+                     rev(c("Political Participation",
+                           "Gender Equity Index", 
+                           "Feelings of Empowerment",
+                           "Social Norms",
+                           "Political Discussions")))
+
+
+ggplot(data = res, aes(x = varF, y = coef_sd)) +
+  geom_point()+
+  geom_errorbar(aes(ymin = ll_sd, ymax = ul_sd), width = 0) +
+  geom_hline(yintercept = 0, linetype = 2, color = "gray")+
+  labs(y = "Effect Size & 95% CI", x = NULL)+
+  theme_bw() +
+  #theme(axis.text = element_text(size = 12))+
+  coord_flip()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggsave("coef_example.png")
 
 ```
 
