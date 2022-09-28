@@ -709,7 +709,7 @@ pgg.df2$Treatment <- pgg.df2$tr2
     "Percent Donating", 
     sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
 
-png(file="pggPan_plot.png", bg="transparent", units="in",
+png(file="did_plots/pggPan_plot.png", bg="transparent", units="in",
    width=8, height=6, res=300)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 pggPan.plot
@@ -778,7 +778,7 @@ save(endComm.plot,   randComm.plot,  conComm.plot,   outInd.plot,    shareInd.pl
      outComm.plot,   listComm.plot,  inInd.plot,     clashInd.plot,  inComm.plot,    cohComm.plot,   cohInd.plot, 
      resInd.plot, shareComm.plot, conInd.plot, randComm.plot2, randComm.plot3, pggComm.plot, 
      clashPan.plot, resPan.plot, inPan.plot, sharePan.plot, conPan.plot, outPan.plot, cohPan.plot, pggPan.plot,
-     file='ecpn_plots.Rdata') # must be easier way to save objects that match a pattern...
+     file='did_plots/ecpn_plots.Rdata') # must be easier way to save objects that match a pattern...
 
 ```
 
@@ -792,6 +792,6 @@ pgg.df
 pgg.df2
 
 save(plot.df_share, plot.df1_share, plot.df2_share,pgg.df, pgg.df2,
-     file='z-did_plot_dfs_share.Rdata')
+     file='did_plots/z-did_plot_dfs_share.Rdata')
 
 ```
