@@ -53,8 +53,13 @@ save(add_ind_tab, file="add_ind_tab.Rdata")
 \end{table}
 
 
+## Appendix C: Placebo Analysis
 
-## Appendix C: Mechanisms and Placebo Analysis
+```{r}
+load("pl_list_of_coefs_and_ps.Rda")
+```
+
+## OLD Appendix C: Mechanisms and Placebo Analysis
 
 vio1p,
      threat1p, emp1p, persp1p, expan1p

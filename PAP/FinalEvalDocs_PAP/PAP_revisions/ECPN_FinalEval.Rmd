@@ -1,0 +1,332 @@
+---
+title: "ECPN Final Evaluation"
+author: 'Christopher Grady, Dawop Saidu, John Daudu, Rebecca Wolfe, Lisa Inks, Tefera
+  Mekonnen, and Nate Crossley '
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  pdf_document: default
+  word_document: default
+bibliography: ../../../../GradSchool/Dissertation/Writing/utils/cdg_references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview of Final Evaluation
+
+ECPN is a 2-year program in the Middle Belt of Nigeria that aims to prevent violence and conflict between farmer and pastoralist communities.  We evaluate the effects of ECPN with an RCT. The RCT (1) randomly selects communities to be "treated" with the ECPN program or remain "control" communities, and then (2) randomly selects community members in treated communities to participate in the programs.  Among participants selected to participate in ECPN programs, some people participate "fully" in every ECPN activity and others participate "partially" in just one ECPN activity.  This yields four experimental groups: (1) full participants in treated communities, (2) partial participants in treated communities, (3) non-participants in treated communities, and (4) non-participants in control communities.
+
+We measure impact in three ways: (1) survey data, (2) observational monitoring, and (3) a natural-field public goods behavioral game.  The surveys measure affect towards the farmer/pastoralist outgroup and many other attitudes that may influence affect towards that outgroup.  Observational monitoring quantifies qualitative evidence regarding interaction between farmers and pastoralists in these communities.  And the public goods game offers a phenomenal measure of coordination between farmers and pastoralists.
+
+# Research Design and Data Sources
+
+This section summarizes the data sources and analytic strategy for evaluating ECPN with these data sources. 
+
+## Research Design
+
+We are interested in the change in attitudes from baseline to endline.  More specifically, we are interested in the _difference_ in the amounts of change between the three treatment groups and the pure control group.  This is called a "difference-in-differences"  (DID) design.  A basic DID design is: separate subjects into a treatment and a control group, measure pre-treatment outcomes for both groups, administer treatment only to the treatment group, measure post-treatment outcomes for both groups.  The ECPN community-level study is exactly this design.  The main individual-level study for ECPN differs only in that we have four experimental groups, not two.
+
+A difference-in-differences analysis is vital when comparing across time.  From 2015-2017 many things change for the survey respondents -- one glaring difference is the state of the Nigerian economy, which fell deeply into recession in 2016.  Changes over time, economic or otherwise, could lead to changes in how respondents answer survey questions, and we would not want to confuse those "time changes" with changes that are due to ECPN^.[Other changes can also lead to a shift in survey responses and other outcome measures, even if underlying attitudes remain the same.  For example, different enumerators generally lead to slightly different survey responses.  In the USA this is especially pronounced with respect to questions about racial tolerance.  We would not want to confuse enumerator differences for a treatment effect.]  The difference-in-differences analysis lets us capture all changes _not_ due to ECPN, and observe if ECPN causes additional changes.
+
+We will use the DID framework to estimate the effect of ECPN with our survey data.  The DID regression equation, without covariate adjustment, is: 
+
+$$Outcome = \beta_0 + \beta_{ECPN} +\beta_{2018} + \beta_{ECPNx2018} + \epsilon$$  
+
+In that equation the $ECPNx2018$ coefficient is our outcome of interest, representing the amount of change in ECPN sites above the amount of change in control sites.  This is identical to a $T-test$ comparing the difference in change of two group means.  For a concrete example, consider outcome values from 0-10 where high numbers are desirable.  Imagine that ECPN sites score 6 in 2015 and 9 in 2018, and that Control sites score 7 in 2015 and 6 in 2018.  The ECPN sites improve three points, but the overall effect is _four_ points because the Control sites regress one point:
+
+$$Effect = (ECPN_{2018} - ECPN_{2015}) - (Control_{2018} - Control_{2015})$$
+$$Effect = (9 - 6) - (6 - 7)$$
+$$Effect = 3 + 1 = 4$$
+
+These equations are for a site-level analysis.  Our individual-level analysis will take a slightly different form because  we plan to use ordered hypothesis testing for our three experimental groups.  This means that we will run three DID regressions comparing each of the three experimental groups to the control group, yielding three $ECPNx2018$ coefficients.  We predict that the coefficient comparing "Full" participants Control participants is higher than the coefficient comparing "Partial" participants to Control participants, and that the coefficient comparing "Partial" participants to Control participants is higher than the coefficient comparing "Non" participants to Control participants.  This can be represented: 
+
+$$\beta_{Full-Control} > \beta_{Partial-Control} > \beta_{Non-Control}$$.  
+
+To determine if the _order_ and _magnitude_ of this difference occurs greater than chance, we will compare our observed results to results on data where we have simulated _no relationship_ between ECPN outcomes and ECPN participation.
+
+## Survey Data
+
+We conduct a baseline and an endline survey for ECPN.  We measured several outcomes relevant to peace-building: (1) attitudes towards outgroups, specifically with the farmer/pastoralist conflict group, (2) violent conflict history, (3) social contact between groups, (4) social cohesion between groups, (5) insecurity due to the conflict, (6) perceptions of the acceptability of violence, (7) perceptions of economic benefit of cooperation, (8) shared resources, and (9) dispute resolution mechanisms.<!--[note to us: this has the "social cohesion" indices as "social connectedness" and the "social distance" index as part of "attitudes towards outgroups".  In the Appendix I do not have these headers.-->  Specific questions for these 9 topics can be found in the [Question Appendix](#questions).  Some of these concepts are exploratory or unrelated to the ECPN impact evaluation.  Specifically, we do not have strong expectations about ECPN changing perceptions of the acceptability of violence in general, resource sharing, or dispute resolution mechanisms.
+
+Each of these nine attitudes is measured through multiple survey questions asked on both the endline survey and the baseline survey.  We will combine these survey questions into indices that summarize a respondent's attitude about each topic of interest.^[We could score indices in multiple ways.  A simple way is to add together the variables that make up the index.  More sophisticated methods could use factor analysis or inverse covariance weighting.]  An index is a better measure of an attitude than one question.  Responses to individual questions are part concept measurement and part measurement error, and the measurement error washes out when combining multiple questions.  The error is by definition random, whereas the concept measurement is directed.  Even if the questions are 50% error and 50% concept measurement, that error is overwhelmed by the use of multiple questions to measure a single concept.
+
+We also use three surveys experiments to measure specific aspects of outgroup attitudes and circumvent social desirability bias.  First, a survey list experiment asking the number of items that make respondents upset to measure general affect towards the outgroup.  Second, a randomization experiment to measure tolerance for interacting with the outgroup.  And third, an endorsement experiment to measure politicization of outgroup affect.
+
+Our primary analysis predicts effects for the survey experiments, attitudes towards outgroups, violent conflict history, social contact between groups, social distance between groups, insecurity due to conflict, and perceptions of economic benefit.  
+
+### Survey Implementation and Sampling Strategy
+
+Our baseline survey randomly sampled individuals from each community.  First our enumeration teams mapped each community, beginning in the community center and extending up to 50 households roughly in each cardinal direction.  Enumerators worked in male-female pairs, with each pair taking one cardinal direction.  Once a pair had mapped 50 households, they randomly selected 10 total households using a random number generator installed on their survey tablets.  Each enumerator took 5 households, randomly selecting a respondent within each household by having each select a number from 1 to $n$, where $n$ is the number of adults in the household.  If the selected respondent was available, the enumerator conducted the survey.  If the selected respondent was not available, the enumerator set up an enumeration time for the following day.
+
+In some communities the households were too few and far apart to map 50 in each direction.^[This was frequently the case for pastoralist settlements.]  In this case, the enumerators created a map with the assistance of the community leaders and then walked to as many households as they could reach in 30 minutes.  They then randomly selected households from that list of "reachable" households.  The within-household randomization remained the same.
+
+To the extent that we can identify respondents from baseline to endline, we will survey the same respondents.  In the case that respondents cannot be identified from the baseline survey they will be replaced by randomly selecting a new respondent from the same experimental group and gender as the missing respondent.  Thus, if a female full participant cannot be identified from a pastoralist community, a new female respondent will be randomly selected from full participants.  This maintains tracking of _groups_ over time, though not tracking of _respondents_ over time.  For non-participants and participants in control communities we will replace using simple random sampling of the community.
+
+## Observational Monitoring
+
+We monitor market and social behavior in the communities under study.  We want to know if ECPN is increasing social interaction between farmers and pastoralists, particularly in their shared marketplace and with social events.  We therefore attempt to measure: (1) cross-group purchasing of market goods, (2) cross-group discussions in the marketplace, (3) cross-group wedding attendance, and (4) cross-group food sharing at weddings.
+
+The observers attended community events <!--(once per month, the first event of each month?  Cannot recall, need to clarify with team.)-->
+
+We also monitor meetings of our full participants.  We want to know if these farmer-pastoralist meetings become more collaborative over time and if women are more involved in the decision-making process over time.  We measure: (1) the number of farmer and pastoralist men and women in attendance, (2) the number of times each group speaks, separating males and females, (3) any disagreements/issues discussed in the meetings, (4) if those issues were resolved, and (5) how those issues were resolved.
+
+These data attempt to quantify qualitative information; they are difficult to collect and will likely to be noisy measures.  They are also extremely valuable for documenting changes in how ECPN participants _interact_, which we may miss in survey responses.^[Several studies, including @Scacco2016 and @paluck2009jsp demonstrate that intergroup contact programs can affect behavior without necessarily affecting attitudes.]  We expect ECPN participants to interact more with their farmer/pastoralist outgroup than non-ECPN participants.  We also expect more equal participation in meetings and more issues resolved successfully over time.
+
+In the analysis we will consider these observational monitorings as panel data.  Each community has data points from the beginning of the project and the end of the project.  Due to funding issues, there is no data in the middle of the project.  We expect more positive change in the ECPN communities than the control communities, and the greatest change in observed behavior for full ECPN participants.  
+
+<!--Note Chris: We need to find out if we have observational monitoring in Control sites-->.
+
+## Natural-Field Public Goods Behavioral "Game"
+
+```{r}
+# fund amonut
+y <- 15000*353
+x <- 9500*361 + 5000*353 + 400*300 #$100 in transfer fees
+percomm <- x/32
+perpers <- percomm/50
+x - 3000*50*32
+(x - 3000*50*32)/30 # about 17150N/$45/community to top off low donations.
+
+```
+
+We use a natural-field behavioral game to measure attitudes towards the farmer/pastoralist outgroup.  Behavioral games create a strategic choice-making situation for participants, and researchers observe participants’ behavioral choices.  In a typical behavioral game, participants make this strategic choice in a lab with full knowledge that they are participating in an experiment.  Due to these artificial conditions, which are not present in real-world choices, results from lab behavioral games may not conform to similar real-world behaviors [@winking2013natural; @galizzi2017external].  Natural-field experiments solve this problem by creating a choice-making situation in the participants' natural environment where participants are not aware that an experiment is taking place [@harrison2004field; @winking2013natural].   Natural-field behavioral games are especially useful for measuring the tangible, behavioral effects of an intervention.  A behavioral game displays an individual's real behavior in an artificial situation; a natural-field behavioral game displays an individual’s real behavior in a real situation.  Our natural-field public goods game as a measure of behavior change complements our survey responses as a measure of attitudinal change.
+
+We use the natural-field public goods "game" to measure intergroup cooperation and social cohesion.^[We also believe this game could measure intergroup trust, since participants with more trust that their outgroup will donate to the community fund should donate more than participants who do not trust their outgroup to donate to the community fund.  It is certainly weaker as a measure of trust than as a measure of cooperation, and a trust game would more explicitly measure intergroup trust.]  Our game is similar in form to the game implemented in @fearon2009can.  In the “game”, we observe participants’ contributions to a community fund that will be used to fund a development project that benefits them *and* their paired conflict community.  Participants are told that any contribution they make to the community fund will be matched, so that their giving \$1 to the community fund becomes \$2 for the community fund.  The socially desirable behavior -- contributing to a community fund -- is costly, but it generates more overall money than the selfish behavior.  Thus, participants must make a difficult trade-off between their own interests and the interests of the broader community.  In this case, that broader community contains both members of their ingroup and members of the outgroup they are or were in conflict with.  
+
+We expect people in treated communities to contribute more money to the community fund than control communities.  Within treated communities, we expect participants who have fully participated in the ECPN program will donate the most money to the community fund, partial participants to donate the second most, and non-participants to donate the least.  Within non-participants, we have a weak expectation that those who have frequent interaction with full participants will donate more than those who do not have frequent interaction with full participants.
+
+### Game Details
+
+In our "game", the fifty participating members from each community receive $5 as part of a development project. They are told that Mercy Corps has money for development that is to be given directly to people in communities where Mercy Corps works.  The money is for these people to do with as they please -- they can keep the money or contribute it to a joint farmer-pastoralist project committee that will use the money for a collective good that will help both communities.  Participants are also told that Mercy Corps also found someone who will match all donations to these project committees, so if participants donate \$1 it becomes \$2 for the project committee, and if they donate all \$5 the project committees will receive \$10.
+
+Following @fearon2009can, all communities are also told that receipt of funds depends on completing a form that tells us: (1) the community members who will form a committee to manage the money, and (2) plans for how the funds will be spent.
+
+More contributions towards the community fund by full participants would show behavioral change in a real situation regarding the use of funds.  It shows that participants are willing to cooperate across community lines and sacrifice their own money so that both communities can benefit.  \$5 is not an inconsequential amount of money in this area. According to our baseline survey, the average annual income in these communities is around \$150 -- \$5 amounts to almost three weeks of income.  Willingness to contribute that money to a community fund that helps the outgroup demonstrates powerfully that the program has affected a significant change in intergroup relations.
+
+### Implementation of the Public Goods Game
+
+The natural-field public goods game will be conducted in all communities, both treatment and control.  An advance team should visit each community to secure their consent to receive funds for development _at least one week_ before we conduct the public goods game.^[We also need to obtain consent to do the survey again.  In control sites, we have not visited for a long time.  Will we be able to get consent, and could knowledge that we are coming to bring "funds for development" affect survey responses about farmers/pastoralists?]  We should explain the conditions of these development funds to the community leaders and other people important to community consent.  They should know: (1) that we can provide \$5 for development to fifty farmers and fifty pastoralists of their community, for \$500 in total development funds; (2) that the community members to whom we give the funds can keep the money or donate it to a project committee containing an equal number of farmers and pastoralists; (3) that receipt of funds depends on completing a form that tells us who in the community will form a committee to manage the money and the plans for how the funds will be spent; and (4) that we found another donor who will match every contribution to the project committee.  The communities should have the form completed when we return for the endline survey, and a project committee and plan for use of funds should be ready when we present the keep/donate option to the participants.
+
+The public goods game will be conducted immediately after the endline survey.  The enumerators will survey each of the 50 community members originally selected to be part of the study^[Where we cannot locate people from the baseline study, we should randomly select another person from their experimental group and gender.  For example, when we cannot identify a female full participant, we randomly select another female full participant.], the community leaders, and one person in the social network of each of the direct participants.  On the day following the survey the ECPN team will gather the 50 research participants together in one private location.  The participants will be told the same thing we told the community leaders: (1) that we can provide \$5 for development to each of them and and fifty people in the other community, for \$500 in total development funds; (2) that they can keep the money or donate it to the joint-community project committee that contains an equal number of farmers and pastoralists; and (3) that we found another donor who will match every contribution to the project committee.
+
+We should then give the participants an envelope with their unique participant ID on it.  This will allow us to know their contribution, but will keep it anonymous to anyone who does not have the participant ID-Name key.  We must be sure to give each participant the correct envelope.  We then tell the group that each envelope contains 2,000 Naira in bank notes^[It is important that every respondent receives the same mix of bank notes.  For practicality and flexibility, four 500 Naira notes are ideal.], and that there is a donation box in the next room^[If this is conducted outside, then we should instead put the donation box in a nearby structure, or at least have it hidden behind something.].  They should go into that room, put whatever money they want to keep in their pocket, leave whatever amount they want to donate in the envelope, and place the envelope in the donation box.  We tell them that we will tally the money and announce tomorrow how much money each community has raised for the public good.
+
+### Scripts
+
+#### Game
+
+Hello everyone.  Thank you all for participating in the ECPN program.  In the past few days, you have all answered our final survey questions.  Thank you very much for answering.  
+
+We have been doing projects in your community, and we now have more development funds to use not for a project, but rather to give directly to people in the communities where we work.  We have \$5/2000N per person to give to you.  It is yours, and you can use it however you would like.
+
+Your community and [__joint farmer/pastoralist community__] have created a project committee to whom you can donate this money so that it may be used to help both communities.  The project committee has an equal number of people from each community.  We have found a donor that will match the funds that you all contribute to the project committee, so that if you donate 100 Naira the project committee receives 200 Naira, and if you donate all 2,000 Naira the project committee receives 2,000 Naira.  You are welcome to donate none, some, or all of the money to the project committee.
+
+_Pass out participant-ID labeled envelopes with four 500 Naira notes in them._
+
+These are your individual donation envelopes.  All the donations will be private -- only you will know how much money you donated.  In [**the next room/that structure**] is a donation box.  Please go into the room, put however much of the 2,000 Naira you wish to donate to the project committee in the envelope, put in your pocket whatever amount you want to keep for yourself, and place the envelope in the donation box.  You are welcome to donate none, some, or all of the money to the project committee.  You may then leave and continue your day.  Tomorrow we will come back and announce how much money your community's project committee will receive.
+
+
+#### Result Announcement
+
+Your community did very well and is one of the most generous communities in ECPN!  You will receive \$X amount towards the project committee.
+
+
+#### Behavioral Game Options
+
+We chose the public goods game, and this specific variation, after considering other variations and even other natural-field behavioral games.
+
+## Analytical Strategy: Combining Groups and Outcomes
+
+The final evaluation for ECPN compares each of our four experimental groups on each outcome simultaneously.  We predict the most change for full participants > partial participants > treated non-participants > control non-participants, and we test hypotheses in that order simultaneously.  We gain statistical power by testing the hypotheses in order of Full > Partial > Non(treated) > Non(control), rather than comparing two groups at a time.  When we compare two groups, we ask one question: "are Group A's outcomes larger than Group B's outcomes?".  When we compare four groups in a specific order we ask three questions: (1) "are Group A's outcomes larger than Group B's outcomes?" _and_ (2) "are Group B's outcomes larger than Group C's outcomes?" _and_ (3) "are Group C's outcomes larger than Group D's outcomes?".  We gain power from multiple ordered hypotheses because random chance will produce four ordered groups far less often than it will produce two ordered groups.  Statistics is differentiating observed outcomes from outcomes we could see merely by random chance.
+
+We also predict that ECPN changes survey responses, observational behavior, and donations in the public goods game.  Since our prediction is about this _collection_ of attitudes and behaviors we should test the hypotheses that ECPN affected _all_ of them against the null hypothesis that ECPN did not affect _any_ of them.  This comparison should increase our statistical power -- even if we observe only small changes on all three of these data sources, the probability of observing _three_ small changes due to random noise is much lower than the probability of observing _one_ small change due to random noise.  If we observe an overall change, we can then look within this global collection of outcomes to assess which outcomes are driving this overall change.
+
+# Conclusion
+
+This document summarizes our research design and analytic strategy for assessing the impact of MercyCorps' program _Engaging Communities for Peace in Nigeria_ (ECPN).  Our research design compares the effects between four groups of participants: (1) full participants, (2) partial participants,(3) non-participants in treated communities, and (4) non-participants in control communities.  The full participants tell us about extended, long-term intergroup contact; the partial participants tell us about short-term intergroup contact; the non-participants in treated communities tell us about the social diffusion of intergroup contact; and non-participants in control communities are the benchmark comparison group.  We measure impact in three ways: (1) survey data, (2) observational monitoring, and (3) a natural-field public goods behavioral game.  Each type of data tells us something unique about farmer-pastoralist relations.  The survey data tells us about individual-level attitude change and social norms, the observational monitoring tells us about cross-group interaction, and the public goods game tells us about cooperation and social cohesion with the outgroup community.  We will use statistical techniques to test the hypothesis that ECPN affects all of these diverse outcomes simultaneously and that the effects of ECPN are directly proportional to the amount of a participant's intergroup contact.
+
+# Question Appendix {#questions}
+
+## Social Cohesion
+
+People in this area are willing to help their neighbors across ethnic and religious lines
+People in this area can be trusted
+People in this area generally do not get along together
+People in this area do not share the same morals
+People in this area see the benefits of working together to achieve common goals
+
+What proportion of your group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
+What proportion of X group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
+If there was a water supply problem in this community, how likely is it that people from your group and people from X group would cooperate to try to solve the problem?
+Suppose something unfortunate happened to someone in this community from X group, such as a serious illness or the death of a parent. How likely is it that some people in the community from your group would get together to help them?
+Suppose something unfortunate happened to someone in this community from your group, such as a serious illness or the death of a parent. How likely is it that some people in the community from X group would get together to help them?
+
+## Outgroup Trust
+
+On a range from 1-5, how much do you trust people from an ethnic group different than your own?  On this range, 5 means “trust completely” and 1 means “do not trust at all.”
+From 1-5, how much do you trust people from a different religion than your own?
+From 1-5, how much do you trust people from X GROUP in your area?
+
+## Social Distance
+
+With regards to someone from X group, would you feel comfortable:
+...if they worked in your field?
+…paying them to watch your animals?
+…trading goods with them?
+…sharing a meal with them?
+…with a close relative marrying a person from X group?
+
+## Perceptions of Economic Benefit
+
+Please tell me how strongly you agree/disagree with each of the following statements:
+You currently benefit economically from cooperating with members of X GROUP. Do you…
+You would benefit economically more than you currently do if there was peace between your communities and X group. Do you… 
+You would benefit economically if there were peace between your community and X group.  Do you… 
+You would personally commit to peace with X group, even if members of X group used violence against your group.
+
+
+## Randomization Experiment
+
+Think about groups that you might join in your leisure time.  Would you join a group that had **5%/25%/50%/75%** X Group members?
+Think about the community you live in.  Would you live in a community that had **5%/25%/50%/75%** X Group members?
+
+## List Experiment
+
+"I’m going to read you a list of items that anger or upset some people.  I’d like you to tell me how many of these things upset you.  Please don’t tell me which items upset you, just how many of them upset you.
+When your football team loses a match
+Increases in the price of gasoline
+Lack of rainfall
+__When you have to interact with a member of X group in the market__
+
+Remember, don’t tell me which items upset you, just how many.
+
+
+## Endorsement Experiment
+
+Imagine that there is a proposal __[by a Farmer’s Cooperative Society/MACBAN]__ for action to enhance access to clean water in rural areas.  Though expensive, the proposal aims to bring fresh, clean water to hundreds of areas without access to it, including this one.  If this were proposed, how would you feel about it?
+
+## Threat Perception
+
+Some people say X group is responsible for most of the violence in this community, while others say that both groups are responsible for the violence here.  Which is closer to your view?
+You see X group as a threat to your community
+You think X group have too much influence on your community
+You think that people from X group have different morals than people from your group
+
+## Social Contact
+
+Think of the market you go to most frequently. During the past month, have members of X GROUP gone to that market too?
+In the past month, how many times did you interact with X group in the market?
+How did you interact? (Economic, Social, Both)
+Were the market interactions mostly…(Very Positive - Very Negative)
+
+In the past month, have you interacted with members of X group outside the market?
+Joined a member of X group for a social event outside the home?
+How often?
+Hosted a member of X group for a ceremony in your home?
+How often?
+Gone to the home of a member of X group for a ceremony? 
+How often?
+
+Have you interacted with members of X group in any other way in the past month?
+How else have you interacted with members of X group?
+Overall, would you say your interactions with X group are: (Very Positive - Very Negative)
+
+## Violent Conflict History
+
+To your knowledge, in the last year, were there any violent clashes or disputes in your community?
+How many were there? 
+About how long ago was the most recent clash?
+And in that clash, about how many people died? 
+In the most recent clash, what was the main cause of violence? 
+
+## Insecurity due to Conflict
+
+In any clash that occurred in the last year, were you or anyone in your family negatively affected by an attack caused by X group? 
+In the last year, to what extent have people’s abilities to work/earn a living in your community been affected by violent clashes or disputes with other groups? Would you say… 
+In the last year were there any areas that you avoided going to or through because of insecurity during the night? 
+In the last year were there any areas that you avoided going to or through because of insecurity, during the day?
+In the last year, did insecurity ever prevent you from…
+Working when you wanted to work?
+About how many days were you unable to work?
+Going to the market?
+Getting water for the household?
+Going to your field/farm?
+Moving your animals to grazing areas?
+Moving your animals to water?
+Earning money or going to work?
+Going to school?
+
+## Shared Resources
+
+Does your community share markets with X group? __OR__ Earlier you said your community shared markets with X group, is that right?
+Does sharing the market with X group cause tension?
+Does sharing the market with X group cause disputes?
+Would you say disputes between your community and X group in or over markets are resolved peacefully…
+Who usually resolves disputes between your community and X group in or over markets?  Please name up to three types of people who resolve disputes the most frequently.
+Does your community share pasture areas with X group?
+Does sharing the pasture with X group cause tension?
+Does sharing the pasture with X group cause disputes?
+Would you say disputes between your community and X group in or over pastures are resolved peacefully…
+Who usually resolves disputes between your community and X group in or over pastures?  Please name up to three types of people who resolve disputes the most frequently.
+Does your community share farmland areas with X group?
+Does sharing the farmland with X group cause tension?
+Does sharing the farmland with X group cause disputes?
+Would you say disputes between your community and X group in or over farmland are resolved peacefully…
+Who usually resolves disputes between your community and X group in or over farmland?  Please name up to three types of people who resolve disputes the most frequently.
+
+## Dispute Resolution
+
+_Note: Also includes questions above asking "who usually resolves disputes"._
+
+I’m going to ask some questions about how disputes are resolved in your community.
+How often do disputes over one issue persist after an attempt at resolving them? Is it…
+During the past year, who usually resolved disputes between members of your community and members of other communities? Please name the three types of people who resolve disputes the most frequently. 
+I’m going to ask you a bit more about how disputes are resolved.
+Please tell me how much you agree or disagree with each of the following statements.
+
+Local government officials try hard to manage conflict in my area.  
+How often are local government officials successful in resolving clashes nonviolently? Is It..
+
+
+State government officials try hard to manage conflict in my area.  
+How often are state government officials successful in resolving clashes nonviolently? Is It..
+
+
+Traditional leaders try hard to manage conflict in my area.  
+How often are traditional leaders successful in resolving clashes nonviolently? Is It..
+
+
+Religious leaders try hard to manage conflict in my area.  
+How often are religious leaders successful in resolving clashes nonviolently? Is It..
+
+
+Security officials try hard to manage conflict in my area.  
+How often are security officials successful in resolving clashes nonviolently? Is It..
+
+
+Women try hard to manage conflict in my area.  
+How often are women successful in resolving clashes nonviolently? Is It..
+
+
+Youth try hard to manage conflict in my area.  
+How often are youth successful in resolving clashes nonviolently? Is It..
+
+
+What type of leader in your community has the most influence on dispute resolution?
+To what extent is the local government addressing the security concerns of this community? 
+
+
+## Acceptability of Violence
+
+Now I am going to ask you some questions about the use of violence.
+Is it always, sometimes, rarely, or never justified to use violence to do each of the following:
+Retaliate against violence
+Defend one's group
+Maintain culture and traditions
+Defend one's religion
+Bring criminals to justice
+Force the government to change their policies
+
+
+# References

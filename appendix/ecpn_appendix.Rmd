@@ -54,7 +54,11 @@ load("paper1_files/add_ind_tab.Rdata")
 \end{center}
 \end{table}
 
-## Appendix C: Mechanisms and Placebo Analysis
+
+## Appendix C: Placebo Analysis
+
+
+## OLD Appendix C: Mechanisms and Placebo Analysis
 
 These tables show results for mechanism and placebo outcomes using inverse-covariance weighted indices.  The tables include the coefficients and $p$-values for community- and individual-level analyses.
 

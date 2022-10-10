@@ -1,0 +1,106 @@
+---
+title: "PAP Deviation"
+author: "Christopher Grady"
+date: date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overall
+
+This document describes deviations from the pre-analysis plan listed [here](https://osf.io/zsvx2).  
+
+
+# Change 1: Hypotheses
+
+## Category of Change
+
+Modify Hypotheses
+
+## Description & Justification
+
+We initially listed 7 hypotheses.  We now list 4.
+
+We combined hypotheses 1 ("increase trust and positive affect") and 4 ("increase positive attitudes") because we see no conceptual difference between "trust and positive affect" and "positive attitudes".  We see trust and affect as attitudes.
+
+We combined hypotheses 2 ("more likely to cooperate in the PGG") and 7 ("fewer community members donate nothing during the Public Goods Game") because both are about donations in the public goods game.
+
+We dropped hypothesis 6 ("Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities."). Hypothesis 6 is beyond the scope of this paper.  This paper is about individual attitudes, perceptions, and behaviors.  Hypothesis 6 is about the success of dispute resolution.  We are considering a separate paper about dispute resolution.
+
+
+
+
+## Sections Amended
+
+
+## Timeline of change
+
+We made this decision after data analysis.
+
+
+# Change 2: Placebo outcomes
+
+## Category
+
+Hypothesis testing.
+
+## Description and Justification
+
+We initially listed radio listening as a placebo outcome.  Along with radio listening, we also use attitudes towards violence as a placebo outcome.  Attitudes about violence are a good candidate for a “placebo outcome” because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way.  Radio listening should also not be affected by ECPN but is less relevant for how attitudes change over time. 
+
+We did not initially list attitudes towards violence as a placebo outcome because the program team was interested to know if the program affected these attitudes.  However, we explicitly did not include attitudes towards violence in any hypothesis because we did not expect the program to affect such attitudes and wanted to use them as placebos in our analysis.^[PAP_quote]
+
+[^PAP_Quote]: In our original PAP submission, we wrote: "...while certain outcomes may be of interest to the program team, the impact evaluation team does not include hypotheses about ECPN changing perceptions of the acceptability of some types of violence, about inter-religious trust, or perceptions of the actors involved in dispute resolution."  We also did not expect ECPN to affect trust in members of other religions, but we do not use it as a "placebo" outcome because intergroup contact could generalize to a wider religious outgroup and religion separates farmers and pastoralists in one state.  We did not expect ECPN to systematically affect perceptions of the actors involved in dispute resolution but do not use these perceptions as a placebo outcome because ECPN worked with some actors involved in dispute resolution (the particular actor involved varied by community).
+
+
+## Timeline of change
+
+We made the decision to include "attitudes towards violence" as a placebo outcome before endline data collection.
+
+
+***************
+
+# Hyptheses and Outcome Measurement
+
+## Initial
+
+We initially listed 7 hypotheses:
+
+ 1. For communities that receive the ECPN program relative to control communities, we will find increased trust and positive affect between farmers and pastoralists. 
+ 2. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to cooperate in the PGG.
+ 3. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to interact with the outgroup.
+ 4. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists have more positive attitudes about the outgroup. 
+ 5. Communities that receive the ECPN program will have increased security compared to control communities. 
+ 6. Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities. 
+ 7. Communities that receive the ECPN program will have fewer community members donate nothing during the Public Goods Game than communities that do not receive the ECPN program.
+
+These hypotheses were measured by several questions/indices: 
+    - 1)  Trust and outgroup affect includes (a) social cohesion in terms of values, (b) social cohesion in terms of actions, (c) affect and social distance with outgroups, specifically with the farmer/pastoralist conflict group, and (d) perceptions of outgroup threat; 
+    - 2) Interaction includes social contact between groups;  
+    - 3) Violent conflict history;  
+    - 4) Perceptions of  insecurity due to the conflict; 
+    - 5) Perceptions of the acceptability of violence; 
+    - 6) Cooperation includes a) sharing of resources and b) perceptions of economic benefit of cooperation; and 
+    - 7) Dispute resolution includes a) perceptions of dispute resolution success and b) perceptions of actors involved in dispute resolution.
+
+## Changes
+
+We also removed questions about "social cohesion" from the attitudes/affect index because colleagues pointed out that these questions measured _social norms_, not social cohesion.  All of these questions ask respondents how they think others in their group or the other group feel or would behave in hypothetical situation.  For example, one asks respondents to agree or disagree with the statement: "People in this area are willing to help their neighbors across ethnic and religious lines".  Another asks "If there was a water supply problem in this community, how likely is it that people from your group and people from [*X group*] would cooperate to try to solve the problem?"  We agree that these questions are measuring an individual's perception of social norms, not an individual's attitudes.
+
+**Dispute Resolution and Violent Conflict History**
+
+Hypothesis 6 was that treatment communities would resolve disputes more peacefully than control communities.   dispute resolutionWe also removed hypothesis 6 because we do not have measures of successful dispute resolution.
+
+**Percent Experiment**
+
+As our outcome, we would normally use the relationship between more outgroup members (5%-75%) and joining the group.  The prediction would be that the percentage of outgroup members has less of an effect after the intervention.  However, that analysis assumes that 5% functions as a baseline for how likely an individual is to join a group with a very small % of outgroup members.  We do not expect that baseline to change.
+
+In our paper, the 5% condition had a low "yes" rate because respondents didn't want to join a group with _any_ outgroup members.  Joining in the 5% condition was correlated with outgroup attitudes.  The assumption that the 5% condition is an inoccuous baseline was violated.  We thus assessed whether the intervention increased respondents' "yes" rate at any % of the outgroup, rather than the difference in "yes" rate as the % of the outgroup increased.
+
+
+# Mechanisms
+
+Completely removed these and are planning another paper to assess mechanisms.  We plan to look at social norms, individual interaction, threat, empathy, and perceptions of benefit from group coordination.

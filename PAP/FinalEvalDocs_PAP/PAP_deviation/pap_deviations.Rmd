@@ -1,0 +1,59 @@
+---
+title: "PAP Deviation"
+author: "Christopher Grady"
+date: "October 2, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overall
+
+This document describes deviations from the pre-analysis plan listed [here](https://osf.io/zsvx2).  
+
+
+# Hyptheses and Outcome Measurement
+
+## Initial
+
+We initially listed 7 hypotheses:
+
+ 1. For communities that receive the ECPN program relative to control communities, we will find increased trust and positive affect between farmers and pastoralists. 
+ 2. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to cooperate in the PGG.
+ 3. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to interact with the outgroup.
+ 4. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists have more positive attitudes about the outgroup. 
+ 5. Communities that receive the ECPN program will have increased security compared to control communities. 
+ 6. Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities. 
+ 7. Communities that receive the ECPN program will have fewer community members donate nothing during the Public Goods Game than communities that do not receive the ECPN program.
+
+These hypotheses were measured by several questions/indices: 
+    - 1)  Trust and outgroup affect includes (a) social cohesion in terms of values, (b) social cohesion in terms of actions, (c) affect and social distance with outgroups, specifically with the farmer/pastoralist conflict group, and (d) perceptions of outgroup threat; 
+    - 2) Interaction includes social contact between groups;  
+    - 3) Violent conflict history;  
+    - 4) Perceptions of  insecurity due to the conflict; 
+    - 5) Perceptions of the acceptability of violence; 
+    - 6) Cooperation includes a) sharing of resources and b) perceptions of economic benefit of cooperation; and 
+    - 7) Dispute resolution includes a) perceptions of dispute resolution success and b) perceptions of actors involved in dispute resolution.
+
+## Changes
+
+**Trust, Affect, and Attitudes**: We combined hypotheses 1 and 7 because we see no conceptual difference between "trust and positive affect" and "positive attitudes".  We see trust and affect as attitudes.
+
+We also removed questions about "social cohesion" from the attitudes/affect index because colleagues pointed out that these questions measured _social norms_, not social cohesion.  All of these questions ask respondents how they think others in their group or the other group feel or would behave in hypothetical situation.  For example, one asks respondents to agree or disagree with the statement: "People in this area are willing to help their neighbors across ethnic and religious lines".  Another asks "If there was a water supply problem in this community, how likely is it that people from your group and people from [*X group*] would cooperate to try to solve the problem?"  We agree that these questions are measuring an individual's perception of social norms, not an individual's attitudes.
+
+**Dispute Resolution and Violent Conflict History**
+
+Hypothesis 6 was that treatment communities would resolve disputes more peacefully than control communities.   dispute resolutionWe also removed hypothesis 6 because we do not have measures of successful dispute resolution.
+
+**Percent Experiment**
+
+As our outcome, we would normally use the relationship between more outgroup members (5%-75%) and joining the group.  The prediction would be that the percentage of outgroup members has less of an effect after the intervention.  However, that analysis assumes that 5% functions as a baseline for how likely an individual is to join a group with a very small % of outgroup members.  We do not expect that baseline to change.
+
+In our paper, the 5% condition had a low "yes" rate because respondents didn't want to join a group with _any_ outgroup members.  Joining in the 5% condition was correlated with outgroup attitudes.  The assumption that the 5% condition is an inoccuous baseline was violated.  We thus assessed whether the intervention increased respondents' "yes" rate at any % of the outgroup, rather than the difference in "yes" rate as the % of the outgroup increased.
+
+
+# Mechanisms
+
+Completely removed these and are planning another paper to assess mechanisms.  We plan to look at social norms, individual interaction, threat, empathy, and perceptions of benefit from group coordination.
