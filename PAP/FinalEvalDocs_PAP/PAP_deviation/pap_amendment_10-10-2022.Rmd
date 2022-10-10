@@ -16,32 +16,45 @@ This document describes deviations from the pre-analysis plan listed [here](http
 
 # Change 1: Hypotheses
 
-## Category of Change
-
-Modify Hypotheses
-
 ## Description & Justification
 
-We initially listed 7 hypotheses.  We now list 4.
+We initially listed 7 hypotheses.  We now list 4.  These changes apply to the community-level analysis and the individual-level analysis.
 
-We combined hypotheses 1 ("increase trust and positive affect") and 4 ("increase positive attitudes") because we see no conceptual difference between "trust and positive affect" and "positive attitudes".  We see trust and affect as attitudes.
+ 1. We combined hypotheses 1 ("increase trust and positive affect") and 4 ("increase positive attitudes") because we see no conceptual difference between "trust and positive affect" and "positive attitudes".  We see trust and affect as attitudes.  
 
-We combined hypotheses 2 ("more likely to cooperate in the PGG") and 7 ("fewer community members donate nothing during the Public Goods Game") because both are about donations in the public goods game.
+ 2. We combined hypotheses 2 ("more likely to cooperate in the PGG") and 7 ("fewer community members donate nothing during the Public Goods Game") because both are about donations in the public goods game.
 
-We dropped hypothesis 6 ("Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities."). Hypothesis 6 is beyond the scope of this paper.  This paper is about individual attitudes, perceptions, and behaviors.  Hypothesis 6 is about the success of dispute resolution.  We are considering a separate paper about dispute resolution.
+ 3. We dropped hypothesis 6 ("Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities."). Hypothesis 6 is beyond the scope of this paper.  This paper is about individual attitudes, perceptions, and behaviors.  Hypothesis 6 is about the success of dispute resolution.  We are considering a separate paper about dispute resolution.
 
-
-
+In the individual-level hypotheses, we unintentionally left out the individual-level hypothesis for _perceptions of physical security_.  We included that individual-level hypothesis.
 
 ## Sections Amended
 
+Theory and Hypotheses.
 
 ## Timeline of change
 
-We made this decision after data analysis.
+We made the decision to modify these hypotheses after data analysis.
 
 
-# Change 2: Placebo outcomes
+# Change 2: Causal Mechanisms
+
+## Description & Justification
+
+We initially included a subsection called "Mechanisms Through Mediating Variables".  We have removed that section.  We do not investigate causal mechanisms in this paper.  We also remove the references to causal mechanisms in the survey data.  We did not list any hypotheses about causal mechanisms, so our hypotheses are unchanged.
+
+That section may be used as part of the pre-analyis plan for a paper about the causal mechanisms of intergroup contact.
+
+## Sections Amended
+
+Theory and Hypotheses; Survey Data; Survey Question Appendix.
+
+## Timeline of change
+
+We made the decision to exclude a section about causal mechanisms after data analysis.
+
+
+# Change 3: Placebo outcomes
 
 ## Category
 
@@ -49,50 +62,72 @@ Hypothesis testing.
 
 ## Description and Justification
 
-We initially listed radio listening as a placebo outcome.  Along with radio listening, we also use attitudes towards violence as a placebo outcome.  Attitudes about violence are a good candidate for a “placebo outcome” because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way.  Radio listening should also not be affected by ECPN but is less relevant for how attitudes change over time. 
+We initially listed only radio listening as a placebo outcome.  Along with radio listening, we also use attitudes towards violence as a placebo outcome.  Attitudes about violence are a good candidate for a “placebo outcome” because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way.  Radio listening should also not be affected by ECPN but is less relevant for how self-reported attitudes change from baseline to endline. 
 
 We did not initially list attitudes towards violence as a placebo outcome because the program team was interested to know if the program affected these attitudes.  However, we explicitly did not include attitudes towards violence in any hypothesis because we did not expect the program to affect such attitudes and wanted to use them as placebos in our analysis.^[PAP_quote]
 
-[^PAP_Quote]: In our original PAP submission, we wrote: "...while certain outcomes may be of interest to the program team, the impact evaluation team does not include hypotheses about ECPN changing perceptions of the acceptability of some types of violence, about inter-religious trust, or perceptions of the actors involved in dispute resolution."  We also did not expect ECPN to affect trust in members of other religions, but we do not use it as a "placebo" outcome because intergroup contact could generalize to a wider religious outgroup and religion separates farmers and pastoralists in one state.  We did not expect ECPN to systematically affect perceptions of the actors involved in dispute resolution but do not use these perceptions as a placebo outcome because ECPN worked with some actors involved in dispute resolution (the particular actor involved varied by community).
+[^PAP_Quote]: In our original PAP submission, we wrote: "...while certain outcomes may be of interest to the program team, the impact evaluation team does not include hypotheses about ECPN changing perceptions of the acceptability of some types of violence, about inter-religious trust, or perceptions of the actors involved in dispute resolution."  We also did not expect ECPN to affect trust in members of other religions, but we did not believe it was appropriate as a "placebo" outcome because intergroup contact could generalize to a wider religious outgroup and religion separates farmers and pastoralists in one state.  And we did not expect ECPN to systematically affect perceptions of the actors involved in dispute resolution but do not use these perceptions as a placebo outcome because ECPN worked with some actors involved in dispute resolution (the particular actor involved varied by community).
 
+## Sections Amended
+
+Overall Study Design of Final Evaluation; Research Design and Data Sources.
 
 ## Timeline of change
 
 We made the decision to include "attitudes towards violence" as a placebo outcome before endline data collection.
 
 
+# Change 4: Individual-level analysis
+
+## Category
+
+Estimation.
+
+## Description and Justification
+
+We planned to compare individuals who had been assigned to participate and complied with individuals who were assigned to participate but did not.  Instead we compare individuals who _did_ participate with individuals who _did not_ participate.  We made this change due to the possibility that individual-level treatment assignment was not followed.
+
+## Sections Amended
+
+Overall Study Design of Final Evaluation.
+
+## Timeline of change
+
+We made the decision to compare actual participants with actual nonparticipants during endline data collection.
+
+
+# Change 5: Modify regression equation
+
+## Category
+
+Estimation.
+
+## Description and Justification
+
+We compare treated communities to control communities using a diffrence-in-differences framework.  At the time of writing the PAP, we only knew of the "change scores" strategy where the outcome of interest is the change from baseline to endline.  After writing the PAP, we learned the "controlling-for" method where the outcome of interest it the endline outcome and the equation controls for the baseline outcome.  The "controlling-for" method is more powerful than the "change scores" method and is unbiased when baseline outcomes are balanced.  We therefore use the "controlling-for" method when baseline outcomes are balanced and the "change scores" method when baseline outcomes are not balanced.^[We learned about this method thanks to DeclareDesign Blog: https://declaredesign.org/blog/use-change-scores-or-control-for-pre-treatment-outcomes-depends-on-the-true-data-generating-process.html]
+
+Were going to try controlling for individual-level covariates in community-level analysis.  Highly unorthodox, decided against doing so on the advice of colleagues.
+
+Were going to use ordered hypothesis testing.  Had incorrect understanding of ordered hypothesis testing.
+
+
+## Sections Amended
+
+Research Design and Data Sources
+
+## Timeline of change
+
+We made the decision to use the "controlling-for" method when baseline outcomes are balanced during endline data collection.  We made the decision to not attempt to control for individual-level characteristics during data analysis.  We made the decision to not use ordered hypothesis testing during data analysis.
+
+
+
 ***************
 
-# Hyptheses and Outcome Measurement
-
-## Initial
-
-We initially listed 7 hypotheses:
-
- 1. For communities that receive the ECPN program relative to control communities, we will find increased trust and positive affect between farmers and pastoralists. 
- 2. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to cooperate in the PGG.
- 3. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to interact with the outgroup.
- 4. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists have more positive attitudes about the outgroup. 
- 5. Communities that receive the ECPN program will have increased security compared to control communities. 
- 6. Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities. 
- 7. Communities that receive the ECPN program will have fewer community members donate nothing during the Public Goods Game than communities that do not receive the ECPN program.
-
-These hypotheses were measured by several questions/indices: 
-    - 1)  Trust and outgroup affect includes (a) social cohesion in terms of values, (b) social cohesion in terms of actions, (c) affect and social distance with outgroups, specifically with the farmer/pastoralist conflict group, and (d) perceptions of outgroup threat; 
-    - 2) Interaction includes social contact between groups;  
-    - 3) Violent conflict history;  
-    - 4) Perceptions of  insecurity due to the conflict; 
-    - 5) Perceptions of the acceptability of violence; 
-    - 6) Cooperation includes a) sharing of resources and b) perceptions of economic benefit of cooperation; and 
-    - 7) Dispute resolution includes a) perceptions of dispute resolution success and b) perceptions of actors involved in dispute resolution.
 
 ## Changes
 
 We also removed questions about "social cohesion" from the attitudes/affect index because colleagues pointed out that these questions measured _social norms_, not social cohesion.  All of these questions ask respondents how they think others in their group or the other group feel or would behave in hypothetical situation.  For example, one asks respondents to agree or disagree with the statement: "People in this area are willing to help their neighbors across ethnic and religious lines".  Another asks "If there was a water supply problem in this community, how likely is it that people from your group and people from [*X group*] would cooperate to try to solve the problem?"  We agree that these questions are measuring an individual's perception of social norms, not an individual's attitudes.
 
-**Dispute Resolution and Violent Conflict History**
-
-Hypothesis 6 was that treatment communities would resolve disputes more peacefully than control communities.   dispute resolutionWe also removed hypothesis 6 because we do not have measures of successful dispute resolution.
 
 **Percent Experiment**
 
