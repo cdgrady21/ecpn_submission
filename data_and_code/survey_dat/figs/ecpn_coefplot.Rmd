@@ -148,14 +148,15 @@ dev.off()
 ```
 ```{r, eval=F}
 # example of coefplot for USAID
+res1 <- res
 res <- res[res$Data %in% "Survey",]
 res$varF <- c("Political Participation", "Political Discussions",
               "Gender Equity Index", "Feelings of Empowerment",
               "Social Norms")
 res[res$varF %in% "Political Discussions" | res$varF %in% "Social Norms",c("coef_sd", "ll_sd", "ul_sd")] <- res[res$varF %in% "Political Discussions" | res$varF %in% "Social Norms",c("coef_sd", "ll_sd", "ul_sd")] *-1
 
-res[res$varF %in% "Political Participation","ll_sd"] <- res[res$varF %in% "Political Participation","ll_sd"]+0.05
-res[res$varF %in% "Political Participation","ul_sd"] <- res[res$varF %in% "Political Participation","ul_sd"]-0.05
+res[res$varF %in% "Political Participation","ll_sd"] <- res[res$varF %in% "Political Participation","ll_sd"]+0.075
+res[res$varF %in% "Political Participation","ul_sd"] <- res[res$varF %in% "Political Participation","ul_sd"]-0.075
 
 res[res$varF %in% "Political Discussions","ll_sd"] <- res[res$varF %in% "Political Discussions","ll_sd"]-0.04
 #res[res$varF %in% "Political Discussions","ul_sd"] <- res[res$varF %in% "Political Discussions","ul_sd"]
@@ -171,21 +172,109 @@ res$varF <- factor(res$varF,
                            "Social Norms",
                            "Political Discussions")))
 
+# dropping some outcomes for simplicity
+res <- res[res$varF %in% c("Political Participation", 
+                           "Feelings of Empowerment",
+                           "Political Discussions"),]
+# name things more intuitively
+res$varF <- droplevels(res$varF)
+res$varF <- c("Political Participation", 
+              "Perceptions of norms",
+              "Political Discussions")
 
-ggplot(data = res, aes(x = varF, y = coef_sd)) +
+# smaller CIs
+res[res$varF %in% "Political Participation","ll_sd"] <- res[res$varF %in% "Political Participation","ll_sd"]+0.05
+res[res$varF %in% "Political Participation","ul_sd"] <- res[res$varF %in% "Political Participation","ul_sd"]-0.05
+
+res[res$varF %in% "Political Discussions","ll_sd"] <- res[res$varF %in% "Political Discussions","ll_sd"]+0.2
+res[res$varF %in% "Political Discussions","ul_sd"] <- res[res$varF %in% "Political Discussions","ul_sd"]-0.25
+
+res[res$varF %in% "Perceptions of norms","ll_sd"] <- res[res$varF %in% "Perceptions of norms","ll_sd"]-0.075
+res[res$varF %in% "Perceptions of norms","ul_sd"] <- res[res$varF %in% "Perceptions of norms","ul_sd"]+0.075
+
+
+ggplot(data = res, aes(x = varF, y = coef_sd, color=varF)) +
   geom_point()+
   geom_errorbar(aes(ymin = ll_sd, ymax = ul_sd), width = 0) +
   geom_hline(yintercept = 0, linetype = 2, color = "gray")+
+  annotate("text", y = 0, x = 3.4, label = "Reference:\nMales", size = 3, color = "gray3")+
   labs(y = "Effect Size & 95% CI", x = NULL)+
+  scale_y_continuous(limits=c(-1,1))+
+  scale_color_manual(values = c("Political Participation" = "#0085CA",
+                               "Political Discussions" = "black",
+                               "Perceptions of norms" = "red"), name = "")+
   theme_bw() +
   #theme(axis.text = element_text(size = 12))+
+  ggtitle("Male-Female Differences in Outcomes")+
   coord_flip()+
   theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank(),
+        legend.position = "none")
 
 ggsave("coef_example.png")
 
+
+#another example: many coefficients for one outcome
+res2 <- res1[res1$var %in% c("Self-reported Contact",
+                             "Public Goods Donation",
+                             "Public Goods Amount",
+                             "Contact Willingness",
+                             "Endorsement Experiment"),]
+res2$varF <- c("Education (high vs low)",
+               "Gender (male vs female)",
+               "Region (north vs south)",
+               "Income",
+               "Age")
+
+coef1 <- -.2363
+res2[res2$varF %in% "Region (north vs south)",c("coef_sd", "ll_sd","ul_sd")] <- c(coef1, coef1-0.25, coef1+0.25)
+rm(coef1)
+
+res2[res2$varF %in% "Income","ll_sd"] <- res2[res2$varF %in% "Income","ll_sd"]+0.2
+res2[res2$varF %in% "Income","ul_sd"] <- res2[res2$varF %in% "Income","ul_sd"]-0.25
+
+res2[res2$varF %in% "Age", "coef_sd"] <- res2[res2$varF %in% "Age", "coef_sd"] -0.03
+
+res2[res2$varF %in% "Gender (male vs female)", c("ll_sd", "ul_sd")] <- res2[res2$varF %in% "Gender (male vs female)", c("ll_sd", "ul_sd")] *0.6
+res2[res2$varF %in% "Gender (male vs female)", "coef_sd"] <- res2[res2$varF %in% "Gender (male vs female)", "coef_sd"] +0.15
+
+# add color
+res2$col <- ifelse(res2$ll_sd>0, "blue", 
+                   ifelse(res2$ul_sd<0, "red", "black"))
+
+ggplot(data = res2, aes(x = varF, y = coef_sd, color=col)) +
+  geom_point()+
+  geom_errorbar(aes(ymin = ll_sd, ymax = ul_sd), width = 0) +
+  geom_hline(yintercept = 0, linetype = 2, color = "gray")+
+  annotate("text", y = 0, x = 5.35, label = "0 = No Effect", size = 3, color = "gray3")+
+  labs(y = "Effect Size & 95% CI", x = NULL)+
+  scale_y_continuous(limits=c(-1.5,1.5))+
+  scale_color_manual(values = c("blue" = "#0085CA",
+                               "black" = "black",
+                               "red" = "red"), name = "")+
+  theme_bw() +
+  #theme(axis.text = element_text(size = 12))+
+  ggtitle("Predictors of political participation")+
+  coord_flip()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none")
+
+ggsave("coef_example2.png")
+
 ```
+
+make new coefplot: participation as outcome
+    - gender (male/female)
+    - education (high/low)
+    - region (north/south)
+    - age
+    - income
+    - caption: "Marginal effect on political participation"
+    - title: Predictors of political participation"
+    - make one with and without gender?
+
+
 
 3. Individual-level survey outcomes
 

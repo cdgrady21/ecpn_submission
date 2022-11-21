@@ -106,10 +106,9 @@ Estimation.
 
 We compare treated communities to control communities using a diffrence-in-differences framework.  At the time of writing the PAP, we only knew of the "change scores" strategy where the outcome of interest is the change from baseline to endline.  After writing the PAP, we learned the "controlling-for" method where the outcome of interest it the endline outcome and the equation controls for the baseline outcome.  The "controlling-for" method is more powerful than the "change scores" method and is unbiased when baseline outcomes are balanced.  We therefore use the "controlling-for" method when baseline outcomes are balanced and the "change scores" method when baseline outcomes are not balanced.^[We learned about this method thanks to DeclareDesign Blog: https://declaredesign.org/blog/use-change-scores-or-control-for-pre-treatment-outcomes-depends-on-the-true-data-generating-process.html]
 
-Were going to try controlling for individual-level covariates in community-level analysis.  Highly unorthodox, decided against doing so on the advice of colleagues.
+We were also going to try controlling for individual-level covariates in community-level analysis.  We planned to do so by (1) predicting individual-level outcomes with individual-level covariates and then (2) aggregating the residuals to create the community-level estimats.  This method would have been highly unorthodox and we decided against doing so on the advice of colleagues. It has been removed from the PAP; we may produce a methodological paper testing that method of aggregation.
 
-Were going to use ordered hypothesis testing.  Had incorrect understanding of ordered hypothesis testing.
-
+Our original PAP was also planning to use simultaneous hypothesis testing and ordered hypothesis testing.  However, our understanding of these testing procedurs was incorrect.  We will not be using them and have removed them from the PAP.
 
 ## Sections Amended
 
@@ -120,13 +119,59 @@ Research Design and Data Sources
 We made the decision to use the "controlling-for" method when baseline outcomes are balanced during endline data collection.  We made the decision to not attempt to control for individual-level characteristics during data analysis.  We made the decision to not use ordered hypothesis testing during data analysis.
 
 
+# Change 6: Behavioral observation data
+
+## Category
+
+Estimation/outcomes.
+
+## Description and Justification
+
+We collected more behavioral observation data than we anticipated.  Instead of collecting behavioral observation data only in treatment sites, we also collected it in control sites.  This allows us to compare behavioral changes in treatment sites to behavioral changes in control sites. We added a new estimation procedure for the behavioral observation data. These observations were also not as regular as we intended, which is now noted in the PAP.
+
+Our original PAP planned to observe project committee meetings.  We were not able to collect observation data at those meetings.  This revised PAP removes references to obsrvational monitoring of the meetings.
+
+## Sections Amended
+
+Research Design and Data Sources
+
+## Timeline of change
+
+We made the decision to gather observational data in control sites after baseline survey data collection.
+
+
+# Change 7: Survey data outcomes
+
+## Category
+
+Ooutcomes.
+
+## Description and Justification
+
+We initially listed survey data outcomes that were unrelated to our hypotheses (for example, survey questions about causal mechanisms, social cohesion/social norms, conflict history, and resource sharing).  We said we would combine many of these questions into indices and analyze the effect of ECPN on those outcomes.  We are no longer analyzing outcomes not directly related to our hypotheses; we now only list survey outcomes that relate to our hypotheses. The main change is that the attitudinal index now only contains questions directly related to attitudes towards the outgroup.
+
+<!--
+We also removed questions about "social cohesion" from the attitudes/affect index because colleagues pointed out that these questions measured _social norms_, not social cohesion.  All of these questions ask respondents how they think others in their group or the other group feel or would behave in hypothetical situation.  For example, one asks respondents to agree or disagree with the statement: "People in this area are willing to help their neighbors across ethnic and religious lines".  Another asks "If there was a water supply problem in this community, how likely is it that people from your group and people from [*X group*] would cooperate to try to solve the problem?"  We agree that these questions are measuring an individual's perception of social norms, not an individual's attitudes.
+-->
+
+In our original PAP, after listing the survey outcomes, we noted that "Some of these concepts are exploratory for the ECPN impact evaluation" and that we did not have hypotheses for those outcomes.  We have no removed that because we no longer list the exploratory outcomes in the PAP.
+
+Our original PAP included a list experiment, but the list experiment failed -- the control list had higher scores than the treatment list in most communities, indicating that the difference between the treatment list and control list was not the percentage of people who agreed with the treatment item.  We therefore exclude the list experiment from our revised PAP's outcomes.  We instead footnote that we conducted a failed list experiment.
+
+## Sections Amended
+
+Research Design and Data Sources
+
+## Timeline of change
+
+We made the decision to only analyze outcomes directly related to our hypotheses after data analysis (these outcomes were included in a report to the NGO that implemented ECPN).
+
+We made the decision to exclude the list experiment after data analysis.
 
 ***************
 
 
 ## Changes
-
-We also removed questions about "social cohesion" from the attitudes/affect index because colleagues pointed out that these questions measured _social norms_, not social cohesion.  All of these questions ask respondents how they think others in their group or the other group feel or would behave in hypothetical situation.  For example, one asks respondents to agree or disagree with the statement: "People in this area are willing to help their neighbors across ethnic and religious lines".  Another asks "If there was a water supply problem in this community, how likely is it that people from your group and people from [*X group*] would cooperate to try to solve the problem?"  We agree that these questions are measuring an individual's perception of social norms, not an individual's attitudes.
 
 
 **Percent Experiment**
@@ -134,8 +179,3 @@ We also removed questions about "social cohesion" from the attitudes/affect inde
 As our outcome, we would normally use the relationship between more outgroup members (5%-75%) and joining the group.  The prediction would be that the percentage of outgroup members has less of an effect after the intervention.  However, that analysis assumes that 5% functions as a baseline for how likely an individual is to join a group with a very small % of outgroup members.  We do not expect that baseline to change.
 
 In our paper, the 5% condition had a low "yes" rate because respondents didn't want to join a group with _any_ outgroup members.  Joining in the 5% condition was correlated with outgroup attitudes.  The assumption that the 5% condition is an inoccuous baseline was violated.  We thus assessed whether the intervention increased respondents' "yes" rate at any % of the outgroup, rather than the difference in "yes" rate as the % of the outgroup increased.
-
-
-# Mechanisms
-
-Completely removed these and are planning another paper to assess mechanisms.  We plan to look at social norms, individual interaction, threat, empathy, and perceptions of benefit from group coordination.
