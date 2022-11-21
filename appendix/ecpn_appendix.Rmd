@@ -74,6 +74,16 @@ load("paper1_files/mech_ind_tab.Rdata")
 \end{table}
 
 
+## Appendix X: Individual-level analysis
+
+```{r}
+load("../b_creating_outcomes/f2-panelData.Rdata")
+table(panel.df$community, panel.df$committee, panel.df$treatment)
+
+```
+
+We approximately 300 baseline respondents, roughly evenly spread throughout all communities (between 8 and 15 respondents per community). Participants are clustered in certain communities where they could more easily be identified during our endline survey.
+
 ## Appendix D: Survey Questions
 
 **Outgroup Affect**
@@ -130,36 +140,6 @@ load("paper1_files/mech_ind_tab.Rdata")
     - Defend one's religion
     - Bring criminals to justice
     - Force the government to change their policies
-
-
-**Threat**
-
-- Please tell me how strongly you agree/disagree with each of the following statements:
-    - You see X group as a threat to your community
-    - You think X group have too much influence on your community
-    - You think that people from X group have different morals than people from your group
-
-**Empathy and Perspective Taking**
-
-- Suppose something unfortunate happened to someone from X group in this community, such as a serious illness or the death of a parent. How likely is it that some people in the community from your group would get together to help them?
-- Suppose something unfortunate happened to someone from your group in this community, such as a serious illness or the death of a parent. How likely is it that some people in the community from X group would get together to help them?
-
-\smallskip
-
-- Some people say [X GROUP] is responsible for most of the violence in this community, while others say that both groups are responsible for the violence here.  Which is closer to your view?
-
-**Ingroup Expansion**
-
-- Now I’m going to ask you questions about your community here in Benue/Nassarawa, including X group. Please answer honestly and remember that your responses will remain confidential.  Please tell me how strongly you agree/disagree with each of the following statements:
-    - People in this area are willing to help their neighbors across ethnic and religious lines
-    - People in this area can be trusted
-    - People in this area generally do not get along together
-    - People in this area do not share the same morals
-    - People in this area see the benefits of working together to achieve common goals
-    - What proportion of your group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
-    - What proportion of X group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
-    - If there was a water supply problem in this community, how likely is it that people from your group and people from X group would cooperate to try to solve the problem?
-
 
 **Public Goods Game**
 

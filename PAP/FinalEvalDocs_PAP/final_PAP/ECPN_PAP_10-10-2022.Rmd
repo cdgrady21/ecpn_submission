@@ -3,8 +3,8 @@ title: "ECPN Final Evaluation PAP"
 author: 'Christopher Grady, Rebecca Wolfe, Dawop Saidu'
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
 bibliography: ../../../../GradSchool/Dissertation/Writing/utils/cdg_references.bib
 ---
 
@@ -70,11 +70,13 @@ ECPN may also work through two psychological intervening variables: decreased ou
 These four mechanisms are not mutually exclusive, but they are distinct.  For example, the "structured contact" mechanism may work through other psychological attitudes: an individual may find the other group less threatening after structured contact.  But contact may also work through updating attitudes about the outgroup in ways we have not measured, and the psychological mechanisms -- decreased perceptions of threat and increased perceptions of benefit -- could function without an increase in contact.  Structured contact within ECPN may also lead to more unstructured contact outside of ECPN -- our second mechanism -- but structured intergroup contact within ECPN might affect attitudes even it did not increase interaction in other contexts, and unstructured contact can increase for people with no direct involvement in ECPN.
 -->
 
-# Overall Design of Final Evaluation
+# Overall Evaluation Design
 
-We evaluate the effects of ECPN with a combination of a RCT at the community level and pre-post test analysis of individuals without random assignment.  Initially the plan was to randomize at both the community and individual level as follows: (1) Communities are randomly selected to be "treated" with the ECPN program or remain "control" communities, and then (2) community members within treated communities are randomly selected to participate in the ECPN activities.  Among participants selected to participate in ECPN programs, some people participate "fully" in every ECPN activity and others participate "partially" in just one ECPN activity.  This would yield four experimental groups: (1) full participants in treated communities, (2) partial participants in treated communities, (3) non-participants in treated communities, and (4) non-participants in control communities.
+We evaluate the effects of ECPN with a combination of a RCT at the community level and pre-post test analysis of individuals without random assignment.  Initially the plan was to randomize at both the community and individual level as follows: (1) Communities are randomly selected to be "treated" with the ECPN program or remain "control" communities, and then (2) community members within treated communities are randomly selected to participate in the ECPN activities.[^genderBlocks]  Among participants selected to participate in ECPN programs, some people participate "fully" in every ECPN activity and others participate "partially" in just one ECPN activity.  This would yield four experimental groups: (1) full participants in treated communities, (2) partial participants in treated communities, (3) non-participants in treated communities, and (4) non-participants in control communities.
 
-However, due to the low individual-level compliance among those randomly selected to participate, we modified our study design.^[Lack of compliance was mainly our inability to locate these respondents at the time the joint project committees were being formed, not participants actively refusing to participate. Some of these “passive non-compliers” were located before the endline survey with the assistance of the communities themselves.  Some people not assigned to participate in ECPN activities also participated, so the non-compliance is two-sided.]  We now have (1) a community-level RCT and (2) a pre-post analysis of individuals we surveyed at baseline and endline.  We use the community-level RCT as our main analysis.
+[^genderBlocks]: Because we desired gender equity in group assignment, we blocked each community into males and females and randomly assigned to experimental groups such that each community had about 10 males and 10 females assigned to be full participants, 8 males and 8 females assigned to be partial participants, and the rest assigned to be non-participants.
+
+However, due to the low individual-level compliance among those randomly selected to participate (approximately 20% of those selected to participate actually did participate), we modified our study design.^[Lack of compliance was mainly our inability to locate these respondents at the time the joint project committees were being formed, not participants actively refusing to participate. Some of these “passive non-compliers” were located before the endline survey with the assistance of the communities themselves.  Some people not assigned to participate in ECPN activities also participated in the committees, so the non-compliance is two-sided.]  We now have (1) a community-level RCT and (2) a pre-post analysis of individuals we surveyed at baseline and endline.  We use the community-level RCT as our main analysis.
 
 **Community-level RCT**
 
@@ -86,9 +88,9 @@ The community-level RCT tells us about community-level change due to ECPN.  Sinc
 
 In the individual-level pre-post analysis, we will resurvey about 100 individuals who participated in the joint project committees, about 100 individuals from treated communities who did not participate in joint project committees, and about 100 individuals in control sites.  Henceforth we will refer to those people who participated as “participants”, those people who did not as “non-participants”, and those people in control communities as “control.”  We will compare these groups with a difference-in-differences frameworks.
 
-The individual-level study has three analyses.  The first analysis, comparing the baseline-endline change of the participants to the baseline-endline change of the control, tells us how participation in joint project committees with ingroup and outgroup members changed the individuals who participated.  The second analysis, comparing the baseline-endline change of non-participants to the baseline-endline change of the control, tells us about the social diffusion of the effects of ECPN to community members who did not directly participate in joint project committees.  The third analysis, comparing the baseline-endline change of participants to the baseline-endline change of non-participants, tell us if the participants changed more than the non-participants.
+The individual-level analysis makes two comparisons.  The first comparison, comparing the baseline-endline change of the participants to the baseline-endline change of the control, tells us how participation in joint project committees with ingroup and outgroup members changed the individuals who participated.  The second comparison, comparing the baseline-endline change of non-participants to the baseline-endline change of the control, tells us about the social diffusion of the effects of ECPN to community members who did not directly participate in joint project committees.^[We can also make a third comparison, comparing the baseline-endline change of participants to the baseline-endline change of non-participants, to tell us if the participants changed more than the non-participants. We do not plan for this to be one of our major comparisons.  And we do not plan to make a fourth comparison: all treated individuals baseline to endline change to all control individuals  baseline to endline change, pooled.]
 
-In the individual-level analyses, individuals are in randomly assigned communities but are not themselves randomly assigned.  As a counterfactual for the amount of change we would expect in a world where the participants were not treated with ECPN and the non-participants were not in close contact with people treated with ECPN, we will use the average change from baseline to endline of individuals in control communities from the same state as the treatment communities.  The average change of people in these control communities may not be a perfect counterfactual for how these individuals in the treatment communities would have changed absent ECPN.  Though these groups were initially randomly selected, we are only resurveying the ~20% of each group’s baseline respondents who we can locate and identify.  The 20% of participants and 20% of nonparticipants we resurvey could be different types than the 20% of control participants we resurvey.  To lend credibility to the claim that participants and nonparticipants in the ECPN communities are not “different types” than control group respondents (i.e. that respondents in control communities function as a counterfactual for respondents in treatment communities), we will (1) compare demographic balance of the participants, non-participants, and controls, and (2) provide evidence for parallel trends by conducting a placebo test on outcomes we do not expect ECPN to change.
+The average change of respondents in control communities may not be a perfect counterfactual for how respondents in the treatment communities would have changed absent ECPN.  Though respondents from these communities were randomly selected at baseline, we are only resurveying the ~20% of each community’s baseline respondents.  The 20% of participants and nonparticipants we resurvey could be different types than the 20% of control participants we resurvey.  To lend credibility to the claim that participants and nonparticipants in the ECPN communities are not “different types” than control group respondents (i.e. that respondents in control communities function as a counterfactual for respondents in treatment communities), we will (1) compare demographic balance of the participants, non-participants, and controls, and (2) provide evidence for parallel trends by conducting a placebo test on outcomes we do not expect ECPN to change.
 
 # Research Design and Data Sources
 
@@ -108,23 +110,27 @@ We will survey two groups during enumeration.  First, we survey respondents iden
 
 In some communities the households were too few and far apart to map 50 in each direction.^[This was frequently the case for pastoralist settlements.]  In this case, the enumerators created a map with the assistance of the community leaders and then walked to as many households as they could reach in ~30 minutes.  They then randomly selected households from that list of "reachable" households.  The within-household randomization remained the same.
 
-At endline, we will use a similar method to randomly select participants. We will sample 50 people per community with this method.
+At endline, we will use the same method to randomly select participants. We will sample 50 people per community with this method.
 
-**Individual-level sampling**: At baseline, we randomly assigned people to engage in the joint committees. Because we desired gender equity in group assignment, we blocked each community into males and females and randomly assigned to experimental groups such that each community had about 10 males and 10 females assigned to be full participants,^[In some communities, there were not enough women sampled to assign 10 women to be full participants.  In these places we increased the number of men from the community assigned to the full participants group so that each side (farmers and pastoralists) had twenty members randomly assigned to be full participants.] 8 males and 8 females assigned to be partial participants, and the rest assigned to be non-participants.
+**Individual-level sampling**: 
 
-However only approximately 20% of those selected to participate actually did participate.  This was not due to refusal by the respondent (typical non-compliance), but rather because we could not locate the respondents when the teams went to the communities to establish the ECPN committees.   In addition to that 20% of participants, we have now identified more respondents from baseline, for a total of approximately 300 respondents.^[These respondents are clustered in certain communities where the team could more easily identify baseline respondents]  We will attempt to identify more of these respondents when we visit the communities and will aim to survey about ten baseline respondents in each community, for approximately 300 baseline respondents evenly distributed in each community.  This gives us individual-level baseline and endline data to use in the individual-level analyses we describe above in the “Analysis -- Individual Level Panel Data” section.
+We will attempt to identify more of these respondents when we visit the communities and will aim to survey about ten baseline respondents in each community, for approximately 300 baseline respondents evenly distributed in each community.  This gives us individual-level baseline and endline data to use in the individual-level analyses we describe above in the “Estimation -- Individual Level Panel Data” section [Individual-level analysis section](#est_ind).
+
+At baseline respondents were randomly sampled from communities and about 20% of those respondents will be surveyed again at endline.^[Due to resource constraints, we and the field team have only attempted to locate and identify respondents assigned to the full or partial participant group in our original study design, and respondents in control communities.]  These 300 contain respondents in control communities, respondents who were assigned to participate in ECPN committees and did, and respondents who were assigned to participate in ECPN committees but were not located in time to include them on committees.  The data for these respondents is constructed in the same way as the data for people randomly selected at endline (i.e. we will construct the same indices in the same way).
 
 
-## Outcomes
+## Data and Outcomes
 
 We will collect survey data, behavioral observation data, and behavioral game data.  We will collect survey data at two time points (baseline and endline).  We will collect behavioral observation data at multiple time points between baseline and endline. We will collect collect behavioral game data at one time point (endline only).
-
-  Observational monitoring quantifies qualitative evidence regarding interaction between farmers and pastoralists in these communities.  And the public goods game offers a behavioral measure of cooperation between farmers and pastoralists.
-
+<!--
+Observational monitoring quantifies qualitative evidence regarding interaction between farmers and pastoralists in these communities.  And the public goods game offers a behavioral measure of cooperation between farmers and pastoralists.
+-->
 
 ### Survey Data
 
-We conduct a baseline survey and an endline survey. We measured several outcomes related to our hypotheses.  Our main survey outcomes are attitudes towards the farmer/pastoralist outgroup (Hypothesis 1), self-reported interaction with the outgroup (Hypothesis 2), and perceptions of security (Hypothesis 3). Each of these outcomes is measured through multiple survey questions asked at baseline and endline.  We will combine these survey questions into indices that summarize a respondent's attitude about each topic of interest.  To construct the index for each measured concept we will use inverse covariance weighting.[^ICW] Specific questions for these topics can be found in the [Question Appendix](#questions).  
+We conduct a baseline survey and an endline survey. The data for the community-level analysis comes from aggregating together the survey responses from ~50 randomly selected respondents in each community (~1500 total survey respondents in 30 communities). Each community's value will be the arithmetic mean of all the randomly-selected respondents in that community.
+
+We measured several outcomes related to our hypotheses.  Our main survey outcomes are attitudes towards the farmer/pastoralist outgroup (Hypothesis 1), self-reported interaction with the outgroup (Hypothesis 2), and perceptions of security (Hypothesis 3). Each of these outcomes is measured through multiple survey questions asked at baseline and endline.  We will combine these survey questions into indices for measurement precision.  To construct the index for each measured concept we will use inverse covariance weighting.[^ICW] Specific questions for these topics can be found in the [Question Appendix](#questions).
 
 [^ICW]: Inverse covariance weighting upweights questions that are less correlated with other questions of the index and downweights questions that are highly correlated.  Compared with other ways of constructing indices, it should maximize precision if all index questions measure the same concept but reduce precision if a question used to create the index is unrelated to the underlying concept.]
 
@@ -141,15 +147,17 @@ We monitor market and social behavior in the communities under study.  We want t
 <!-- [This didn't happen.]
 We also monitor meetings of our project committees in treatment sites.  We want to know if these farmer-pastoralist meetings become more collaborative over time and if women are more involved in the decision-making process over time.  We measure: (1) the number of farmer and pastoralist men and women in attendance, (2) the number of times each group speaks, separating males and females, (3) any disagreements/issues discussed in the meetings, (4) if those issues were resolved, and (5) how those issues were resolved.
 -->
-These data attempt to quantify qualitative information; they are difficult to collect and will likely to be noisy measures.  But they are extremely valuable for documenting changes in how ECPN participants _interact_, which we may miss in survey responses.^[Several studies, including @Scacco2016 and @paluck2009jsp demonstrate that intergroup contact programs can affect behavior without necessarily affecting attitudes.]  We expect ECPN participants to interact more with their farmer/pastoralist outgroup than non-ECPN participants.  <!--We also expect more equal participation in meetings and more issues resolved successfully over time.-->
+These data quantify qualitative information; they are difficult to collect and will likely to be noisy measures.  But they are extremely valuable for documenting changes in how ECPN participants _interact_, which we may miss in survey responses.^[Several studies, including @Scacco2016 and @paluck2009jsp demonstrate that intergroup contact programs can affect behavior without necessarily affecting attitudes.]  We expect ECPN participants to interact more with their farmer/pastoralist outgroup than non-ECPN participants.  <!--We also expect more equal participation in meetings and more issues resolved successfully over time.-->
 
 The behavioral monitoring will produce panel data: each site has some data points from the beginning of the project and some from the end of the project.^[Due to funding issues, there was no monitoring in the middle of the project.]
 
 ### Behavioral Game Data
 
-We use the natural-field public goods "game" to measure intergroup cooperation.^[We also believe this game could measure intergroup trust, since participants with more trust that their outgroup will donate to the community fund should donate more than participants who do not trust their outgroup to donate to the community fund.  It is weaker as a measure of trust than as a measure of cooperation, and a trust game would more explicitly measure intergroup trust.]  Our game is similar in form to the game implemented in @fearon2009can.  In the “game”, we observe participants’ contributions to a community fund that will be used to fund a development project that benefits them *and* their paired conflict community.  Participants are told that any contribution they make to the community fund will be matched, so that their giving 100 Naira to the community fund becomes 300 Naira for the community fund.  The socially desirable behavior -- contributing to a community fund -- is costly, but it generates more overall money than the selfish behavior.  Thus, participants must make a difficult trade-off between their own interests and the interests of the broader community.  In this case, that broader community contains both members of their ingroup and members of the outgroup they are or were in conflict with.  
+We use the natural-field public goods "game" to measure intergroup cooperation (Hypothesis 4).^[We also believe this game could measure intergroup trust, since participants with more trust that their outgroup will donate to the community fund should donate more than participants who do not trust their outgroup to donate to the community fund.  It is weaker as a measure of trust than as a measure of cooperation, and a trust game would more explicitly measure intergroup trust.]  Our game is similar in form to the game implemented in @fearon2009can.  In the “game”, we observe participants’ contributions to a community fund that will be used to fund a development project that benefits them *and* their paired conflict community.  Participants are told that any contribution they make to the community fund will be matched, so that their giving 100 Naira to the community fund becomes 300 Naira for the community fund.  The socially desirable behavior -- contributing to a community fund -- is costly, but it generates more overall money than the selfish behavior.  Thus, participants must make a difficult trade-off between their own interests and the interests of the broader community.  In this case, that broader community contains both members of their ingroup and members of the outgroup they are or were in conflict with.  
 
-This game was conducted at endline only.  We expect (1) people in treated communities are more likely to contribute to the community fund and (2) people in treated communities contribute more money to the community fund than people in control communities.  More details of the behavioral game are in the appendix [@behGame].
+This game was conducted at endline only.  This will make it difficult to interpret that measure, as we won’t know if differences in the level of cooperation are due to (1) the people who participated were more cooperative types, or (2) the engagement in project committees and learning how to work with the outgroup made the more cooperative.
+
+For outcomes, we expect (1) people in treated communities are more likely to contribute to the community fund and (2) people in treated communities contribute more money to the community fund than people in control communities.  More details of the behavioral game are in the appendix [@behGame].
 
 ## Estimation -- Community Level RCT
 
@@ -163,9 +171,7 @@ We will use following linear model and ordinary least squares (OLS) to estimate 
 
 $$ Y_{i,j} = \beta_0 + \beta_1 Z_{i,j} + X_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate1}
 
-where $i$ is the community in state $j$, $Z$ is the treatment indicator, and $Y$ is the outcome at endline.  $X$ is the baseline outcome for community $i$ and $D$ is a state fixed effect. If baseline outcomes are not balanced, we will use the change score, $Y_i = Y_{i,endline} - Y_{i,baseline}$ and we will not use $X$. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle sites within states.
-
-The data for the community-level analysis comes from aggregating together the survey responses from ~50 randomly selected respondents in each community (~1500 total survey respondents in 30 communities).  The survey responses will be made into individual-level indices to increase measurement precision.  To construct the index for each concept we will use inverse covariance weighting. Each community's value will be the arithmetic mean of all the randomly-selected respondents in that community.
+where $i$ is the community in state $j$, $Z$ is the treatment indicator, and $Y$ is the outcome at endline.  $X$ is the baseline outcome for community $i$ and $D$ is a state fixed effect. If baseline outcomes are not balanced, we will use the change score, $Y_i = Y_{i,endline} - Y_{i,baseline}$ and we will not use $X$. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
 
 <!--
 An alternative analysis strategy would be to more directly account for community-level uncertainty around the community mean.  This could be done by bootstrapping within communities to obtain community-level confidence intervals and then conducting permutation tests across villages. Since we have individual-level data and covariates, we could also produce outcomes that control for individual-level noise through covariance adjustment [@rosenbaum2002covariance].  Treatment at the community level is assigned randomly, so in expectation covariance adjustment will not affect the relationship between treatment and outcomes, but it could reduce the error around the outcome and increase statistical power. We will not use these strategies in this paper but may produce methods paper testing these strategies.-->
@@ -179,7 +185,7 @@ We will use following linear model and ordinary least squares (OLS) to estimate 
 
 $$ Y_{i,j,k} = \beta_0 + \beta_1 Z_{i,j,k} * \beta_2 T_{i,j,k} + X_{j} + D_{k} + \epsilon_{i,j, k} $${#eq:ate2}
 
-where $i$ is the observation in site $j$ and state $k$, $Z$ is the treatment indicator, $T$ is timepoint, and $Y$ is the outcome.  $X$ is the site fixed effect and $D$ is a state fixed effect. For standard errors we will bootstrap observations within sites; for $p$-values we will use randomization inference to shuffle observations within sites.
+where $i$ is the observation in site $j$ and state $k$, $Z$ is the treatment indicator, $T$ is timepoint, and $Y$ is the outcome.  $X$ is the site fixed effect and $D$ is a state fixed effect.  We are interested in the interaction between treatment and time (did outcomes improve more in treatment sites than control sites). For standard errors we will bootstrap observations within sites; for $p$-values we will use randomization inference to shuffle treatment to observations within sites.
 
 The behavioral observations are panel data: each site has some data points from the beginning of the project and some from the end of the project.^[Due to funding issues, there was no monitoring in the middle of the project.]  We treat data points from the beginning of the project as 0 (baseline) and data from the end of the project as 1 (endline).^[We do not average all baseline and endline together to create one observation per site because that dismisses the information gained from multiple baseline and endline data points.]
 
@@ -189,27 +195,45 @@ We will use following linear model and ordinary least squares (OLS) to estimate 
 
 $$ Y_{i,j} = \beta_0 + \beta_1 Z_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate3}
 
-where $i$ is the community in state $j$, $Z$ is the treatment indicator, $Y$ is the outcome at endline, and $D$ is a state fixed effect. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle sites within states.
+where $i$ is the community in state $j$, $Z$ is the treatment indicator, $Y$ is the outcome at endline, and $D$ is a state fixed effect. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
 
-The behavioral game was conducted only at endline, so this equation compares treatment to control at endline only.
+## Estimation -- Individual Level Panel Data {#est_ind}
 
-## Estimation -- Individual Level Panel Data
+**Survey Data Analysis**
 
-The data for our individual-level analyses comes from surveying the same ~300 respondents at baseline and endline.  At baseline respondents were randomly sampled from communities and about 20% of those respondents will be surveyed again at endline.^[Due to resource constraints, we and the field team have only attempted to locate and identify respondents assigned to the full or partial participant group in our original study design, and respondents in control communities.]  These 300 contain respondents in control communities, respondents who were assigned to participate in ECPN committees and did, and respondents who were assigned to participate in ECPN committees but were not located in time to include them on committees.  The data for these respondents is constructed in the same way as the data for people randomly selected at endline (i.e. we will construct the same indices in the same way).
+The data for our individual-level analyses comes from surveying the same ~300 respondents at baseline and endline. With these data, we will make two main comparisons: (1) participants compared to controls and (2) non-participants compared to controls.  We can also make a third comparison -- participants compared to non-participants -- but we do not plan for that to be part of our main analysis.
 
-With these data, we will make three comparisons: (1) participants compared to controls, (2) non-participants compared to controls, and (3) participants compared to non-participants.  We can also compare all individuals from the baseline in treated communities to all individuals from the baseline in control communities.
+We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-Our primary interest is the average amount of change in outcome indices from baseline to endline in each of the treatment groups.  The average amount of change in the participants group relative to controls represents the effect of participating in ECPN, and the average amount of change in the non-participants group relative to controls represents the effect of ECPN on people in the community who did not participate directly in ECPN.  Instead of covariates to absorb error, individual-level error should be minimized by analyzing the _change_ from baseline to endline.  Since we are only looking at an effect within individuals, characteristics of those individuals are controlled for.  As with the community-level study, we plan to use one-tailed tests with the individual-level studies because we only predict that our intervention will improve attitudes and behaviors.
+$$ Y_{i,j} = \beta_0 + \beta_1 P_{i,j} + \beta_2 N_{i,j} + X_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate1}
 
+where $i$ is the community in state $j$, $P$ is the Participant indicator, $N$ is the Nonparticipant indicator, and $Y$ is the outcome at endline.  $X$ is the baseline outcome for community $i$ and $D$ is a state fixed effect. If baseline outcomes are not balanced, we will use the change score, $Y_i = Y_{i,endline} - Y_{i,baseline}$ and we will not use $X$. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
+
+<!--This does not belong here and is redundant with earlier paragraphs.
+Our primary interest is the average amount of change in outcome indices from baseline to endline in each of the treatment groups.  The average amount of change in the participants group relative to controls represents the effect of participating in ECPN, and the average amount of change in the non-participants group relative to controls represents the effect of ECPN on people in the community who did not participate directly in ECPN.  Instead of covariates to absorb error, individual-level error should be minimized by analyzing the _change_ from baseline to endline.  Since we are only looking at an effect within individuals, characteristics of those individuals are controlled for.
+-->
+<!--We do not use ordered hypothesis testing.
 We hypothesize that the participants will display greater attitude change than the nonparticipants, and that the nonparticipants will display greater attitude change than the control group.  We can leverage our expectations about this order of effects using Ordered Hypothesis Testing [@rosenbaum2008order].  With ordered hypothesis testing we gain power by formalizing our belief that that some coefficients will be larger than others.  The probability of seeing multiple coefficients in a specific order through random chance is lower than the probability of seeing multiple coefficients in any order; thus we gain statistical power if our hypotheses are in the order we expect.  In this case, we expect the coefficient describing the participant-control comparison to be larger than the coefficient describing the nonparticipant-control comparison, and we expect the coefficient describing the nonparticipant-control comparison to be larger than zero.
-  
-While we have baseline and endline data for our attitudinal and self-report measures, we do not have baseline data for our behavioral measure, the Public Goods game. This will make it difficult to interpret that measure, as we won’t know if differences in the level of cooperation is due to that the people who participated were more cooperative types, and therefore that’s why they agreed to participate, rather than the engagement in project committees and learning how to work with the outgroup made the more cooperative. However, by looking at this measure in parallel with the other measures, if we see similar trends, we can intuit that the program may have contributed to more cooperative behavior, though any findings will be inconclusive. 
+-->
 
-### Participant vs. Control Differences and Differences
+**Behavioral Game Data Analysis**
 
-We are interested in the amount of change in the participants group that is attributable to ECPN.  The primary issue with an endline-baseline comparison of participants is that we do not know how these individuals would have changed over time in the absence of ECPN.  That analysis assumes no systematic changes from baseline-endline except for ECPN (i.e. that we would detect no group-level differences from baseline to endline if we had not conducted ECPN).  This may be a faulty assumption.  To establish what the participant group’s over-time trend would have been without ECPN, we should compare the change we see in the participants group to the change in a group that is similar except that they were not exposed to ECPN.  We have two strategies for establishing a trend: (1) the average change of respondents in control communities and (2) a synthetic control of respondents from control communities.^[We do not believe we have enough pre-treatment data for a synthetic control.]
+We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-We can compare the change in individuals from the treatment group with the average change in individuals from the control group _if_ the average change in control group is the average change we’d expect in these treatment groups in a world where the treatment group did not receive treatment.  Since the baseline sampling strategy for each group was the same (random selection) but groups have attrition such that only 20% participated and are re-contacted at endline, we cannot assume parallel trends.  We can show evidence for parallel trends in two ways: (1) a placebo test in which we establish parallel trends on an outcome not predicted to change through ECPN, and/or (2) establish that attrition was random and so the recontacted group members are as good as randomly selected.
+$$ Y_{i,j} = \beta_0 + \beta_1 P_{i,j} + \beta_2 N_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate3}
+
+where $i$ is the community in state $j$, $P$ is the Participant indicator, $N$ is the Nonparticipant indicator, $Y$ is the outcome at endline, and $D$ is a state fixed effect. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
+
+The behavioral game was conducted only at endline, so this equation is endline only.
+
+**Behavioral Observation Data Analysis**
+
+There is no behavioral observation data at the individual-level, only at the site-level.
+
+<!--This whole section is redundant with "**Individual-level pre-post analysis**" in Overall Evaluation Design.
+### Participant & Nonparticipant vs. Control Differences
+
+We are interested in the amount of change in the participants and nonparticipants that is attributable to ECPN.  To establish what the participants and nonparticipants over-time trend would have been without ECPN, we should compare their change to the change in the control group. For that analysis, the groups should have parallel trends in the absence of ECPN.  Since only 20% of baseline respondents in each community are re-contacted at endline, we cannot assume parallel trends -- the type of respondent recontacted in treatment communities could be different than the type recontacted in control communities.  We can show evidence for parallel trends in two ways: (1) a placebo test in which we establish parallel trends on an outcome not predicted to change through ECPN, and/or (2) establish that attrition was random and so the recontacted group members are as good as randomly selected.
 
 A placebo test requires us to have baseline and endline data for an outcome or outcomes that should not be affected by ECPN but that represents how ECPN outcomes would have changed in the absence of ECPN.  Our primary candidates for this are questions about the acceptability of violence and questions about radio listening frequency.  To establish parallel trends on this outcome, we would need to see a non-significant interaction coefficient in the following linear model:
 
@@ -221,13 +245,15 @@ Another way to establish parallel trends is to confirm that attrition from our o
 
 The other strategy is the construct a synthetic control group to simulate what would have happened with the treatment groups in the absence of ECPN.  This would be similar to the method described in @xu2017generalized article entitled "Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.”  In the synthetic control method, often described as a difference-in-differences design plus matching, the treatment group is compared to a weighted average of control group observations.  Due to limited pre-treatment data, we may not have enough data to establish a synthetic control.
 
-### Non-Participant vs. Control Difference-in-Differences
+**Non-Participant vs. Control Difference-in-Differences**
 
-We are also interested in the amount of change in the non-participants group that is attributable to ECPN exposure.  This analysis, and the tests to establish parallel trends between the non-participants and the control group, are identical to the analysis and tests described for the participant vs. control comparison.  If we find evidence for parallel trends in our placebo test and attrition analysis, we will use the control group as a counterfactual for the amount of change we’d expect in non-participants if non-participants were not exposed to ECPN.
-
+If we find evidence for parallel trends in our placebo test and attrition analysis, we will use the control group as a counterfactual for the amount of change we’d expect in non-participants if non-participants were not exposed to ECPN.
+-->
+<!--
 ### Participant vs. Non-participant Heterogeneity
 
 The third analysis in Study 2 tells us if participants in treated communities changed more than non-participants in treated communities; if there was a benefit to their participation in ECPN committees.  To answer this question we compare participants-nonparticipants using the difference-in-differences design described to compare participants-controls and nonparticipants-controls.  If we find evidence that respondents who did not participate in ECPN projects because we could not locate them are a good counterfactual for respondents who did participate in ECPN projects, then we can treat participants who did not participate as the “baseline change” group in a within-community difference-in-differences design.  We would interact “Year” with “Group” with a blocking variable for “Community” to obtain one coefficient estimate per group for the baseline-endline change.  This difference can be causally attribute to participation in ECPN committee if these two groups would have changed at the same rate without one having participated in ECPN committees.  Without this parallel trends assumption, we can still describe the difference in the amount of change between groups, but we cannot say definitively that the difference is due to participation in ECPN.
+-->
 
 ## Inference Criteria
 
@@ -235,12 +261,7 @@ We hypotheses that the program will _improve_ outcomes (rather than _change_ out
 
 We have no reason a priori to change the $\alpha$ level of our testing procedures compared to other studies, so we maintain the common standard of $\alpha=.05$.
 
-
-*********************
-
-chris: here
-
-
+<!--
 ## Analytical Strategy: Combining Outcomes and Ordering Hypothesis Tests
 
 We will use three analytic strategies to increase statistical power in our studies.  The first technique is testing multiple hypotheses simultaneously, described in @Caughey2017npc.  We predict that ECPN changes multiple outcomes: survey responses on multiple attitude dimensions and donations in the public goods game.  Since our prediction is about this _collection_ of attitudes and behaviors we should test the hypothesis that ECPN affected _all_ of them against the null hypothesis that ECPN did not affect _any_ of them.  This comparison should increase our statistical power -- even if we observe only small changes on all these outcomes, the probability of observing _multiple_ small changes due to random noise is much lower than the probability of observing _one_ small change due to random noise.  If we observe an overall change, we can then look within this global collection of outcomes to assess which outcomes are driving this overall change.
@@ -248,10 +269,10 @@ We will use three analytic strategies to increase statistical power in our studi
 We can further increase our power by testing hypotheses in order.  In the same way that randomly observing multiple outcomes correlated with treatment is less likely than randomly observing one outcome correlated with treatment, predicting and observing some outcomes more strongly correlated with treatment than others increases power relative to predicting all outcomes equally correlated with treatment.  To the extent that we believe ECPN will more strongly affect certain outcomes than others, we can gain power by testing hypotheses about outcomes in an ordered fashion.
 
 We can also increase power by combining the result of multiple studies in the same way that we combine the results of multiple outcomes.  We predict that ECPN will affect outcomes (1) at the community-level, (2) among participants in ECPN committees, and (3) among non-participants in treated villages.  We are less likely to randomly observe small $p$-values in multiple analyses about the same intervention than to randomly observe small $p$-values in one analysis about an intervention.  To leverage the $p$-values we have from multiple analyses, we will first record and combine the $p$-values from each of the three analyses described above (community-level, participants, and nonparticipants).  We will then simulate the possible results we could have observed in each of those studies if there was no effect.  To simulate these studies with no effect, we break the relationship between treatment and outcomes by shuffling the treatment indicator (for the community-level study) or the outcome scores (for the individual-level studies).  We then have the distribution of $p$-values we would see if ECPN had no effect in each study.  Our outcome of interest is the proportion of this “no effect distribution” that is smaller than our observed group of $p$-values.^[The combined $p$-values could be weighted if we believe some analyses provide more information than other analyses.  After consulting with other methodologists we may want to weigh the community-level analysis, though at the current time we do not have plans to weight any of the analyses.]
-
+-->
 # Conclusion
 
-This document summarizes our research designs and analytic strategies for assessing the impact of Mercy Corps' program _Engaging Communities for Peace in Nigeria_ (ECPN).  Our research designs compare (1) the effects of ECPN between communities that received ECPN and control communities that did not, and (2) the effect over time for people who did and did not directly participate in ECPN activities.    We measure impact in three ways: (1) survey data, (2) observational monitoring, and (3) a natural-field public goods behavioral game.  Each type of data tells us something unique about farmer-pastoralist relations.  The survey data tells us about individual-level attitude change and social norms, the observational monitoring tells us about cross-group interaction, and the public goods game tells us about cooperation and social cohesion with the outgroup community.  We will use statistical techniques to test the hypothesis that ECPN affects all of these diverse outcomes simultaneously.
+This document summarizes our research designs and analytic strategies for assessing the impact of Mercy Corps' program _Engaging Communities for Peace in Nigeria_ (ECPN).  Our research designs compare (1) the effects of ECPN between communities that received ECPN and control communities that did not, and (2) the effect over time for people who did and did not directly participate in ECPN activities.  We measure impact in three ways: (1) survey data, (2) observational monitoring, and (3) a natural-field public goods behavioral game.  Each type of data tells us something unique about farmer-pastoralist relations.  The survey data tells us about individual-level attitudes and perceptions, the observational monitoring tells us about cross-group interaction, and the public goods game tells us about cooperation with the outgroup community.
 
 
 ******
@@ -314,10 +335,6 @@ We chose the public goods game, and this specific variation, after considering o
 While there is some concern that what we find will be more of a practice effect in the treatment communities than actual cooperation, since they already have similar project committees working this way, after looking at other games, which were largely dyadic (i.e., dictator game, with or without punishment;  trust games) we elected to use the public goods since having trust in joint institutions (i.e., the project committee) is important in of itself. We will use other attitudinal measures to triangulate on why we see or do not see cooperative behavior. 
 
 
-# Survey Implementation Appendix
-
-
-
 # Power Appendix 
 
 Community-level power analysis (presented below) suggests we can detect an effect between 0.3 - 0.4 SD with 80% power.  The power is based on testing 8 hypotheses simultaneously via Caughey's Non-parametric combinations procedure [@Caughey2017npc].  It does not use individuals' or communities' covariates to absorb error, though our final analysis will.  Since the number of communities cannot change, the lines are from simulations with varying amounts of statistical noise added to potential outcomes.  Small amounts of noise do not have a substantial effect on power.  
@@ -333,281 +350,70 @@ The "noise" parameter simulated how much an individual would change without the 
 
 # Survey Question Appendix {#questions}
 
-## Social Cohesion
+**Outgroup Affect**
 
-- People in this area are willing to help their neighbors across ethnic and religious lines
-- People in this area can be trusted
-- People in this area generally do not get along together
-- People in this area do not share the same morals
-- People in this area see the benefits of working together to achieve common goals
+- With regards to someone from [X GROUP], would you feel comfortable:
+    - if they worked in your field?
+    - paying them to watch your animals?
+    - trading goods with them?
+    - sharing a meal with them?
+    - with a close relative marrying a person from [X GROUP]?
+- From 1-5, how much do you trust people from [X GROUP] in your area?
+- Now I’m going to ask you questions about your community here in Benue/Nassarawa, including [X GROUP].  Please tell me how strongly you agree/disagree with each of the following statements: People in this area can be trusted.
 
-- What proportion of your group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
-- What proportion of X group in this area contribute time or money toward common development goals, such as building a levy or repairing a road?
-- If there was a water supply problem in this community, how likely is it that people from your group and people from X group would cooperate to try to solve the problem?
-- Suppose something unfortunate happened to someone in this community from X group, such as a serious illness or the death of a parent. How likely is it that some people in the community from your group would get together to help them?
-- Suppose something unfortunate happened to someone in this community from your group, such as a serious illness or the death of a parent. How likely is it that some people in the community from X group would get together to help them?
+**Contact**
 
-## Outgroup Trust
+- Now I’m going to ask you questions about your contact with [X GROUP] in your area.
+    - Think of the market you go to most frequently. During the past month, have members of X GROUP gone to that market too?  In the past month, how many times did you interact with X group in the market?
+- In the past month, have you:
+    - Joined a member of X group for a social event outside the home?  How often?
+    - Hosted a member of X group for a ceremony in your home?  How often?
+    - Gone to the home of a member of X group for a ceremony?  How often?
+    - Have you interacted with members of X group in any other way in the past month?
 
-- On a range from 1-5, how much do you trust people from an ethnic group different than your own?  On this range, 5 means “trust completely” and 1 means “do not trust at all.”
-- From 1-5, how much do you trust people from a different religion than your own?
-- From 1-5, how much do you trust people from X GROUP in your area?
+**Insecurity**
 
-## Social Distance
-
-- With regards to someone from X group, would you feel comfortable:
-  * if they worked in your field?
-  * paying them to watch your animals?
-  * trading goods with them?
-  * sharing a meal with them?
-  * with a close relative marrying a person from X group?
-
-## Perceptions of Economic Benefit
-
-Please tell me how strongly you agree/disagree with each of the following statements:
-
-- You currently benefit economically from cooperating with members of X GROUP.
-- You would benefit economically more than you currently do if there was peace between your communities and X group.
-- You would benefit economically if there were peace between your community and X group.
-- You would personally commit to peace with X group, even if members of X group used violence against your group.
-
-
-## Randomization Experiment
-
-Think about groups that you might join in your leisure time.  Would you join a group that had **5%/25%/50%/75%** X Group members?
-
-Think about the community you live in.  Would you live in a community that had **5%/25%/50%/75%** X Group members?
-
-## List Experiment
-
-"I’m going to read you a list of items that anger or upset some people.  I’d like you to tell me how many of these things upset you.  Please don’t tell me which items upset you, just how many of them upset you.
-
-- When your football team loses a match
-- Increases in the price of gasoline
-- Lack of rainfall
-- __When you have to interact with a member of X group in the market__
-
-Remember, don’t tell me which items upset you, just how many.
-
-
-## Endorsement Experiment
-
-Imagine that there is a proposal __[by a Farmer’s Cooperative Society/MACBAN]__ for action to enhance access to clean water in rural areas.  Though expensive, the proposal aims to bring fresh, clean water to hundreds of areas without access to it, including this one.  If this were proposed, how would you feel about it?
-
-## Threat Perception
-
-- Some people say X group is responsible for most of the violence in this community, while others say that both groups are responsible for the violence here.  Which is closer to your view?
-- You see X group as a threat to your community
-- You think X group have too much influence on your community
-- You think that people from X group have different morals than people from your group
-
-## Social Contact
-
-- Think of the market you go to most frequently. During the past month, have members of X GROUP gone to that market too?
-- In the past month, how many times did you interact with X group in the market?
-- How did you interact? (Economic, Social, Both)
-- Were the market interactions mostly…(Very Positive - Very Negative)
-
-- In the past month, have you interacted with members of X group outside the market?
-- Joined a member of X group for a social event outside the home?
-- How often?
-- Hosted a member of X group for a ceremony in your home?
-- How often?
-- Gone to the home of a member of X group for a ceremony? 
-- How often?
-
-- Have you interacted with members of X group in any other way in the past month?
-- How else have you interacted with members of X group?
-- Overall, would you say your interactions with X group are: (Very Positive - Very Negative)
-
-## Violent Conflict History
-
-- To your knowledge, in the last year, were there any violent clashes or disputes in your community?
-- How many were there? 
-- About how long ago was the most recent clash?
-- And in that clash, about how many people died? 
-- In the most recent clash, what was the main cause of violence? 
-
-## Insecurity due to Conflict
-
-- In any clash that occurred in the last year, were you or anyone in your family negatively affected by an attack caused by X group? 
-- In the last year, to what extent have people’s abilities to work/earn a living in your community been affected by violent clashes or disputes with other groups? Would you say… 
 - In the last year were there any areas that you avoided going to or through because of insecurity during the night? 
 - In the last year were there any areas that you avoided going to or through because of insecurity, during the day?
+- In the last year, did insecurity ever prevent you from: 
+    - Working when you wanted to work? About how many days were you unable to work?
+    - Going to the market?
+    - Getting water for the household?
+    - Going to your field/farm?
+    - Moving your animals to grazing areas?
+    - Moving your animals to water?
+    - Earning money or going to work?
+    - Going to school?
 
-In the last year, did insecurity ever prevent you from…
+**Endorsement Experiment**
 
-- Working when you wanted to work?
-- About how many days were you unable to work?
-- Going to the market?
-- Getting water for the household?
-- Going to your field/farm?
-- Moving your animals to grazing areas?
-- Moving your animals to water?
-- Earning money or going to work?
-- Going to school?
+- Imagine that there is a proposal by [**the Farmer’s Cooperative Society**/**MACBAN**] for action to enhance access to clean water in rural areas.  Though expensive, the proposal aims to bring fresh, clean water to hundreds of areas without access to it, including this one.  If this were proposed, how would you feel about it?
 
-## Shared Resources
+**Percent Experiemnt**
 
-- Does your community share markets with X group? __OR__ Earlier you said your community shared markets with X group, is that right?
-- Does sharing the market with X group cause tension?
-- Does sharing the market with X group cause disputes?
-- Would you say disputes between your community and X group in or over markets are resolved peacefully…
-- Who usually resolves disputes between your community and X group in or over markets?  Please name up to three types of people who resolve disputes the most frequently.
-
-- Does your community share pasture areas with X group?
-- Does sharing the pasture with X group cause tension?
-- Does sharing the pasture with X group cause disputes?
-- Would you say disputes between your community and X group in or over pastures are resolved peacefully…
-- Who usually resolves disputes between your community and X group in or over pastures?  Please name up to three types of people who resolve disputes the most frequently.
-
-- Does your community share farmland areas with X group?
-- Does sharing the farmland with X group cause tension?
-- Does sharing the farmland with X group cause disputes?
-- Would you say disputes between your community and X group in or over farmland are resolved peacefully…
-- Who usually resolves disputes between your community and X group in or over farmland?  Please name up to three types of people who resolve disputes the most frequently.
-
-## Dispute Resolution
-
-_Note: Also includes questions above asking "who usually resolves disputes"._
-
-I’m going to ask some questions about how disputes are resolved in your community.
-
-- How often do disputes over one issue persist after an attempt at resolving them?
-- During the past year, who usually resolved disputes between members of your community and members of other communities? Please name the three types of people who resolve disputes the most frequently. 
-
-Please tell me how much you agree or disagree with each of the following statements.
-- Local government officials try hard to manage conflict in my area.  
-- How often are local government officials successful in resolving clashes nonviolently? Is It..
-
-- State government officials try hard to manage conflict in my area.  
-- How often are state government officials successful in resolving clashes nonviolently?
+- Think about groups that you might join in your leisure time.  Would you join a group that had **5/25/50/75**% X Group members?
+- Think about the community you live in.  Would you live in a community that had **5/25/50/75**% X Group members?
 
 
-- Traditional leaders try hard to manage conflict in my area.  
-- How often are traditional leaders successful in resolving clashes nonviolently? Is It..
+**Violence Placebo**
 
+- Now I am going to ask you some questions about the use of violence.  Is it always, sometimes, rarely, or never justified to use violence to do each of the following:
+    - Retaliate against violence
+    - Defend one's group
+    - Maintain culture and traditions
+    - Defend one's religion
+    - Bring criminals to justice
+    - Force the government to change their policies
 
-- Religious leaders try hard to manage conflict in my area.  
-- How often are religious leaders successful in resolving clashes nonviolently? Is It..
+**Public Goods Game**
 
+"Thank you very much for participating in our survey.  Before I go, there is one last thing.  As you may have heard, we have development funds to use in this community.  We have randomly selected you as one of the 50 people to receive these funds.  These funds are not for a Mercy Corps project, but rather for you to keep personally or to donate to a community fund.   
 
-- Security officials try hard to manage conflict in my area.  
-- How often are security officials successful in resolving clashes nonviolently? Is It..
+We have 1,000 Naira to give to you.  It is yours, and you can use it either way--for yourself or for a community good.
 
+Your community and [joint farmer/pastoralist community] have created a project committee to whom you can donate this money so that it may be used to help both communities.  The project committee has 4  people from each community.  We have found a donor that will match the funds that you all contribute to the project committee, so that if you donate 100 Naira the project committee receives 300 Naira, and if you donate all 1,000 Naira the project committee receives 3,000 Naira.  You are welcome to donate none, some, or all of the money to the project committee.
 
-- Women try hard to manage conflict in my area.  
-- How often are women successful in resolving clashes nonviolently? Is It..
+These are your individual donation envelopes.  All the donations will be private -- only you will know how much money you donated. It essential that you keep how much you give private -- please do not tell anyone.  I have with me a donation envelope to collect donations.  Please go into your home, put however much of the 1,000 Naira you wish to donate to the project committee in the envelope, take whatever amount you want to keep for yourself, and come back to place your envelope in the donation envelope.  Remember, you are welcome to donate none, some, or all of the money to the project committee.  After that we are finished and you may continue your day.  We will come back and publicly announce how much money your community's project committee will receive."
 
-
-- Youth try hard to manage conflict in my area.  
-- How often are youth successful in resolving clashes nonviolently? Is It..
-
-
-- What type of leader in your community has the most influence on dispute resolution?
-- To what extent is the local government addressing the security concerns of this community? 
-
-
-## Acceptability of Violence
-
-Now I am going to ask you some questions about the use of violence.
-
-Is it always, sometimes, rarely, or never justified to use violence to do each of the following:
-
-- Retaliate against violence
-- Defend one's group
-- Maintain culture and traditions
-- Defend one's religion
-- Bring criminals to justice
-- Force the government to change their policies
-
-
-# Questions in Indices
-
-```{r, eval=F}
-# should use inverse covariance weighting for some of these.  Should reconsider the variables in some of these.
-
-### Social Cohesion Index
-
-#### SC1 -- Cohesion of values
-ecpn$sc1.index=ecpn$sc_help + ecpn$sc_trust + ecpn$sc_getalong + ecpn$sc_values + ecpn$sc_work
-
-#### SC2 -- Cohesion of actions
-ecpn$sc2.index=ecpn$sc_you_contribute + ecpn$sc_x_contribute + ecpn$sc_water + ecpn$sc_misfortune_x + ecpn$sc_misfortune_you
-
-
-### Outgroup Attitudes Index
-ecpn$out_ethnic_trust+ecpn$out_rel_trust+ecpn$out_x_trust+ecpn$out.field+
-  ecpn$out.animals+ecpn$out.trade+ecpn$out.meal+ecpn$out.marry
-
-#### Outgroup Survey Exps
-Randomization exp.  
-List exp.  
-Endorsement Exp.
-
-### Outgroup Threat Index
-ecpn$threat.index=ecpn$threat_threat+ecpn$threat_influence+ecpn$threat_values
-
-### Social Contact Index: note that this really includes one measure of the positivity of the contact.  And it has separate measures for contact & frequency of contact.
-ecpn$contact.index=ecpn$cont_market+ecpn$cont_market_num+ecpn$cont_event+
-  ecpn$cont_home+ecpn$cont_home_x+ecpn$cont_other+ecpn$cont_pos
-
-### Clash History Index
-ecpn$clash.index=ecpn$clash_num+ecpn$clash_when+ecpn$clash_killed+ecpn$clash_personal+ecpn$clash_work
-
-### Insecurity Index
-ecpn$insecurity.index=ecpn$insecurity_night+ecpn$insecurity_day+ecpn$insecurity_work+
-  ecpn$insecurity_market+ecpn$insecurity_water+ecpn$insecurity_field+
-  ecpn$insecurity_graze+ecpn$insecurity_animals_water+ecpn$insecurity_money+
-  ecpn$insecurity_school
-
-### Violence Index
-vio.vars <- c('violence_retaliate','violence_defend_gr','violence_culture',
-  'violence_defend_r','violence_criminals','violence_government', 'peace_commit')
-
-### Shared Resources Index: note that this really has two concepts: total sharing of resources and if that sharing causes problems.
-ecpn$share.index=ecpn$share_market+ecpn$share_market_tens+ecpn$share_market_disp+
-  ecpn$share_market_disp_resolve+ecpn$share_pastures+ecpn$share_pastures_tens+
-  ecpn$share_pastures_disp+ecpn$share_pastures_disp_resolve+ecpn$share_farm+
-  ecpn$share_farm_tens+ecpn$share_farm_disp+ecpn$share_farm_disp_resolve+
-  ecpn$share_peace
-
-### Perceptions of Economic Benefit
-eb.vars <- c("econ_benefit", "more_benefit", "would_benefit")
-
-### Dispute Resolution: note this should probably absorb the questions about dispute resolution from the shared resources index, and the shared resources index drops them to just become about the sharing.
-
-How often do disputes over one issue persist after an attempt at resolving them? Is it…
-
-### Perceptions of Conflict Management
-Local government officials try hard to manage conflict in my area.  
-How often are local government officials successful in resolving clashes nonviolently? Is It..
-
-
-State government officials try hard to manage conflict in my area.  
-How often are state government officials successful in resolving clashes nonviolently? Is It..
-
-
-Traditional leaders try hard to manage conflict in my area.  
-How often are traditional leaders successful in resolving clashes nonviolently? Is It..
-
-
-Religious leaders try hard to manage conflict in my area.  
-How often are religious leaders successful in resolving clashes nonviolently? Is It..
-
-
-Security officials try hard to manage conflict in my area.  
-How often are security officials successful in resolving clashes nonviolently? Is It..
-
-
-Women try hard to manage conflict in my area.  
-How often are women successful in resolving clashes nonviolently? Is It..
-
-
-Youth try hard to manage conflict in my area.  
-How often are youth successful in resolving clashes nonviolently? Is It..
-
-To what extent is the local government addressing the security concerns of this community?
-```
 
 # References

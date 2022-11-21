@@ -106,17 +106,13 @@ Estimation.
 
 We compare treated communities to control communities using a diffrence-in-differences framework.  At the time of writing the PAP, we only knew of the "change scores" strategy where the outcome of interest is the change from baseline to endline.  After writing the PAP, we learned the "controlling-for" method where the outcome of interest it the endline outcome and the equation controls for the baseline outcome.  The "controlling-for" method is more powerful than the "change scores" method and is unbiased when baseline outcomes are balanced.  We therefore use the "controlling-for" method when baseline outcomes are balanced and the "change scores" method when baseline outcomes are not balanced.^[We learned about this method thanks to DeclareDesign Blog: https://declaredesign.org/blog/use-change-scores-or-control-for-pre-treatment-outcomes-depends-on-the-true-data-generating-process.html]
 
-We were also going to try controlling for individual-level covariates in community-level analysis.  We planned to do so by (1) predicting individual-level outcomes with individual-level covariates and then (2) aggregating the residuals to create the community-level estimats.  This method would have been highly unorthodox and we decided against doing so on the advice of colleagues. It has been removed from the PAP; we may produce a methodological paper testing that method of aggregation.
-
-Our original PAP was also planning to use simultaneous hypothesis testing and ordered hypothesis testing.  However, our understanding of these testing procedurs was incorrect.  We will not be using them and have removed them from the PAP.
-
 ## Sections Amended
 
 Research Design and Data Sources
 
 ## Timeline of change
 
-We made the decision to use the "controlling-for" method when baseline outcomes are balanced during endline data collection.  We made the decision to not attempt to control for individual-level characteristics during data analysis.  We made the decision to not use ordered hypothesis testing during data analysis.
+We made the decision to use the "controlling-for" method when baseline outcomes are balanced during endline data collection.
 
 
 # Change 6: Behavioral observation data
@@ -144,7 +140,7 @@ We made the decision to gather observational data in control sites after baselin
 
 ## Category
 
-Ooutcomes.
+Outcomes/measurement.
 
 ## Description and Justification
 
@@ -154,9 +150,11 @@ We initially listed survey data outcomes that were unrelated to our hypotheses (
 We also removed questions about "social cohesion" from the attitudes/affect index because colleagues pointed out that these questions measured _social norms_, not social cohesion.  All of these questions ask respondents how they think others in their group or the other group feel or would behave in hypothetical situation.  For example, one asks respondents to agree or disagree with the statement: "People in this area are willing to help their neighbors across ethnic and religious lines".  Another asks "If there was a water supply problem in this community, how likely is it that people from your group and people from [*X group*] would cooperate to try to solve the problem?"  We agree that these questions are measuring an individual's perception of social norms, not an individual's attitudes.
 -->
 
-In our original PAP, after listing the survey outcomes, we noted that "Some of these concepts are exploratory for the ECPN impact evaluation" and that we did not have hypotheses for those outcomes.  We have no removed that because we no longer list the exploratory outcomes in the PAP.
+In our original PAP, after listing the survey outcomes, we noted that "Some of these concepts are exploratory for the ECPN impact evaluation" and that we did not have hypotheses for those outcomes.  We have now removed that because we no longer list the exploratory outcomes in the PAP.
 
 Our original PAP included a list experiment, but the list experiment failed -- the control list had higher scores than the treatment list in most communities, indicating that the difference between the treatment list and control list was not the percentage of people who agreed with the treatment item.  We therefore exclude the list experiment from our revised PAP's outcomes.  We instead footnote that we conducted a failed list experiment.
+
+Our original PAP described a "randomization experimnt".  We have renamed that a "percent experiment" to avoid confusion with the randomized response method of maintaining confidentiality.  In addition, as our main outcome, we described using the relationship between more outgroup members (5%-75%) and willingness to join the group.  Our prediction was that the percentage of outgroup members has less of an effect after the intervention.  However, that analysis assumes that 5% functions as a baseline for how likely an individual is to join a group with a very small % of outgroup members.  We do not expect that baseline to change.  In our paper, the 5% condition had a low "yes" rate because respondents didn't want to join a group with _any_ outgroup members.  Joining in the 5% condition was correlated with positive outgroup attitudes.  The assumption that the 5% condition is an innocuous baseline was violated.  We thus assessed whether the intervention increased respondents' "yes" rate at any % of the outgroup, rather than the difference in "yes" rate as the % of the outgroup increased.
 
 ## Sections Amended
 
@@ -168,14 +166,67 @@ We made the decision to only analyze outcomes directly related to our hypotheses
 
 We made the decision to exclude the list experiment after data analysis.
 
-***************
+We made the decision to analyze the "yes rate" of the percent experiment after data analysis.
 
 
-## Changes
+# Change 8: Removed unorthodox measurement and estimation strategies
+
+## Category
+
+Measurement and estimation.
+
+## Description and Justification
+
+We were going to try controlling for individual-level covariates in community-level analysis.  We planned to do so by (1) predicting individual-level outcomes with individual-level covariates and then (2) aggregating the residuals to create the community-level estimats.  This method would have been highly unorthodox and we decided against doing so on the advice of colleagues. It has been removed from the PAP; we may produce a methodological paper testing that method of aggregation.
+
+Our original PAP was also planning to use simultaneous hypothesis testing and ordered hypothesis testing.  However, our understanding of these testing procedurs was incorrect.  We will not be using them and have removed them from the PAP. However, the expectation that led us to propose ordered hypothesis testing was correct: "we expect the coefficient describing the participant-control comparison to be larger than the coefficient describing the nonparticipant-control comparison, and we expect the coefficient describing the nonparticipant-control comparison to be larger than zero."
+
+Our original PAP also planned to combine our analyses from different levels of analysis (community-level comparisons and individual-level comparisons): "To leverage the $p$-values we have from multiple analyses, we will first record and combine the $p$-values from each of the three analyses described above (community-level, participants, and nonparticipants).  We will then simulate the possible results we could have observed in each of those studies if there was no effect.  To simulate these studies with no effect, we break the relationship between treatment and outcomes by shuffling the treatment indicator (for the community-level study) or the outcome scores (for the individual-level studies).  We then have the distribution of $p$-values we would see if ECPN had no effect in each study.  Our outcome of interest is the proportion of this “no effect distribution” that is smaller than our observed group of $p$-values."  We may produce a methodological paper testing that method of inference, but we no longer do it in this paper.
+
+## Sections Amended
+
+Analytical Strategy: Combining Outcomes and Ordering Hypothesis Tests
+
+## Timeline of change
+
+We made the following decisions during data analysis: (1) to not attempt to control for individual-level characteristics, (2) to not use ordered hypothesis testing, and (3) to not combine $p$-values across levels of analysis.
 
 
-**Percent Experiment**
+# Change 9: Survey question list
 
-As our outcome, we would normally use the relationship between more outgroup members (5%-75%) and joining the group.  The prediction would be that the percentage of outgroup members has less of an effect after the intervention.  However, that analysis assumes that 5% functions as a baseline for how likely an individual is to join a group with a very small % of outgroup members.  We do not expect that baseline to change.
+## Category
 
-In our paper, the 5% condition had a low "yes" rate because respondents didn't want to join a group with _any_ outgroup members.  Joining in the 5% condition was correlated with outgroup attitudes.  The assumption that the 5% condition is an inoccuous baseline was violated.  We thus assessed whether the intervention increased respondents' "yes" rate at any % of the outgroup, rather than the difference in "yes" rate as the % of the outgroup increased.
+Measurement.
+
+## Description and Justification
+
+Our original PAP's appendix listed every question in the survey.  We now only list questions we use in the paper.
+
+## Sections Amended
+
+Appendix
+
+## Timeline of change
+
+We made the decision to only include survey outcomes directly related to our hypotheses after data analysis (these outcomes were included in a report to the NGO that implemented ECPN).
+
+
+# Change 10: No synthetic control.
+
+## Category
+
+Estimation.
+
+## Description and Justification
+
+Our original PAP mentioned the possibility of using a synthetic control group as the comparison group for our individual-level comparisons.  We decided not to use a synthetic control.
+
+## Sections Amended
+
+Estimation -- Individual Level Panel Data
+
+## Timeline of change
+
+We made the decision to not use a synthetic control before endline data collection.
+
+
