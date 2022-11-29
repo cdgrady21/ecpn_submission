@@ -1,11 +1,13 @@
 ---
 title: "ECPN Final Evaluation PAP"
-author: 'Christopher Grady, Rebecca Wolfe, Dawop Saidu'
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
+author: "Christopher Grady, Rebecca Wolfe, Dawop Saidu"
+date: "`r format(Sys.Date(), "%B %d, %Y")`"
 output:
+  html_document:
+    df_print: paged
   word_document: default
   pdf_document: default
-bibliography: ../../../../GradSchool/Dissertation/Writing/utils/cdg_references.bib
+bibliography: ../../../../utils/cdg_references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -31,9 +33,9 @@ Th ECPN intervention is based on a number of social psychological theories that 
   * Support of law, authorities or customs
   * Personal interaction
  
-@pettigrew2006meta conducted a meta-analysis of 515 studies and found that intergroup contact reduces prejudice. Moreover, @Paluck2009prejReduction, who reviewed the contact hypothesis as well as other prejudice reducing interventions in both the lab and the field, found that there have been few field experiments examining the contact hypothesis, and the ones they note involve intense living arrangements during a camp or a dorm. A more recent review by @paluck2017contact focused on field experiments did find an overall significant effect of contact, but this was largely in smaller studies. Additionally, studies focused on racial and ethnic prejudice had weaker effects.
+@pettigrew2006meta conducted a meta-analysis of 515 studies and found that intergroup contact reduces prejudice. Moreover, @Paluck2009prejReduction, who reviewed the contact hypothesis as well as other prejudice reducing interventions in both the lab and the field, found that there have been few field experiments examining the contact hypothesis, and the ones they note involve intense living arrangements during a camp or a dorm. A more recent review by @paluck2019contact focused on field experiments did find an overall significant effect of contact, but this was largely in smaller studies. Additionally, studies focused on racial and ethnic prejudice had weaker effects.
 
-In Kaduna -- part of the Middle Belt of Nigeria -- @Scacco2016 tested the contact hypothesis with Christian and Muslim youth in a computer training program. Youth were divided into either heterogeneous or homogeneous classrooms, and within the heterogeneous classrooms, youth were either in homogeneous pairs or heterogeneous pairs. The main findings of the study were that while attitudes did not change due to contact, cooperative behavior did as measured by dictator and destruction games. This effect appears driven not so much that contact made people more cooperative towards the outgroup, but that those in homogeneous groups tended to favor their ingroup more.  
+In Kaduna -- part of the Middle Belt of Nigeria -- @scacco2018nigeria tested the contact hypothesis with Christian and Muslim youth in a computer training program. Youth were divided into either heterogeneous or homogeneous classrooms, and within the heterogeneous classrooms, youth were either in homogeneous pairs or heterogeneous pairs. The main findings of the study were that while attitudes did not change due to contact, cooperative behavior did as measured by dictator and destruction games. This effect appears driven not so much that contact made people more cooperative towards the outgroup, but that those in homogeneous groups tended to favor their ingroup more.  
 
 Contact and creating opportunities for cooperation is the implicit theory behind many community-driven development programs (CDD). Yet, the effects of such programs are minimal, particularly on social outcomes. CDD purports that this process will lead to social cohesion [@chase2005social]. Recent studies on the benefits of these programs have shown little evidence that the process builds social cohesion or social capital between groups in a range of contexts, from DRC, the Philippines, and Afghanistan [@king2013critical]. However, @fearon2009can found in Liberia that a CDD did improve cooperation among community members that were in mixed-gender groups as compared to all women’s groups.
  
@@ -147,7 +149,7 @@ We monitor market and social behavior in the communities under study.  We want t
 <!-- [This didn't happen.]
 We also monitor meetings of our project committees in treatment sites.  We want to know if these farmer-pastoralist meetings become more collaborative over time and if women are more involved in the decision-making process over time.  We measure: (1) the number of farmer and pastoralist men and women in attendance, (2) the number of times each group speaks, separating males and females, (3) any disagreements/issues discussed in the meetings, (4) if those issues were resolved, and (5) how those issues were resolved.
 -->
-These data quantify qualitative information; they are difficult to collect and will likely to be noisy measures.  But they are extremely valuable for documenting changes in how ECPN participants _interact_, which we may miss in survey responses.^[Several studies, including @Scacco2016 and @paluck2009jsp demonstrate that intergroup contact programs can affect behavior without necessarily affecting attitudes.]  We expect ECPN participants to interact more with their farmer/pastoralist outgroup than non-ECPN participants.  <!--We also expect more equal participation in meetings and more issues resolved successfully over time.-->
+These data quantify qualitative information; they are difficult to collect and will likely to be noisy measures.  But they are extremely valuable for documenting changes in how ECPN participants _interact_, which we may miss in survey responses.^[Several studies, including @scacco2018nigeria and @paluck2009jsp demonstrate that intergroup contact programs can affect behavior without necessarily affecting attitudes.]  We expect ECPN participants to interact more with their farmer/pastoralist outgroup than non-ECPN participants.  <!--We also expect more equal participation in meetings and more issues resolved successfully over time.-->
 
 The behavioral monitoring will produce panel data: each site has some data points from the beginning of the project and some from the end of the project.^[Due to funding issues, there was no monitoring in the middle of the project.]
 
@@ -157,7 +159,7 @@ We use the natural-field public goods "game" to measure intergroup cooperation (
 
 This game was conducted at endline only.  This will make it difficult to interpret that measure, as we won’t know if differences in the level of cooperation are due to (1) the people who participated were more cooperative types, or (2) the engagement in project committees and learning how to work with the outgroup made the more cooperative.
 
-For outcomes, we expect (1) people in treated communities are more likely to contribute to the community fund and (2) people in treated communities contribute more money to the community fund than people in control communities.  More details of the behavioral game are in the appendix [@behGame].
+For outcomes, we expect (1) people in treated communities are more likely to contribute to the community fund and (2) people in treated communities contribute more money to the community fund than people in control communities.  More details of the behavioral game are in the appendix {#behGame}.
 
 ## Estimation -- Community Level RCT
 
@@ -277,7 +279,7 @@ This document summarizes our research designs and analytic strategies for assess
 
 ******
 
-# Behavioral Game Appendix{#behGame}
+# Behavioral Game Appendix (#behGame)
 
 We use a natural-field behavioral game to measure attitudes towards the farmer/pastoralist outgroup.  Behavioral games create a strategic choice-making situation for participants, and researchers observe participants’ behavioral choices.  In a typical behavioral game, participants make this strategic choice in a lab with full knowledge that they are participating in an experiment.  Due to these artificial conditions, which are not present in real-world choices, results from lab behavioral games may not conform to similar real-world behaviors [@winking2013natural; @galizzi2017external].  Natural-field experiments solve this problem by creating a choice-making situation in the participants' natural environment where participants are not aware that an experiment is taking place [@harrison2004field; @winking2013natural].   
 
@@ -339,7 +341,7 @@ While there is some concern that what we find will be more of a practice effect 
 
 Community-level power analysis (presented below) suggests we can detect an effect between 0.3 - 0.4 SD with 80% power.  The power is based on testing 8 hypotheses simultaneously via Caughey's Non-parametric combinations procedure [@Caughey2017npc].  It does not use individuals' or communities' covariates to absorb error, though our final analysis will.  Since the number of communities cannot change, the lines are from simulations with varying amounts of statistical noise added to potential outcomes.  Small amounts of noise do not have a substantial effect on power.  
 
-![Community-Level Power Analysis](../DesignPower/ecpn_power_figure.png)
+![Community-Level Power Analysis](../../../figs/ecpn_power_figure.png)
 
 Individual-level power analysis suggests we can detect an effect size between 0.10 = 0.15 SD with a small amount of noise, defined here as draws from a normal distribution with mean=0 and sd=0.25 SDs.  We can detect an effect size of about 0.20 SD with a moderate amount of noise, defined here as draws from a normal distribution with mean=0 and sd=0.50 SDs.  The power is based on testing 4 hypotheses simultaneously via Caughey's Non-parametric combinations procedure [@Caughey2017npc].
 

@@ -1,8 +1,10 @@
 ---
 title: "PAP Deviation"
 author: "Christopher Grady"
-date: date: '`r format(Sys.Date(), "%B %d, %Y")`'
-output: html_document
+date: "`r format(Sys.Date(), "%B %d, %Y")`"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
