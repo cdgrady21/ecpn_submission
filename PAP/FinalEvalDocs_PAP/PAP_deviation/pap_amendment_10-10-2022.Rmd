@@ -1,7 +1,7 @@
 ---
 title: "PAP Deviation"
 author: "Christopher Grady"
-date: "`r format(Sys.Date(), "%B %d, %Y")`"
+date: "`r Sys.Date()`"
 output:
   pdf_document: default
   html_document: default
@@ -66,9 +66,9 @@ Hypothesis testing.
 
 We initially listed only radio listening as a placebo outcome.  Along with radio listening, we also use attitudes towards violence as a placebo outcome.  Attitudes about violence are a good candidate for a “placebo outcome” because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way.  Radio listening should also not be affected by ECPN but is less relevant for how self-reported attitudes change from baseline to endline. 
 
-We did not initially list attitudes towards violence as a placebo outcome because the program team was interested to know if the program affected these attitudes.  However, we explicitly did not include attitudes towards violence in any hypothesis because we did not expect the program to affect such attitudes and wanted to use them as placebos in our analysis.^[PAP_quote]
+We did not initially list attitudes towards violence as a placebo outcome because the program team was interested to know if the program affected these attitudes.  However, we explicitly did not include attitudes towards violence in any hypothesis because we did not expect the program to affect such attitudes and wanted to use them as placebos in our analysis.[^PAP_quote]
 
-[^PAP_Quote]: In our original PAP submission, we wrote: "...while certain outcomes may be of interest to the program team, the impact evaluation team does not include hypotheses about ECPN changing perceptions of the acceptability of some types of violence, about inter-religious trust, or perceptions of the actors involved in dispute resolution."  We also did not expect ECPN to affect trust in members of other religions, but we did not believe it was appropriate as a "placebo" outcome because intergroup contact could generalize to a wider religious outgroup and religion separates farmers and pastoralists in one state.  And we did not expect ECPN to systematically affect perceptions of the actors involved in dispute resolution but do not use these perceptions as a placebo outcome because ECPN worked with some actors involved in dispute resolution (the particular actor involved varied by community).
+[^PAP_quote]: In our original PAP submission, we wrote: "...while certain outcomes may be of interest to the program team, the impact evaluation team does not include hypotheses about ECPN changing perceptions of the acceptability of some types of violence, about inter-religious trust, or perceptions of the actors involved in dispute resolution."  We also did not expect ECPN to affect trust in members of other religions, but we did not believe it was appropriate as a "placebo" outcome because intergroup contact could generalize to a wider religious outgroup and religion separates farmers and pastoralists in one state.  And we did not expect ECPN to systematically affect perceptions of the actors involved in dispute resolution but do not use these perceptions as a placebo outcome because ECPN worked with some actors involved in dispute resolution (the particular actor involved varied by community).
 
 ## Sections Amended
 
