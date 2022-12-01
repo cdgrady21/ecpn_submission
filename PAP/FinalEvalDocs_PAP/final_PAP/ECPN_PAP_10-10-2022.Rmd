@@ -1,6 +1,7 @@
 ---
 title: "ECPN Final Evaluation PAP"
 author: "Christopher Grady, Rebecca Wolfe, Dawop Saidu"
+date: "`r Sys.Date()`"
 output:
   pdf_document: default
   word_document: default
@@ -47,7 +48,7 @@ This study builds off this previous work in the following ways: 1) we examine co
  1. For communities that receive the ECPN program^[ECPN includes a combination of mediation support, projects that a committee of farmers and pastoralists jointly decide on and implement, and community fora that prevents conflict from escalating.  We use “ECPN” to refer to all the various ECPN activities: mediation, joint projects, community fora, etc.] relative to control communities, we will find improved attitudes between farmers and pastoralists. 
  2. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to interact with the outgroup.
  3. For communities that receive the ECPN program relative to control communities, we will find increased perceptions of physical security by farmers and pastoralists.
- 4. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to cooperate in the PGG (will donate more money) and less likely to donate nothing.[We also have a weak hypothesis about changes in the variance of donations, but we do not feel strongly about this hypothesis and believe it could go in either direction.  We could observe lower variance because the treatment decreases the size of an individual's decision space -- after treatment, people know about how much everyone in their area will give, and they conform to that amount.  But we could observe higher variance because treatment changes the perception of the social norm for _some_ people, leading to a distribution of donation amounts drawn from two distributions: the old social norm and the new social norm.  If those norms are sufficiently far apart, it would increase variance.  Unlike most of our tests, our test of variance would be two-tailed because are do not have expectations about the direction of the effect.]
+ 4. For communities that receive the ECPN program relative to control communities, we will find farmers and pastoralists are more likely to cooperate in the PGG (will donate more money) and less likely to donate nothing.^[We also have a weak hypothesis about changes in the variance of donations, but we do not feel strongly about this hypothesis and believe it could go in either direction.  We could observe lower variance because the treatment decreases the size of an individual's decision space -- after treatment, people know about how much everyone in their area will give, and they conform to that amount.  But we could observe higher variance because treatment changes the perception of the social norm for _some_ people, leading to a distribution of donation amounts drawn from two distributions: the old social norm and the new social norm.  If those norms are sufficiently far apart, it would increase variance.  Unlike most of our tests, our test of variance would be two-tailed because are do not have expectations about the direction of the effect.]
 
 **Individual-level hypotheses**:
 
@@ -158,7 +159,7 @@ We use the natural-field public goods "game" to measure intergroup cooperation (
 
 This game was conducted at endline only.  This will make it difficult to interpret that measure, as we won’t know if differences in the level of cooperation are due to (1) the people who participated were more cooperative types, or (2) the engagement in project committees and learning how to work with the outgroup made the more cooperative.
 
-For outcomes, we expect (1) people in treated communities are more likely to contribute to the community fund and (2) people in treated communities contribute more money to the community fund than people in control communities.  More details of the behavioral game are in the appendix {#behGame}.
+For outcomes, we expect (1) people in treated communities are more likely to contribute to the community fund and (2) people in treated communities contribute more money to the community fund than people in control communities.  More details of the behavioral game are in the [appendix](#behGame).
 
 ## Estimation -- Community Level RCT
 
@@ -170,7 +171,7 @@ We will use the DiD framework to estimate the effect of ECPN with our baseline a
 
 We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-$$ Y_{i,j} = \beta_0 + \beta_1 Z_{i,j} + X_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate1}
+$$ Y_{i,j} = \beta_0 + \beta_1 Z_{i,j} + X_{i,j} + D_{j} + \epsilon_{i,j} $$
 
 where $i$ is the community in state $j$, $Z$ is the treatment indicator, and $Y$ is the outcome at endline.  $X$ is the baseline outcome for community $i$ and $D$ is a state fixed effect. If baseline outcomes are not balanced, we will use the change score, $Y_i = Y_{i,endline} - Y_{i,baseline}$ and we will not use $X$. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
 
@@ -184,7 +185,7 @@ The final step is compare treatment to control communities across the range of o
 
 We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-$$ Y_{i,j,k} = \beta_0 + \beta_1 Z_{i,j,k} * \beta_2 T_{i,j,k} + X_{j} + D_{k} + \epsilon_{i,j, k} $${#eq:ate2}
+$$ Y_{i,j,k} = \beta_0 + \beta_1 Z_{i,j,k} * \beta_2 T_{i,j,k} + X_{j} + D_{k} + \epsilon_{i,j, k} $$
 
 where $i$ is the observation in site $j$ and state $k$, $Z$ is the treatment indicator, $T$ is timepoint, and $Y$ is the outcome.  $X$ is the site fixed effect and $D$ is a state fixed effect.  We are interested in the interaction between treatment and time (did outcomes improve more in treatment sites than control sites). For standard errors we will bootstrap observations within sites; for $p$-values we will use randomization inference to shuffle treatment to observations within sites.
 
@@ -194,7 +195,7 @@ The behavioral observations are panel data: each site has some data points from 
 
 We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-$$ Y_{i,j} = \beta_0 + \beta_1 Z_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate3}
+$$ Y_{i,j} = \beta_0 + \beta_1 Z_{i,j} + D_{j} + \epsilon_{i,j} $$
 
 where $i$ is the community in state $j$, $Z$ is the treatment indicator, $Y$ is the outcome at endline, and $D$ is a state fixed effect. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
 
@@ -206,7 +207,7 @@ The data for our individual-level analyses comes from surveying the same ~300 re
 
 We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-$$ Y_{i,j} = \beta_0 + \beta_1 P_{i,j} + \beta_2 N_{i,j} + X_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate1}
+$$ Y_{i,j} = \beta_0 + \beta_1 P_{i,j} + \beta_2 N_{i,j} + X_{i,j} + D_{j} + \epsilon_{i,j} $$
 
 where $i$ is the community in state $j$, $P$ is the Participant indicator, $N$ is the Nonparticipant indicator, and $Y$ is the outcome at endline.  $X$ is the baseline outcome for community $i$ and $D$ is a state fixed effect. If baseline outcomes are not balanced, we will use the change score, $Y_i = Y_{i,endline} - Y_{i,baseline}$ and we will not use $X$. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
 
@@ -221,7 +222,7 @@ We hypothesize that the participants will display greater attitude change than t
 
 We will use following linear model and ordinary least squares (OLS) to estimate the average treatment effect:
 
-$$ Y_{i,j} = \beta_0 + \beta_1 P_{i,j} + \beta_2 N_{i,j} + D_{j} + \epsilon_{i,j} $${#eq:ate3}
+$$ Y_{i,j} = \beta_0 + \beta_1 P_{i,j} + \beta_2 N_{i,j} + D_{j} + \epsilon_{i,j} $$
 
 where $i$ is the community in state $j$, $P$ is the Participant indicator, $N$ is the Nonparticipant indicator, $Y$ is the outcome at endline, and $D$ is a state fixed effect. For standard errors we will bootstrap sites within states; for $p$-values we will use randomization inference to shuffle treatment to sites within states.
 
@@ -278,7 +279,7 @@ This document summarizes our research designs and analytic strategies for assess
 
 ******
 
-# Behavioral Game Appendix (#behGame)
+# Behavioral Game Appendix {#behGame}
 
 We use a natural-field behavioral game to measure attitudes towards the farmer/pastoralist outgroup.  Behavioral games create a strategic choice-making situation for participants, and researchers observe participants’ behavioral choices.  In a typical behavioral game, participants make this strategic choice in a lab with full knowledge that they are participating in an experiment.  Due to these artificial conditions, which are not present in real-world choices, results from lab behavioral games may not conform to similar real-world behaviors [@winking2013natural; @galizzi2017external].  Natural-field experiments solve this problem by creating a choice-making situation in the participants' natural environment where participants are not aware that an experiment is taking place [@harrison2004field; @winking2013natural].   
 
