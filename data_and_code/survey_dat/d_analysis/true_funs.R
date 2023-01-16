@@ -84,7 +84,7 @@ true.fun <- function(var, tr, nsims=10000, dat=ag.df)
       rand.coef[i] <- summary(lm.null)$coefficients[2,1]
     }
   }
-  else if(tr=="treatment" & (grepl("end", var) | grepl("y1", var))){
+  else if(tr=="treatment" & (grepl("end$", var) | grepl("y1", var))){
     thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
     thecoef <-coef(thelm)[2]
     
@@ -100,7 +100,7 @@ true.fun <- function(var, tr, nsims=10000, dat=ag.df)
       rand.coef[i] <- summary(lm.null)$coefficients[2,1]
     }
   }
-  else if(tr=="treatment" & !(grepl("end", var) | grepl("y1", var))){
+  else if(tr=="treatment" & !(grepl("end$", var) | grepl("y1", var))){
     thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
     thecoef <-coef(thelm)[2]
     
@@ -116,7 +116,7 @@ true.fun <- function(var, tr, nsims=10000, dat=ag.df)
       rand.coef[i] <- summary(lm.null)$coefficients[2,1]
     }
   }
-  else if(grepl("end", var) | grepl("y1", var)){
+  else if(grepl("end$", var) | grepl("y1", var)){
     thelm <- lm(dat[,var]~dat[,tr]+state, data=dat)
     thecoef <-coef(thelm)[2]
     
@@ -130,7 +130,7 @@ true.fun <- function(var, tr, nsims=10000, dat=ag.df)
       rand.coef[i] <- summary(lm.null)$coefficients[2,1]
     }
   }
-  else if(!grepl("end", var) | grepl("y1", var)){
+  else if(!grepl("end$", var) | grepl("y1", var)){
     thelm <- lm(dat[,paste0(var,"_end")]~dat[,tr]+dat[,paste0(var,"_base")]+state, data=dat)
     thecoef <-coef(thelm)[2]
     

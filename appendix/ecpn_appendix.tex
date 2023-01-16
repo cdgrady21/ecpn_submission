@@ -35,46 +35,6 @@
 \makeatother
 \usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -201,6 +161,8 @@ intervention between exchangeable units and that our empirical
 distribution (for confidence intervals) is created by resampling units
 as they were sampled.
 
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
 \hypertarget{appendix-b-robustness-checks-for-analysis}{%
 \subsection{Appendix B: Robustness checks for
 analysis}\label{appendix-b-robustness-checks-for-analysis}}
@@ -219,69 +181,11 @@ controlling-for (``cont'') or differencing (``diff''). Note that not not
 all outcomes are indices, some outcomes are endline only, and only
 contact outcomes use count variables.
 
-\begin{verbatim}
-## [[1]]
-##                                 coef  truep  version base
-## attitude_cw~treatment     0.11601349 0.0443  cw_cont    1
-## attitude_index~treatment  0.09280439 0.0378 ind_cont    0
-## attitude_cw~treatment1    0.10026696 0.1421  cw_diff    0
-## attitude_index~treatment1 0.07306274 0.1218 ind_diff    0
-## 
-## [[2]]
-##                            coef  truep  version base
-## in_cw~treatment      0.09790809 0.0304  cw_cont    0
-## in_index~treatment  -0.01045169 0.5934 ind_cont    0
-## in_cw~treatment1     0.15909111 0.0229  cw_diff    1
-## in_index~treatment1  0.05375752 0.2068 ind_diff    0
-## 
-## [[3]]
-##                                     coef  truep  version base
-## contactOnly_cw~treatment     0.012937275 0.4182  cw_cont    0
-## contactOnly_index~treatment  0.003357323 0.4207 ind_cont    0
-## contactOnly_cw~treatment1    0.137779036 0.0624  cw_diff    1
-## contactOnly_index~treatment1 0.014713596 0.1825 ind_diff    0
-## 
-## [[4]]
-##                        coef  truep  version base
-## rMean~treatment  0.09327385 0.0491  cw_cont    0
-## 2                        NA     NA ind_cont    0
-## rMean~treatment1 0.06213299 0.2420  cw_diff    1
-## 4                        NA     NA ind_diff    0
-## 
-## [[5]]
-##                         coef  truep  version base
-## end_exp~treatment  0.1225162 0.2161  cw_cont    0
-## 2                         NA     NA ind_cont    0
-## end_exp~treatment1 0.1225162 0.2098  cw_diff    1
-## 4                         NA     NA ind_diff    0
-## 
-## [[6]]
-##                                coef truep  version base
-## pgp_donate_end~treatment 0.02241997 0.284  cw_cont   NA
-## 2                                NA    NA ind_cont   NA
-## 3                                NA    NA  cw_diff   NA
-## 4                                NA    NA ind_diff   NA
-## 
-## [[7]]
-##                              coef  truep  version base
-## pgp_amount_end~treatment -35.1235 0.8435  cw_cont   NA
-## 2                              NA     NA ind_cont   NA
-## 3                              NA     NA  cw_diff   NA
-## 4                              NA     NA ind_diff   NA
-\end{verbatim}
-
-\begin{verbatim}
-##                                       coef  truep
-## contactOnly_cw~treatment        0.01293728 0.4204
-## contactOnly_cats_cw~treatment   0.01695302 0.3772
-## contactOnly_raw_cw~treatment   -0.01988471 0.6021
-## contactOnly_cw~treatment1       0.13777904 0.0653
-## contactOnly_cats_cw~treatment1  0.12048417 0.0640
-## contactOnly_raw_cw~treatment1   0.07120127 0.2072
-\end{verbatim}
-
 \begin{table}[H]
 \begin{center}
+\label{tab:attitude_tab}
+\caption{\textbf{Attitudes.} Effect of ECPN on attitudes with alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
 
 \begin{tabular}{l|r|r|r}
 \hline
@@ -298,7 +202,6 @@ Differencing \& Additive & 0.073 & 0.122 & 0\\
 \end{tabular}
 
 
-\caption{\label{tab:attitude_tab}\textbf{Effect of ECPN on main outcomes with alternative methods of estimation and index construction.} The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \end{center}
 \end{table}
 
@@ -345,13 +248,6 @@ and \(p\)-values for community- and individual-level analyses.
 \hypertarget{appendix-x-individual-level-analysis}{%
 \subsection{Appendix X: Individual-level
 analysis}\label{appendix-x-individual-level-analysis}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{load}\NormalTok{(}\StringTok{"../b\_creating\_outcomes/f2{-}panelData.Rdata"}\NormalTok{)}
-\FunctionTok{table}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{community, panel.df}\SpecialCharTok{$}\NormalTok{committee, panel.df}\SpecialCharTok{$}\NormalTok{treatment)}
-\end{Highlighting}
-\end{Shaded}
 
 We approximately 300 baseline respondents, roughly evenly spread
 throughout all communities (between 8 and 15 respondents per community).

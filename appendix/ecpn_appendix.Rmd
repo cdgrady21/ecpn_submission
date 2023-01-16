@@ -6,7 +6,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 #load()
 ```
 
@@ -38,18 +38,20 @@ Randomization inference and bootstrapping are nonparametric methods to generate 
 
 In each of these procedures, we mimic our randomization process by randomizing/resampling the intervention to communities in site-level clusters and within state blocks. This means that both communities in an implementation site (farmers and pastoralists) will always be treated/sampled together and that assignment to the intervention and resampling are conducted separately in Nassarawa and Benue, just as the intervention was assigned in this study.  This procedure ensures that our null distribution (for $p$-values) is created by randomizing the intervention between exchangeable units and that our empirical distribution (for confidence intervals) is created by resampling units as they were sampled.
 
+**********
+
 ## Appendix B: Robustness checks for analysis
 
-These tables shows results with different ways of making indices (additive vs inverse-covariance weighted), different models for estimating effects (differencing vs controlling-for), and different ways of coding count variables (raw vs ranked).  Each table is an outcome.  Rows are results for different ways of creating the outcomes.  Columns show the coefficient from OLS regression, true p-value from randomization inference, and a binary "base" indicator showing which method was used in the paper. 
+These tables shows results with different ways of making indices (additive vs inverse-covariance weighted), different models for estimating effects (differencing vs controlling-for), and different ways of coding count variables (raw vs ranked).  Each table is an outcome.  Rows are results for different ways of creating the outcomes.  Columns show the coefficient from OLS regression, true p-value from randomization inference, and a binary "base" indicator showing which method was used in the paper.  
 
-index: inverse-covariance weights ("cw") or additive ("ind").  model: controlling-for ("cont") or differencing ("diff").  Note that not not all outcomes are indices, some outcomes are endline only, and only contact outcomes use count variables.
+The base method is always inverse-covariance weighted indices; the estimation method is controlling-for unless the baseline difference between the treatment and control groups is 0.20 standard deviations or more; the base method of handling count variables is dense rank. Only contact outcomes use count variables, only survey outcomes have a baseline and an endline and are measured with indices.
 
 ```{r, echo=F}
 load("../data_and_code/survey_dat/d_analysis/list_of_coefs_and_ps.Rda")
 load("../data_and_code/survey_dat/d_analysis/list_of_rank_bin_raw.Rda")
 
-newList
-var_tab
+#newList[[3]]
+#var_tab
 
 attitude_tab <- newList[[1]][,c(1:2,4)]
 colnames(attitude_tab) <- c("coefficient", "p-value", "base")
@@ -61,10 +63,117 @@ attitude_tab <- knitr::kable(attitude_tab, format="latex")
 
 \begin{table}[H]
 \begin{center}
+\label{tab:attitude_tab}
+\caption{\textbf{Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
 `r attitude_tab`
-\caption{\label{tab:attitude_tab}\textbf{Effect of ECPN on main outcomes with alternative methods of estimation and index construction.} The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \end{center}
 \end{table}
+
+```{r}
+security_tab <- newList[[2]][,c(1:2,4)]
+colnames(security_tab) <- c("coefficient", "p-value", "base")
+rownames(security_tab) <- c("Controlling-for & ICW", "Controlling-for & Additive",
+                            "Differencing & ICW", "Differencing & Additive")
+security_tab <- round(security_tab,3)
+security_tab <- knitr::kable(security_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:security_tab}
+\caption{\textbf{Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r security_tab`
+\end{center}
+\end{table}
+
+
+```{r}
+contact_tab <- newList[[3]][,c(1:2,4)]
+var_tab$base <- c(0,0,0,1,0,0)
+var_tab <- var_tab[c(2,3,5,6),]
+contact_tab <- rbind(contact_tab, var_tab)
+colnames(contact_tab) <- c("coefficient", "p-value", "base")
+rownames(contact_tab) <- c("Controlling-for & ICW & Ranks", "Controlling-for & Additive & Ranks",
+                            "Differencing & ICW & Ranks", "Differencing & Additive & Ranks",
+                           "Controlling-for & ICW & Categories",
+                           "Controlling-for & ICW & Raw",
+                           "Differencing & ICW & Categories",
+                           "Differencing & ICW & Raw")
+contact_tab <- round(contact_tab,3)
+contact_tab <- knitr::kable(contact_tab, format="latex")
+
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:contact_tab}
+\caption{\textbf{Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r contact_tab`
+\end{center}
+\end{table}
+
+```{r}
+percExp_tab <- newList[[4]][c(1,3),c(1:2,4)]
+colnames(percExp_tab) <- c("coefficient", "p-value", "base")
+rownames(percExp_tab) <- c("Controlling-for",
+                            "Differencing")
+percExp_tab <- round(percExp_tab,3)
+percExp_tab <- knitr::kable(percExp_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:percExp_tab}
+\caption{\textbf{Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r percExp_tab`
+\end{center}
+\end{table}
+
+```{r}
+endExp_tab <- newList[[5]][c(1,3),c(1:2,4)]
+colnames(endExp_tab) <- c("coefficient", "p-value", "base")
+rownames(endExp_tab) <- c("Controlling-for",
+                            "Differencing")
+endExp_tab <- round(endExp_tab,3)
+endExp_tab <- knitr::kable(endExp_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:endExp_tab}
+\caption{\textbf{Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r endExp_tab`
+\end{center}
+\end{table}
+
+```{r}
+pgg_tab <- rbind(newList[[6]][1,c(1:2,4)], newList[[7]][1,c(1:2,4)])
+colnames(pgg_tab) <- c("coefficient", "p-value", "base")
+rownames(pgg_tab) <- c("Donation (binary)",
+                            "Donation amount")
+pgg_tab <- round(pgg_tab,3)
+pgg_tab <- knitr::kable(pgg_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pgg_tab}
+\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pgg_tab`
+\end{center}
+\end{table}
+
 
 ## Appendix B: Results with Additive Indices
 
