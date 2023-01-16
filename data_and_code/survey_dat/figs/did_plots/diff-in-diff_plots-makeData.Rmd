@@ -1,0 +1,240 @@
+---
+title: "ecpn_diff-in-diff plots: data and function"
+output:
+  word_document: default
+  html_document: default
+---
+
+note: if want to convert to pdf:
+
+dev.copy(pdf,file="endComm_plot_nas.pdf")
+dev.off()
+
+pdf(file="endComm_plot_nas.pdf", bg="transparent", width=5, height=5)
+endComm_plot_nas
+dev.off()
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load("../../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../../c_creating_dataframes/rand_df.Rdata")
+load("../../b_creating_outcomes/f2-panelData.Rdata")
+load("../../../obs_dat/b_analysis/eventsMedian.Rdata")
+load("../../../obs_dat/b_analysis/marketMedian.Rdata")
+
+# clean environment
+rm(list=ls(pattern="Var|var|.fun|Fun|Col|Index|Indice|Stand|fmla|outcomes"))
+
+#until I figure out insecurity, vio, list, reverse scale it.
+#ag.df$in_cw_base <- abs(ag.df$in_cw_base+1)
+#ag.df$in_cw_end <- abs(ag.df$in_cw_end+1)
+#panel.df$in_cw_y0 <- abs(panel.df$in_cw_y0+1)
+#panel.df$in_cw_y1 <- abs(panel.df$in_cw_y1+1)
+
+#ag.df$vio_cw_base <- abs(ag.df$vio_cw_base-1)
+#ag.df$vio_cw_end <- abs(ag.df$vio_cw_end-1)
+#panel.df$vio_cw_y0 <- abs(panel.df$vio_cw_y0-1)
+#panel.df$vio_cw_y1 <- abs(panel.df$vio_cw_y1-1)
+
+
+#ag.df$list_exp_base <- ag.df$list_exp_base*-1
+#ag.df$list_exp_end <- ag.df$list_exp_end*-1
+```
+
+
+# Make plot data
+
+Isolate vars.
+
+```{r}
+# comm
+ag.vars <- c("attitude_cw", "in_cw", 'contactOnly_cw',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
+# individual
+ind.vars <- c('attitude_cw', "in_cw", 'contactOnly_cw',
+              'pgp_amount_y1', 'pgp_donate_y1')
+# both (placebo)
+pl.vars <- "vio_cw"
+
+# add additive index
+ag.vars <- c(ag.vars, setdiff(gsub("_cw", "_index", ag.vars), ag.vars))
+ind.vars <- c(ind.vars, setdiff(gsub("_cw", "_index", ind.vars), ind.vars))
+stopifnot(setdiff(ag.vars,names(ag.df))==0)
+stopifnot(setdiff(ind.vars,names(panel.df))==0)
+```
+
+Ag.df plot data
+- mean, sd
+- also could want to plot SEs.  
+- for SE with clusters, need effective sample size, which needs ICC.
+
+```{r}
+#Aggregate Plot df
+base <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_base"), "treatment", "state", "psu")]
+names(base) <- sub("_base", "", names(base))
+base$survey <- "Baseline"
+end <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_end"), "treatment", "state", "psu")]
+names(end) <- sub("_end", "", names(end))
+end$survey <- "Endline"
+plot.df <- rbind(base,end)
+rm(base, end)
+
+# get ICCs with dplyr
+plot2.df <- plot.df %>% dplyr::group_by(survey) %>% 
+  dplyr::summarize_all(funs(ICC::ICCbare(psu,.))) %>%
+  as.data.frame() # warnings for non-numerics
+names(plot2.df) <- paste0(names(plot2.df), "_icc")
+
+# get mean and sd with dplyr
+plot.df$state <- as.character(plot.df$state) # save me trouble with dplyr later
+plot.df$psu <- as.numeric(as.character(plot.df$psu))
+plot1.df<-plot.df %>% 
+  dplyr::group_by(treatment,survey) %>%
+  dplyr::summarise_all(list(~mean(.), ~sd(.))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+# combine mean/sd df with ICC df
+plot.df <- cbind(plot1.df, plot2.df)
+plot.df$Treatment<-ifelse(plot.df$treatment %in% 1, "ECPN", "Non-ECPN")
+#plot.df$State <- ifelse(plot.df$state %in% "nas", "Nas", "Ben")
+#plot.df$plotID <- interaction(plot.df$Treatment, plot.df$State)
+rm(plot1.df, plot2.df)
+
+# need to add SEs; need to calc effective sample size; need to remove state, psu, survey, from these
+sdVars <-  names(plot.df)[grepl("_sd", names(plot.df))]
+sdVars <- sdVars[!sdVars %in% c("state_sd", "psu_sd")]
+seVars <- sub("_sd", "_se", sdVars)
+iccVars <- sub("_sd", "_icc", sdVars)
+essVars <- sub("_sd", "_ess", sdVars)
+plot.df[,essVars] <- (2*15)/(1+plot.df[,iccVars]*(2-1)) 
+
+# icc is negative for a couple things...making effective sample size larger than actual...
+for(i in 1:length(iccVars))
+{
+  plot.df[,essVars[i]] <- ifelse(plot.df[,essVars[i]] > 30, 30, plot.df[,essVars[i]])
+}
+plot.df[,seVars] <- plot.df[,sdVars]/sqrt(plot.df[,essVars])
+```
+
+Individual-level (Tr-Co) plot data
+
+```{r}
+#Panel Plot df
+base1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "community")]
+names(base1) <- sub("_y0", "", names(base1))
+base1$survey <- "Baseline"
+end1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "community")]
+names(end1) <- sub("_y1", "", names(end1))
+end1$survey <- "Endline"
+plot.df1 <- rbind(base1,end1)
+plot.df1$state <- as.character(plot.df1$state) # save me trouble with dplyr later
+plot.df1$community <- as.character(plot.df1$community)
+
+plot.df1<-plot.df1 %>% 
+  dplyr::group_by(treatment,survey) %>% 
+  dplyr::summarise_all(funs(mean(., na.rm = TRUE), sd(., na.rm=T))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+sumVars <- intersect(names(base1), ind.vars)
+iccVars1 <- paste0(intersect(names(base1), gsub("_icc", "", iccVars)), "_icc")
+for(i in 1:length(sumVars))
+{
+  plot.df1[plot.df1$survey %in% "Baseline",iccVars1[i]] <- ICC::ICCbare(base1$community,base1[,sumVars[i]])
+  plot.df1[plot.df1$survey %in% "Endline",iccVars1[i]] <- ICC::ICCbare(end1$community,end1[,sumVars[i]])
+}
+plot.df1$Treatment<-ifelse(plot.df1$treatment %in% 1, "ECPN", "Non-ECPN")
+
+# need to add SEs; need to calc effective sample size; need to remove state, psu, survey, from these
+sdVars1 <-  names(plot.df1)[grepl("_sd", names(plot.df1))]
+sdVars1 <- sdVars1[!sdVars1 %in% c("state_sd", "community_sd")]
+seVars1 <- sub("_sd", "_se", sdVars1)
+iccVars <- sub("_sd", "_icc", sdVars1)
+essVars1 <- sub("_sd", "_ess", sdVars1)
+avgSize <- mean(table(base1$community)) # diff sized clusters...using the average
+lengthComm <- length(table(base1$community)) # number of clusters is 29 -- no loko pastoralists.
+plot.df1[,essVars1] <- (avgSize*lengthComm)/(1+plot.df1[,iccVars1]*(avgSize-1)) 
+plot.df1[,seVars1] <- plot.df1[,sdVars1]/sqrt(plot.df1[,essVars1])
+```
+
+Individual Part-Non-Co plot data.
+
+```{r}
+# Part-non-control Plot df
+base2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "committee")]
+names(base2) <- sub("_y0", "", names(base2))
+base2$survey <- "Baseline"
+end2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "committee")]
+names(end2) <- sub("_y1", "", names(end2))
+end2$survey <- "Endline"
+plot.df2 <- rbind(base2,end2)
+plot.df2$Treatment <- interaction(plot.df2$treatment, plot.df2$committee)
+levels(plot.df2$Treatment) <- c("Control", "Non-Part", NA, "Part")
+plot.df2$Treatment <- ordered(plot.df2$Treatment, levels=c("Part", "Non-Part", "Control"))
+
+plot.df2$state <- as.character(plot.df2$state) # save me trouble with dplyr later
+plot.df2<-plot.df2 %>% 
+  dplyr::group_by(Treatment,survey) %>%  # chris: could add state here to differentiate nas from ben
+  dplyr::summarise_all(funs(mean(., na.rm = TRUE), sd(., na.rm=T))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+for(i in 1:length(sumVars))
+{
+  plot.df2[plot.df2$survey %in% "Baseline",iccVars1[i]] <- ICC::ICCbare(base1$community,base1[,sumVars[i]])
+  plot.df2[plot.df2$survey %in% "Endline",iccVars1[i]] <- ICC::ICCbare(end1$community,end1[,sumVars[i]])
+}
+# need to add SEs; need to calc effective sample size; need to remove state, psu, survey, from these
+plot.df2[,essVars1] <- (avgSize*lengthComm)/(1+plot.df2[,iccVars1]*(avgSize-1)) 
+plot.df2[,seVars1] <- plot.df2[,sdVars1]/sqrt(plot.df2[,essVars1])
+
+rm(list=ls(pattern="(se|sd|ess|icc)Vars"))
+rm(list=ls(pattern="base|end|avgSize|lengthComm"))
+```
+
+##########
+# Plot functions - ggplot showing each group before and after.
+##########
+
+```{r}
+# Fixing colors
+grps <-c("ECPN","Non-ECPN","Part", "Non-Part", "Control")
+color.codes<-as.character(c("#FC8D59", "#00BFC4", "#FC8D59", "dark red", "#00BFC4"))
+#ECPN = "#FC8D59", Non-ECPN = "#00BFC4", Part="FC8D59", Non-Part="green", Control="#00BFC4")
+#plot.df$colors <- c("#00BFC4","#00BFC4","#FC8D59","#FC8D59")
+#plot.df1$colors <- c("#FC8D59","#FC8D59","#00BFC4","#00BFC4")
+#plot.df2$colors <- c("#FC8D59","#FC8D59", "green", "green", "#FFFFBF","#FFFFBF")
+
+# The main Plot function chris: still need to make SE errorbars same color as lines...
+# gg line plot
+plot.fun<-function(var, thedf, time, title, xlab, ylab, ymin, ymax){
+  ggplot(data=thedf, aes(x=thedf[[time]], y=thedf[[paste0(var, "_mean")]], group=Treatment)) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  scale_colour_manual(values=setNames(color.codes, grps)) +
+  coord_cartesian(ylim = c(ymin, ymax)) +
+  #geom_errorbar(aes(ymin = thedf[[paste0(var, "_mean")]] - thedf[[paste0(var, "_se")]], 
+   #                ymax= thedf[[paste0(var, "_mean")]] + thedf[[paste0(var, "_se")]],
+  #                 color=Treatment), 
+  #      width=.2, position=position_dodge(0.03)) + 
+  ggtitle(title) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab(xlab) +
+  ylab(ylab)
+}
+```
+
+
+# Save
+
+```{r}
+save.image("didPlots_dfs.Rdata")
+
+```

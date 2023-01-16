@@ -1,6 +1,6 @@
 ---
 title: "ECPN Final Evaluation PAP"
-author: "Christopher Grady, Rebecca Wolfe, Dawop Saidu"
+author: "Christopher Grady, Rebecca Wolfe, Dawop Saidu, Lisa Inks"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default

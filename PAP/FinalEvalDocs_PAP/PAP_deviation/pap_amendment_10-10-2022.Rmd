@@ -22,11 +22,11 @@ This document describes deviations from the pre-analysis plan listed [here](http
 
 We initially listed 7 hypotheses.  We now list 4.  These changes apply to the community-level analysis and the individual-level analysis.
 
- 1. We combined hypotheses 1 ("increase trust and positive affect") and 4 ("increase positive attitudes") because we see no conceptual difference between "trust and positive affect" and "positive attitudes".  We see trust and affect as attitudes.  
+ 1. We combined hypotheses 1 ("increase trust and positive affect") and 4 ("increase positive attitudes") for two reasons.  First, we dropped survey measures of positive affect.  Second, the survey includes multiple attitudinal measures that focus on underlying attitudes regarding trustworthiness and we felt the general "positive attitudes" wording was a more accurate description than the specific "trust" wording.
 
  2. We combined hypotheses 2 ("more likely to cooperate in the PGG") and 7 ("fewer community members donate nothing during the Public Goods Game") because both are about donations in the public goods game.
 
- 3. We dropped hypothesis 6 ("Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities."). Hypothesis 6 is beyond the scope of this paper.  This paper is about individual attitudes, perceptions, and behaviors.  Hypothesis 6 is about the success of dispute resolution.  We are considering a separate paper about dispute resolution.
+ 3. We dropped hypothesis 6 ("Communities that receive the ECPN program will resolve disputes more peacefully compared to control communities."). Hypothesis 6 is beyond the scope of this paper.  This paper is about individual attitudes, perceptions, and behaviors.  Hypothesis 6 is about the success of dispute resolution.  In addition, the dispute resolution aspect of the intervention was targeted at community leaders rather than the whole community. We are considering a separate paper about dispute resolution.
 
 In the individual-level hypotheses, we unintentionally left out the individual-level hypothesis for _perceptions of physical security_.  We included that individual-level hypothesis.
 

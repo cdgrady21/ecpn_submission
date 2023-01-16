@@ -1,0 +1,619 @@
+---
+title: "ecpn_diff-in-diff plots"
+output:
+  word_document: default
+  html_document: default
+---
+
+note: if want to convert to pdf:
+
+dev.copy(pdf,file="endComm_plot_nas.pdf")
+dev.off()
+
+pdf(file="endComm_plot_nas.pdf", bg="transparent", width=5, height=5)
+endComm_plot_nas
+dev.off()
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load("didPlots_dfs.Rdata")
+
+#until I figure out insecurity, vio, list, reverse scale it.
+#ag.df$in_cw_base <- abs(ag.df$in_cw_base+1)
+#ag.df$in_cw_end <- abs(ag.df$in_cw_end+1)
+#panel.df$in_cw_y0 <- abs(panel.df$in_cw_y0+1)
+#panel.df$in_cw_y1 <- abs(panel.df$in_cw_y1+1)
+
+#ag.df$vio_cw_base <- abs(ag.df$vio_cw_base-1)
+#ag.df$vio_cw_end <- abs(ag.df$vio_cw_end-1)
+#panel.df$vio_cw_y0 <- abs(panel.df$vio_cw_y0-1)
+#panel.df$vio_cw_y1 <- abs(panel.df$vio_cw_y1-1)
+
+
+#ag.df$list_exp_base <- ag.df$list_exp_base*-1
+#ag.df$list_exp_end <- ag.df$list_exp_end*-1
+```
+
+## Attitudes
+
+ECPN sites improved more on Outgroup Index than control sites.
+
+```{r}
+(attitudeComm.plot <- plot.fun(var='attitude_cw', thedf=plot.df, time='survey', title="Community-level attitude change", 
+         xlab="Survey", ylab="Average Attitudinal Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="attitudeComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+attitudeComm.plot
+dev.off()
+```
+
+Part vs Non vs Con.  Part is blue and improves.  Non-part is green and gets a bit worse.  Control is red and gets much worse.
+
+```{r}
+(attitudePan.plot <- plot.fun(var='attitude_cw', thedf=plot.df2, time='survey', title="Individual-level attitude change",
+         xlab="Survey", ylab="Average Attitudinal Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="attitudePan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+attitudePan.plot
+dev.off()
+
+# why using these ugly colors instead of red green blue? have since fixed.
+#ggplot_build(outPan.plot)$data
+#ggplot_build(outComm.plot)$data
+```
+
+```{r, eval=F, include=F}
+# looking at indices on the same scale. Tell the same story: up for all, up more for treatment and participants.
+
+(outComm.plot <- plot.fun(var='x_index', thedf=plot.df, time='survey', title="Outgroup Attitudes - Community", 
+         xlab="Survey", ylab="Average Outgroup Index Score",
+         ymin=0, ymax=0.5))
+
+(outInd.plot <- plot.fun(var='x_index', thedf=plot.df1, time='survey', title="Outgroup Attitudes - Individual",
+         xlab="Survey", ylab="Average Outgroup Index Score",
+         ymin=-0.35, ymax=0.35))
+
+(outPan.plot <- plot.fun(var='x_index', thedf=plot.df2, time='survey', title="Outgroup Attitudes - Panel",
+         xlab="Survey", ylab="Average Outgroup Index Score",
+         ymin=0.3, ymax=0.7))
+```
+
+
+**********************
+chris: Titles need updating after this point.
+**********************
+
+
+
+
+
+
+## Intergroup Contact Index
+
+ECPN sites decreased less on contact index than control sites.
+
+```{r}
+(conComm.plot <- plot.fun(var='contactOnly_cw', thedf=plot.df, time='survey', title="Intergroup Contact - Community", 
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="conComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conComm.plot
+dev.off()
+```
+
+Part improves, Non-part and Control both get worse at identical rate.
+
+```{r}
+(conPan.plot <- plot.fun(var='contactOnly_cw', thedf=plot.df2, time='survey', title="Intergroup Contact - Panel",
+         xlab="Survey", ylab="Average Intergroup Contact Index Score",
+         ymin=0, ymax=0.7))
+
+png(file="conPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conPan.plot
+dev.off()
+
+```
+
+
+```{r, eval=F}
+# index not cw
+(conComm.plot <- plot.fun(var='contactOnly_index', thedf=plot.df, time='survey', title="Contact Index - Community", 
+         xlab="Survey", ylab="Average Contact Index Score",
+         ymin=0.3, ymax=0.7))
+
+(conPan.plot <- plot.fun(var='contactOnly_index', thedf=plot.df2, time='survey', title="Contact Index - Panel",
+         xlab="Survey", ylab="Average Contact Index Score",
+         ymin=0.3, ymax=0.7))
+
+
+```
+
+## Perceptions of Security Index
+
+ECPN sites improved more on the security index than control sites.
+
+```{r}
+(inComm.plot <- plot.fun(var='in_cw', thedf=plot.df, time='survey', title="Perceptions of Physical Security - Community", 
+         xlab="Survey", ylab="Average Perceptions of Physical Security Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="inComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inComm.plot
+dev.off()
+```
+
+Control gets much worse, part gets a little worse and non-part gets a little better.
+
+```{r}
+(inPan.plot <- plot.fun(var='in_cw', thedf=plot.df2, time='survey', title="Perceptions of Physical Security - Panel",
+         xlab="Survey", ylab="Average Perceptions of Physical Security Index Score",
+         ymin=0.3, ymax=0.7))
+
+png(file="inPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inPan.plot
+dev.off()
+```
+
+
+## Placebo plot
+
+Communities: Treatment gets _more_ accepting of violence, Control gets less accepting.  If there was SDB, we would expect the opposite.
+
+```{r}
+(vioComm.plot <- plot.fun(var='vio_cw', thedf=plot.df, time='survey', title="Attitudes towards Violence - Community", 
+         xlab="Survey", ylab="Average Violence Index Score",
+         ymin=0.1, ymax=0.6))
+
+png(file="vioComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+vioComm.plot
+dev.off()
+```
+
+Panel: All groups become less violence-accepting at ~the same rate.
+
+```{r}
+(vioPan.plot <- plot.fun(var='vio_cw', thedf=plot.df2, time='survey', title="Attitudes towards Violence - Individual",
+         xlab="Survey", ylab="Average Attitudes towards Violence Index Score",
+         ymin=0.1, ymax=0.6))
+
+png(file="vioPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+vioPan.plot
+dev.off()
+```
+
+
+**************************
+After this point, less important plots.
+
+
+
+**************************
+
+
+
+
+
+## List Experiment
+
+High values are bad here.
+
+ECPN sites decreased less than control sites on list experiment.  A measure of prejudice where high values mean a greater proportion of people expressing anger at "interacting with the outgroup in the market."
+
+<!--Lots of places have negative prejudice at endline (fewer angry with 4 item list than 3 item list).-->
+
+```{r}
+(listComm.plot <- plot.fun(var='list_exp', thedf=plot.df, time='survey', title="List Experiment", 
+         xlab="Survey", ylab="Average Difference Between 3 Item and 4 Item List",
+         ymin=-0.35, ymax=0.35))
+
+png(file="listComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+listComm.plot
+dev.off()
+
+```
+
+
+## Percent Experiment
+
+ECPN sites and control sites stayed the same on the percent experiment.  This percent experiment is a measure of prejudice where lower scores indicate less willingness to join a group/live in a community as the percentage of outgroup members in the community increase from 5/25/50/75 percent.
+
+```{r}
+(randComm.plot <- plot.fun(var='rand_lm', thedf=plot.df, time='survey', title="Percent Experiment", 
+         xlab="Survey", ylab="Average Change in Relationship Between % Outgroup Members and Joining Group/Living in Community",
+         ymin=-0.004, ymax=0.004))
+
+```
+
+Making a better graph by showing the 75% to 5% drop for TR and Co at baseline and endline (4 lines, each with 4 points).
+
+```{r}
+rand.df$tr2 <- ifelse(rand.df$treatment %in% 1, "Treatment", "Control")
+rand.df$treatmentSurvey <- interaction(rand.df$tr2, rand.df$survey)
+rand.df$tr2 <- NULL
+rand.df <- rand.df[!is.na(rand.df$rand_condition),] # remove ppl who refused to answer, so we don't get an NA category
+
+plot2.df <- rand.df %>% 
+  select(treatment,survey,treatmentSurvey, community, rand_outcome, rand_condition) %>%
+  dplyr::group_by(treatmentSurvey, rand_condition) %>%
+  dplyr::summarise(randOut=mean(rand_outcome, na.rm=T)) %>%
+  as.data.frame()
+levels(plot2.df$treatmentSurvey) <- c("Co-Base", "Tr-Base", "Co-End", "Tr-End")
+plot2.df$SurveyGroup <- ordered(plot2.df$treatmentSurvey, 
+                                    levels = c("Tr-Base", "Tr-End", "Co-Base", "Co-End"))
+
+(randComm.plot2 <- ggplot(data=plot2.df, aes(x=factor(rand_condition), y=randOut, group=SurveyGroup)) +
+  geom_line(aes(color=SurveyGroup))+
+  geom_point(aes(color=SurveyGroup))+
+  geom_text(aes(x=2.6, y=0.60, label="Tr-End"), color="firebrick4", size=3.5) + 
+  geom_text(aes(x=2.6, y=0.505, label="Co-End"), color="deepskyblue4", size=3.5) +
+  geom_text(aes(x=2.6, y=0.455, label="Tr-Base"), color="firebrick2", size=3.5) + 
+  geom_text(aes(x=2.6, y=0.395, label="Co-Base"), color="deepskyblue", size=3.5) + 
+  coord_cartesian(ylim = c(min(plot2.df['randOut'])-0.1, max(plot2.df['randOut'])+0.1)) +
+  ggtitle("Percent Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Percentage Outgroup Members") +
+  ylab("Percentage Subjects Willing to Join/Live") + 
+  scale_color_manual(values=c("firebrick2", "firebrick4", "deepskyblue", "deepskyblue4"), guide=F))
+
+png(file="randComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+randComm.plot2
+dev.off()
+
+```
+
+
+Maybe it's better to show the difference between baseline and endline at each proportion outgroup. So lines for Tr and Co at each % outgroup members.
+
+```{r}
+plot3.df <- rand.df %>% 
+  select(treatment,survey, community, rand_outcome, rand_condition) %>%
+  dplyr::group_by(treatment, rand_condition) %>%
+  dplyr::summarise(randOut_end=mean(rand_outcome[survey %in% 1], na.rm=T), 
+                   randOut_base=mean(rand_outcome[survey %in% 0]),
+                   randOut=randOut_end-randOut_base) %>%
+  as.data.frame()
+plot3.df$Treatment <- ifelse(plot3.df$treatment %in% 1, "Treatment", "Control")
+plot3.df$Treatment <- ordered(plot3.df$Treatment, levels=c("Treatment", "Control"))
+
+(randComm.plot3 <- ggplot(data=plot3.df, aes(x=factor(rand_condition), y=randOut, group=Treatment)) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  coord_cartesian(ylim = c(min(plot3.df['randOut'])-0.05, max(plot3.df['randOut'])+0.05)) +
+  ggtitle("Percent Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Percentage Outgroup Members") +
+  ylab("Percentage Subjects Willing to Join/Live"))
+```
+
+Nevermind, that's not better.
+
+### Percent Experiment -- Panel/Ind Data
+
+```{r}
+panel.df$tr_f <- droplevels(interaction(panel.df$treatment, panel.df$committee))
+panel.df$tr2 <- ifelse(panel.df$tr_f %in% "1.1", "Part", 
+                       ifelse(panel.df$tr_f %in% "1.0", "Non", 
+                              ifelse(panel.df$tr_f %in% "0.0", "Control", NA)))
+
+## need to remake dataset to have TR2, SVY, COND, OUTCOME
+rand_ind.df1 <- panel.df[,c("tr2", "rand_condition_y0", "rand_condition_y1", "rand_outcome_y0", "rand_outcome_y1", "id_num")]
+rand_baseline <- panel.df[,c("tr2", "rand_condition_y0", "rand_outcome_y0")]
+names(rand_baseline) <- gsub("_y0", "", names(rand_baseline))
+rand_baseline$survey <- "base"
+rand_endline <- panel.df[,c("tr2", "rand_condition_y1", "rand_outcome_y1")]
+names(rand_endline) <- gsub("_y1", "", names(rand_endline))
+rand_endline$survey <- "end"
+rand_ind.df <- rbind(rand_baseline, rand_endline)
+rand_ind.df$treatmentSurvey <- interaction(rand_ind.df$tr2, rand_ind.df$survey)
+
+rand_ind.df2 <- rand_ind.df %>% dplyr::group_by(treatmentSurvey, rand_condition) %>%
+  dplyr::summarise(randOut=mean(rand_outcome, na.rm=T)) %>%
+  as.data.frame()
+levels(rand_ind.df2$treatmentSurvey) <- c("Co-Base", "Non-Base", "Part-Base", "Co-End", "Non-End", "Part-End")
+rand_ind.df2$SurveyGroup <- ordered(rand_ind.df2$treatmentSurvey, 
+                                    levels = c("Part-Base", "Part-End", "Non-Base", "Non-End", "Co-Base", "Co-End"))
+
+(randPan.plot <- ggplot(data=rand_ind.df2, aes(x=factor(rand_condition), y=randOut, group=SurveyGroup)) +
+  geom_line(aes(color=SurveyGroup))+
+  geom_point(aes(color=SurveyGroup))+
+  geom_text(aes(x=4.3, y=0.55, label="Part-End"), color="firebrick4", size=3.5) + 
+  geom_text(aes(x=4.3, y=0.34, label="Co-End"), color="deepskyblue4", size=3.5) +
+  geom_text(aes(x=4.3, y=0.31, label="Part-Base"), color="firebrick2", size=3.5) + 
+  geom_text(aes(x=4.3, y=0.45, label="Co-Base"), color="deepskyblue", size=3.5) + 
+  geom_text(aes(x=4.3, y=0.405, label="Non-Base"), color="palegreen2", size=3.5) + 
+  geom_text(aes(x=4.3, y=0.61, label="Non-End"), color="palegreen4", size=3.5) + 
+  coord_cartesian(ylim = c(min(rand_ind.df2['randOut'])-0.05, max(rand_ind.df2['randOut'])+0.05)) +
+  ggtitle("Percent Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Percentage Outgroup Members") +
+  ylab("Percentage Subjects Willing to Join/Live") + 
+  scale_color_manual(values=c("firebrick2", "firebrick4", "palegreen2", "palegreen4", "deepskyblue", "deepskyblue4" ), guide=F))
+
+png(file="randPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+randPan.plot
+dev.off()
+
+```
+
+Again, maybe it's better to show the _difference_ between baseline and endline at each proportion outgroup. So lines for Part, Non, and Co at each % outgroup members.
+
+```{r}
+rand_ind.df3 <- rand_ind.df %>% dplyr::group_by(tr2, rand_condition) %>%
+  dplyr::summarise(randOut_end=mean(rand_outcome[survey %in% "end"], na.rm=T),
+                   randOut_base=mean(rand_outcome[survey %in% "base"], na.rm=T),
+                   randOut=randOut_end - randOut_base) %>%
+  as.data.frame()
+
+rand_ind.df3$Treatment <- rand_ind.df3$tr2
+#plot3.df$Treatment <- ordered(plot3.df$Treatment, levels=c("Treatment", "Control"))
+
+(randPan.plot3 <- ggplot(data=rand_ind.df3, aes(x=factor(rand_condition), y=randOut, group=Treatment)) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  coord_cartesian(ylim = c(min(rand_ind.df3['randOut'])-0.05, max(rand_ind.df3['randOut'])+0.05)) +
+  ggtitle("Percent Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Percentage Outgroup Members") +
+  ylab("Percentage Subjects Willing to Join/Live"))
+```
+
+
+
+
+## Endorsement Experiment
+
+ECPN sites decreased less than control sites on the endorsement experiment.  This endorsement experiment is a measure of prejudice where respondents are asked their support for a public policy.  Half are asked their support when the policy is endorsed by the outgroup.  The greater the decrease in support due to the outgroup endorsement, the higher the prejudice.
+
+Both groups have mildly negative response to outgroup endorsement at baseline.  Both groups have more negative response at endline, but control response changes the most negatively.
+
+```{r}
+(endComm.plot <- plot.fun(var='end_exp', thedf=plot.df, time='survey', title="Endorsement Experiment", 
+         xlab="Survey", ylab="Average Change in Support for Policy Endorsed by Outgroup",
+         ymin=-0.6, ymax=0))
+
+png(file="endComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+endComm.plot
+dev.off()
+```
+
+Individual-level graph. chris: here.
+
+```{r}
+# need a plot with the relationship at baseline for Part, Non, and C, then the relationship at endline for Part, Non, and Co.  
+## Probably need the relationsip for each TR group in each community to do any analysis.
+## aggregating all the TR-Endorse, TR-Generic, CO-Endorse, CO-Generic
+endInd_df <- panel.df[,c("tr2", "end_condition_y0", "end_condition_y1",
+                         "end_outcome_y0", "end_outcome_y1", "state", "farm_pastor", "community")]
+
+test <- endInd_df %>% dplyr::group_by(community, tr2) %>%
+  dplyr::summarise_all(mean,na.rm=T)
+lm(end_outcome_y0~end_condition_y0*tr2, data=test)
+lm(end_outcome_y1~end_condition_y1*tr2, data=test)
+
+# ignoring communities
+part <- endInd_df[endInd_df$tr2 %in% "Part",]
+non <- endInd_df[endInd_df$tr2 %in% "Non",]
+con <- endInd_df[endInd_df$tr2 %in% "Control",]
+
+part_baseline <- coefficients(lm(end_outcome_y0~end_condition_y0, data=part))[2]
+part_endline <- coefficients(lm(end_outcome_y1~end_condition_y1, data=part))[2]
+
+non_baseline <- coefficients(lm(end_outcome_y0~end_condition_y0, data=non))[2]
+non_endline <- coefficients(lm(end_outcome_y1~end_condition_y1, data=non))[2]
+
+con_baseline <- coefficients(lm(end_outcome_y0~end_condition_y0, data=con))[2]
+con_endline <- coefficients(lm(end_outcome_y1~end_condition_y1, data=con))[2]
+
+
+
+
+(endInd.plot <- plot.fun(var='end_exp', thedf=plot.df1, time='survey', title="Endorsement Experiment", 
+         xlab="Survey", ylab="Average Change in Support for Policy Endorsed by Outgroup",
+         ymin=-0.6, ymax=0.2))
+
+
+```
+
+
+## Public Goods Game
+
+Not a before after plot, since this was just at endline.  Barplot for donate at all and donate amount.
+
+```{r}
+# want a plot that shows Tr/Co on X-axis with bars for each outcome (donate at all, donate amount), and Y-axis is percent for donate at all (0-1) & amount for donate amount (0-1000)
+
+## Make a df with obs that are comm-outcome, vars for community and value amount
+pgg.df <- ag.df %>% select(pgp_donate_end, pgp_amount_end, treatment)
+pgg.df <- reshape2::melt(pgg.df, id="treatment")
+pgg.df <- pgg.df %>% dplyr::group_by(treatment,variable) %>% 
+  summarise(Value=mean(value)) %>%
+  as.data.frame()
+
+#putting outcomes on same scale
+pgg.df[pgg.df$variable %in% "pgp_amount_end", 'Value'] <- pgg.df[pgg.df$variable %in% "pgp_amount_end", 'Value']/1000
+colnames(pgg.df)[colnames(pgg.df)=="variable"] <- "Outcome"
+levels(pgg.df$Outcome) <- c("Made Donation", "Donation Amount")
+pgg.df$Treatment <- as.factor(ifelse(pgg.df$treatment %in% 1, "ECPN", "Non-ECPN"))
+pgg.df$Treatment <- ordered(pgg.df$Treatment, levels = c("ECPN", "Non-ECPN"))
+
+(pggComm.plot <- ggplot(data=pgg.df, aes(x=Outcome, y=Value, fill=Treatment)) +
+  geom_bar(stat="identity", position="dodge")+
+  scale_fill_manual(values=setNames(color.codes, grps)) +
+  ggtitle("Public Goods Game") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("PGG Outcome") +
+  #ylab("Percent Donating") +
+  scale_y_continuous(
+    "Percent Donating", 
+    sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
+
+png(file="pggComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+pggComm.plot
+dev.off()
+
+# Individual
+
+
+# Panel
+## Make a df with obs that are comm-outcome, vars for community and value amount
+panel.df$tr2 <- droplevels(interaction(panel.df$treatment, panel.df$committee))
+pgg.df2 <- panel.df %>% select(pgp_donate_y1, pgp_amount_y1, tr2)
+pgg.df2 <- reshape2::melt(pgg.df2, id="tr2")
+pgg.df2 <- pgg.df2 %>% dplyr::group_by(tr2,variable) %>% 
+  summarise(Value=mean(value)) %>%
+  as.data.frame()
+
+##putting outcomes on same scale
+pgg.df2[pgg.df2$variable %in% "pgp_amount_y1", 'Value'] <- pgg.df2[pgg.df2$variable %in% "pgp_amount_y1", 'Value']/1000
+colnames(pgg.df2)[colnames(pgg.df2)=="variable"] <- "Outcome"
+levels(pgg.df2$Outcome) <- c("Made Donation", "Donation Amount")
+pgg.df2$tr2 <- as.factor(as.character(pgg.df2$tr2))
+levels(pgg.df2$tr2) <- c("Control", "Non-Part", "Part")
+pgg.df2$tr2 <- ordered(pgg.df2$tr2, levels = c("Part", "Non-Part", "Control"))
+pgg.df2$Treatment <- pgg.df2$tr2
+
+## Plot
+(pggPan.plot <- ggplot(data=pgg.df2, aes(x=Outcome, y=Value, fill=Treatment)) +
+  geom_bar(stat="identity", position="dodge")+
+  scale_fill_manual(values=setNames(color.codes, grps)) +
+  ggtitle("Public Goods Game") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("PGG Outcome") +
+  #ylab("Percent Donating") +
+  scale_y_continuous(
+    "Percent Donating", 
+    sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
+
+png(file="did_plots/pggPan_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+pggPan.plot
+dev.off()
+```
+
+
+# Density Plots
+
+```{r}
+load("nullPs.Rdata")
+load("GlobP_un.Rdata")
+load("thep.Rdata")
+
+load("p_nullPs.Rdata")
+load("theGlobP_approx.Rdata")
+load("p_thep_approx.Rdata")
+
+```
+
+Community
+
+```{r}
+png(file="nullDist_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+
+plot(density(nullPs),
+     main="Null Distribution of p-values: Community Data")
+abline(v=GlobP_un)
+
+dev.off()
+
+# the corrected p
+thep
+
+```
+
+Panel
+
+```{r}
+png(file="p_nullDist_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+
+plot(density(p_nullPs),
+     main="Null Distribution of p-values: Panel Data")
+abline(v=theGlobP_approx)
+
+dev.off()
+
+# the corrected p
+p_thep_approx
+```
+
+# Save plots
+
+For use later.
+
+```{r}
+thing <- grep(".plot",names(.GlobalEnv),value=TRUE)
+#Pattern1_list<-do.call("list",mget(thing)) # show the graph of all objects
+
+
+save(endComm.plot,   randComm.plot,  conComm.plot,   outInd.plot,    shareInd.plot,  clashComm.plot, resComm.plot, 
+     outComm.plot,   listComm.plot,  inInd.plot,     clashInd.plot,  inComm.plot,    cohComm.plot,   cohInd.plot, 
+     resInd.plot, shareComm.plot, conInd.plot, randComm.plot2, randComm.plot3, pggComm.plot, 
+     clashPan.plot, resPan.plot, inPan.plot, sharePan.plot, conPan.plot, outPan.plot, cohPan.plot, pggPan.plot,
+     file='did_plots/ecpn_plots.Rdata') # must be easier way to save objects that match a pattern...
+
+```
+
+
+```{r, eval=F, include=F}
+# save plot.dfs for rebecca ot see
+plot.df_share <- plot.df[,1:15]
+plot.df1_share <- plot.df1[,1:12]
+plot.df2_share <- plot.df2[,1:12]
+pgg.df
+pgg.df2
+
+save(plot.df_share, plot.df1_share, plot.df2_share,pgg.df, pgg.df2,
+     file='did_plots/z-did_plot_dfs_share.Rdata')
+
+```
