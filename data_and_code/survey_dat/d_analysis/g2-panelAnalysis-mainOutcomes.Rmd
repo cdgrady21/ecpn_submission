@@ -1,0 +1,932 @@
+---
+title: "g2-panelAnalysis"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(7867564)
+rm(list=ls())
+load("../b_creating_outcomes/f2-panelData.Rdata")
+
+#library(NPC) # archived
+library(estimatr)
+library(mosaic)
+library(coin)
+library(robustbase)
+
+#True p-value function.
+load("true_fun_ind.rda")
+
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var="pgp_amount_y1", tr='treatment')
+#true.fun(var="pgp_amount_y1", tr='bene_cw')
+
+#com.fun(var="x_cw", nsims=1000)
+#com.fun1(var="x_cw", nsims=1000)
+
+#strat.fun("cohes_cw_y0")
+#strat.fun("x_cw_y0")
+```
+
+# ECPN Hypotheses
+
+ 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will trust each other more and feel more positively towards the outgroup than individuals
+ 2. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will cooperate more in the PGG than individuals who did not participate in these activities.
+ 3. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will interact more with the outgroup than individuals who did not participate in these
+activities.
+ 4. Individuals involved in more ECPN activities will cooperate more, trust each other more, have more
+positive attitudes about the outgroup, and interact more than those who participated in fewer ECPN
+activities. More specifically, we will see the most change in participants who participated in the
+joint projects, followed by the non-participants in the treatment communities, and then the control
+participants who we expect to have no change^[The data for this hypothesis is limited.  Many of the pre-identified respondents who were supposed to be participating in ECPN did not say they were participating in the survey.  Many of the pre-identified respondents who were not supposed to be participating in ECPN said they were participating in the survey. I am marking as a full participant/committee member everyone who said they were on a committee in the survey OR who was in the "full participant" group on the spreadsheet John sent.  Otherwise just 21 people, which makes me think they did not understand the survey question.]
+
+The first set of analyses is about people in treatment sites compared to people in control sites.  The second set of analyses will compare treatment people on committees, non-committee treatment people, and control people.
+
+************
+
+# Committee vs Non-committee vs. Control
+
+chris: note that this is NOT WHAT THE CODE IS DOING ANYMORE.  I did not understand ordered hypothesis testing.  Now we are just looking at a linear effect where control==1, nonparticipants==2, participants==3.
+
+Here we directly deal with our ordered hypothesis that effects should be committee members > non-committee members > controls.
+
+## Differences from Baseline-Endline by Committee, Non-committee, and Control
+
+To analyze our ordered hypothesis that effects should be committee members > non-committee members > controls, we want to do: (1) lm(outcome ~ treatment+committee+state), which gives us the effect estimate for committee members in treatment area, non-committee members in treatment areas, and control people.  (2) Then we simulate a world where the program had no effect by shuffling treatment assignment, which breaks its relationship to outcomes. We do that thousands of times to obtain a distribution of possible effects and p-values in the world where ECPN did nothing.  (3) Then we compare the real p-value estimates to that null distribution of no effects.
+
+_Both_ null coefficients need to be greater than their respective real coefficients.  I've also added that the sum of the two null coefficients should not be greater than the sum of the real coefficients.  Otherwise, if our real coefs are both 0.10, we still say the null distribution is NOT more extreme if it's two coefs are 0.20 and 0.09, because one is lower.
+
+We will use the differencing strategy when groups are not balanced at baseline.  We will use the controlling-for strategy when groups are balanced at baseline.  We say the groups are balanced if all groups are within 0.2 SDs of eachother at baseline.
+
+
+
+```{r}
+# make treatment variables
+panel.df$tr_f <- droplevels(interaction(panel.df$treatment, panel.df$committee))
+panel.df$tr_n <- as.numeric(panel.df$tr_f)
+```
+
+
+### Percent Experiment / Rand Exp
+
+```{r}
+strat.fun("rand_outcome_y0")
+(p_randp1 <- com.fun(var="rand_outcome", nsims=1000))
+#(p_randp1 <- com.fun1(var="rand_outcome_y1", nsims=1000))
+
+```
+
+
+### Intergroup Affect
+
+ 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will trust each other more and feel more positively towards the outgroup than individuals
+
+Variables: `r paste(xVars, collapse=", ")`
+
+```{r}
+strat.fun("x_cw_y0")
+(p_xp1 <- com.fun1(var="x_cw", nsims=1000))
+trustp_ind <- com.fun1(var="x_index", nsims=1000)
+```
+
+The p-value is `r p_xp1$truep`.
+
+### Social Cohesion
+
+ 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will trust each other more and feel more positively towards the outgroup than individuals
+
+Cohesion1 Vars: `r paste(cohesVars1, collapse=", ")`
+
+Cohesion2 Vars: `r paste(cohesVars2, collapse=", ")`
+
+```{r}
+strat.fun("cohes_cw_y0")
+(p_cohesp <- com.fun('cohes_cw', nsims=1000))
+```
+
+The p-value is `r p_cohesp$truep`.
+
+This index has two components.  The first set of questions are abstract things like "Are people in this area willing to help their neighbors across ethnic and religious lines?".  Before we ask these questions we say "I am going to ask you about people in this area, including people from the outgroup."
+
+The second set are concrete hypothetical situations that directly relate to the outgroup, like "If something unfortunate happened to someone from your group in this community, such as a serious illness or the death of a parent, how likely is it that some people in the community from the outgroup would get together to help them?"
+
+#### Cohesion 1, abstract questions
+
+```{r}
+strat.fun("cohes1_cw_y0")
+com.fun('cohes1_cw', nsims=1000)
+```
+
+
+#### Cohesion 2, concrete hypotheticals
+
+```{r}
+strat.fun("cohes2_cw_y0")
+(p_cohesp2 <- com.fun('cohes2_cw', nsims=1000))
+```
+
+The p-value is `r p_cohesp2$truep`.
+
+
+### PGG
+
+ 2. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will cooperate more in the PGG than individuals who did not participate in these activities.
+
+#### Donation Amount
+
+```{r pgg1}
+## no baseline, so differencing
+(p_pgpp1 <- com.fun1('pgp_amount_y1', nsims=1000))
+```
+
+The p-value is `r p_pgpp1$truep`.
+
+#### Donate yes/no
+
+```{r}
+(p_pgpp2 <- com.fun1('pgp_donate_y1', 1000))
+```
+
+The p-value is `r p_pgpp2$truep`.
+
+<!--
+#### Donation variance
+
+```{r, eval=F}
+com.fun('pgp_meanDist_y1', 1000)
+```
+
+All people in treatment communities have lower donation variance, but there is no difference between committee members and non-committee members in treatment areas.
+-->
+
+### Intergroup Contact / Interaction
+
+ 3. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will interact more with the outgroup than individuals who did not participate in these
+activities.
+
+**Note: this is also a mechanism and is in the mechanism section.**
+
+Intergroup interaction variables: `r paste(contactVars[c(1:4,7)], collapse=", ")`
+
+```{r}
+strat.fun("contactOnly_cw_y0")
+(p_conp1 <- com.fun1('contactOnly_cw', 1000))
+strat.fun("contactOnly_index_y0")
+conp_ind <- com.fun1('contactOnly_index', 1000)
+```
+
+The p-value of `r p_conp1$truep` suggests the relationship we see between committee members, non-committee treatment members, and control communities on our contact index is very unlikely to arise due to chance alone.  People in treatment communities, _especially committee members_, have a greater increased in intergroup interaction than people in control areas.
+
+**Robustness check** with alternative measure
+
+```{r, eval=F}
+strat.fun("contactOnly_cats_cw_y0")
+(p_conp1.1 <- com.fun1('contactOnly_cats_cw', 1000))
+strat.fun("contactOnly_cats_index_y0")
+conp_ind.1 <- com.fun1('contactOnly_cats_index', 1000)
+
+lm_robust(contactOnly_cats_cw~tr_n, clusters=community, data=panel.df)
+```
+
+
+### Insecurity 
+
+Insecurity Vars: `r paste(inVars, collapse=", ")`
+
+```{r}
+strat.fun("in_cw_y0")
+(p_inp1 <- com.fun1('in_cw', 1000))
+inp_ind <- com.fun1('in_index', 1000)
+```
+
+All people in treatment areas became more secure relative to control areas, and there is only a small difference between committee and non-committee members.  The p-value of `r p_inp1$truep` suggests the relationship we see between committee members, non-committee treatment members, and control communities on our insecurity index could arise due to chance alone.
+
+
+## Placebo - attitudes about violence.
+
+Attitudes about violence: `r vioVars`
+
+```{r resolve}
+strat.fun("vio_cw_y0")
+(p_viop1 <- com.fun1('vio_cw', 1000))
+(p_viop1 <- com.fun1('vio_index', 1000))
+vio1p <- p_viop1
+```
+
+## Mechanisms
+
+**Threat**
+
+```{r}
+strat.fun("threat_cw_y0")
+(p_threatp1 <- com.fun('threat_cw', 1000))
+#com.fun("threat_group.threat_dis_group.x_threat", 1000)
+threat1p <- com.fun('threat_index', 1000)
+
+(p_threat_trust <- true.fun('allTrust_cw', 'threat_cw'))
+(p_threat_contact <- true.fun('contactOnly_cw', 'threat_cw'))
+(p_threat_in <- true.fun('in_cw', 'threat_cw'))
+```
+
+ECPN does not reduce feelings of threat.  But feelings of threat negatively correlated with intergroup attitudes, contact, and security.
+
+**Empathy**
+
+```{r}
+strat.fun("emp_cw_y0")
+(p_threatp1 <- com.fun1('emp_cw', 1000))
+emp1p <- com.fun1('emp_index', 1000)
+
+(p_emp_trust <- true.fun1('allTrust_cw', 'emp_cw'))
+(p_emp_contact <- true.fun1('contactOnly_cw', 'emp_cw'))
+(p_emp_in <- true.fun1('in_cw', 'emp_cw'))
+
+
+
+# select
+strat.fun("persp_cw_y0")
+# true pvals persp
+(p_persp1 <- com.fun('persp_cw', 1000))
+persp1p <- com.fun('persp_index', 1000)
+
+(p_persp_trust <- true.fun1('allTrust_cw', 'persp_cw'))
+(p_persp_contact <- true.fun1('contactOnly_cw', 'persp_cw'))
+(p_persp_in <- true.fun1('in_cw', 'persp_cw'))
+
+```
+
+ECPN does increase empathy.  Improving empathy correlated with improving intergroup attitudes, intergroup contact, but not security.
+
+ECPN increases perspective-taking a bit, but not to a statistically significant level (remember, only measured with one question).  perspective-taking correlates with intergroup attitudes and contact.
+
+**Expansion**
+
+```{r}
+strat.fun("expand_cw_y0")
+(p_expandp1 <- com.fun('expand_cw', 1000))
+expan1p <- com.fun('expand_index', 1000)
+
+(p_expand_trust <- true.fun('allTrust_cw', 'expand_cw'))
+(p_expand_contact <- true.fun('contactOnly_cw', 'expand_cw'))
+(p_expand_in <- true.fun('in_cw', 'expand_cw'))
+
+```
+
+ECPN does not cause ingroup expansion, but ingroup expansion correlated with intergroup attitudes and contact.  Somewhat with security.
+
+<!--
+# All Hypotheses Together
+
+### My NPC
+
+Gather the observed pvalues, use fisher's method to generate a globalP, compare that globalP to the null distribution of globalPs made the same way.
+
+Issue: simulating the null distribution of globalPs will take too long because I used randomization inferene to get all the individual Ps.  Need to also get Ps using lm_lin, make those into an approximate globalP, and then compare to null distribution.
+
+```{r Ps, eval=F}
+## First need a function to transform true P-values as described in Caughey et al 2017
+## transform ps #realp <- (p+(2*B)^-1)/(1+B^-1)#, where B is number of samples from permutation space (number of sims in true.fun).
+p_trans.fun <- function(ps,nsims)
+{
+  trans_ps <- rep(NA,length(ps))
+  for(i in 1:length(ps)){
+    trans_ps[i] <- (ps[i]+(2*nsims)^-1)/(1+nsims^-1)
+  }
+  return(trans_ps)
+}
+#fakePs <- c(0.1,0.1,0.1,0.2)
+#p_trans.fun(fakePs,3000)
+
+
+# The cumulative coef -- all Hyps from community analysis
+allcoef <- sum(p_xp1[[1]]/sd(panel.df$x_cw),
+                 p_cohesp[[1]]/sd(panel.df$cohes_cw_y0),
+                 p_pgpp1[[1]]/sd(panel.df$pgp_amount_y1),
+                 p_pgpp2[[1]]/sd(panel.df$pgp_donate_y1),
+                 p_conp1[[1]]/sd(panel.df$contactOnly_cw), 
+                 p_inp1[[1]]/sd(panel.df$in_cw),
+                 p_resp1[[1]]/sd(panel.df$resolve_cw_y0)
+                 )
+
+## Only the outcomes we prespecified at ind level
+thecoef <- sum(p_xp1[[1]]/sd(panel.df$x_cw),
+                 p_cohesp[[1]]/sd(panel.df$cohes_cw_y0),
+                 p_pgpp1[[1]]/sd(panel.df$pgp_amount_y1),
+                 p_pgpp2[[1]]/sd(panel.df$pgp_donate_y1),
+                 p_conp1[[1]]/sd(panel.df$contactOnly_cw) 
+                 )
+
+
+# collect the Ps for a global p-value
+allPs <- p_trans.fun(c(p_xp1$truep, p_cohesp$truep, p_pgpp1$truep, p_pgpp2$truep, p_conp1$truep, p_inp1$truep, p_resp1$truep),1000)
+thePs <- p_trans.fun(c(p_xp1$truep, p_cohesp$truep, p_pgpp1$truep, p_pgpp2$truep, p_conp1$truep),1000)
+
+## Observed Global-P
+(theGlobP_un <- metap::sumlog(thePs)[[3]])
+(allGlobP_un <- metap::sumlog(allPs)[[3]])
+
+## Observed Approximate Global-P
+ap_x <- lm_robust(x_cw ~ tr_n+state, clusters=community, panel.df)$p.value[[2]]
+ap_cohes <- lm_robust(cohes_cw_y1 ~ tr_n+cohes_cw_y0, clusters=community, panel.df)$p.value[[2]]
+ap_pgp1 <- lm_robust(pgp_amount_y1 ~ tr_n+state, clusters=community, panel.df)$p.value[[2]]
+ap_pgp2 <- lm_robust(pgp_donate_y1 ~ tr_n+state, clusters=community, panel.df)$p.value[[2]]
+ap_con1 <- lm_robust(contactOnly_cw ~ tr_n+state, clusters=community, panel.df)$p.value[[2]]
+ap_in1 <- lm_robust(in_cw ~ tr_n+state, clusters=community, panel.df)$p.value[[2]]
+ap_res1 <- lm_robust(resolve_cw_y1 ~ tr_n+state+resolve_cw_y0, clusters=community, panel.df)$p.value[[2]]
+    
+# gather the ps and prepare to use fisher product test
+ap_allPs <- c(ap_x, ap_cohes, ap_pgp1, ap_pgp2,
+                ap_con1, ap_in1, ap_res1)
+ap_thePs <- c(ap_x, ap_cohes, ap_pgp1, ap_pgp2,
+                ap_con1)
+
+## observed approximate globalp
+allGlobP_approx <- metap::sumlog(ap_allPs)[[3]]
+theGlobP_approx <- metap::sumlog(ap_thePs)[[3]]
+
+
+# Null distribution of global-ps
+multcom.fun <- function(nsims)
+{
+  randGlobP <- matrix(data=NA, nrow=nsims, ncol=2)
+  for(i in 1:nsims){
+    # randomly select for treatment PSUs within state
+    rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+    rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- panel.df
+    
+    # 10p had no preselected, need to add it as 0% committee so have a committee proportion for each tr site pair
+    rand.samp[nrow(rand.samp)+1,] <- NA
+    rand.samp$community <- as.character(rand.samp$community)
+    rand.samp[nrow(rand.samp), c("treatment", "community", "psu", "committee")] <- c(1,"10.pastoralists", 10, 0)
+    rand.samp[,"newtr"] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+    
+    # randomly select respondents to be committee members within newtr communities
+    committees <- droplevels(rand.samp[rand.samp$treatment %in% 1, c("committee", "community")])
+    toadd <- as.vector(prop.table(table(committees$community, committees$committee),1)[,"1"]) # prop of commit ppl in each tr community
+    tr.samp <- droplevels(rand.samp[rand.samp$newtr %in% 1,]) #simulated treatment people
+    #tr.samp$newcomm <- randomizr::block_ra(block_var = tr.samp$community, block_prob = shuffle(as.numeric(toadd))) # deprecated syntax for block_ra.
+    tr.samp$newcomm <- randomizr::block_ra(blocks = tr.samp$community, block_prob = shuffle(as.numeric(toadd)))
+    rand.samp$newcomm <- tr.samp$newcomm[match(rand.samp$id_num, tr.samp$id_num)]
+    rand.samp$newcomm[is.na(rand.samp$newcomm)] <- 0 # make control ppl 0
+    rand.samp["new_tr_f"] <- droplevels(interaction(rand.samp[,"newtr"], rand.samp[,"newcomm"]))
+    rand.samp["new_tr_n"] <- as.numeric(rand.samp[,"new_tr_f"])
+    
+    # calculate ps for each outcome when tr is shuffled
+    null_x <- lm_robust(x_cw ~ new_tr_n+state, clusters=community, rand.samp)$p.value[[2]]
+    null_cohes <- lm_robust(cohes_cw_y1 ~ new_tr_n+cohes_cw_y0, clusters=community, rand.samp)$p.value[[2]]
+    null_pgp1 <- lm_robust(pgp_amount_y1 ~ new_tr_n+state, clusters=community, rand.samp)$p.value[[2]]
+    null_pgp2 <- lm_robust(pgp_donate_y1 ~ new_tr_n+state, clusters=community, rand.samp)$p.value[[2]]
+    null_con1 <- lm_robust(contactOnly_cw ~ new_tr_n+state, clusters=community, rand.samp)$p.value[[2]]
+    null_in1 <- lm_robust(in_cw ~ new_tr_n+state, clusters=community, rand.samp)$p.value[[2]]
+    null_res1 <- lm_robust(resolve_cw_y1 ~ new_tr_n+state+resolve_cw_y0, clusters=community, rand.samp)$p.value[[2]]
+    
+    # gather the ps and prepare to use fisher product test
+    ## null_ps <- c(ls()[grepl("^null", ls())]) # how to get from enviro?
+    null_allPs <- c(null_x, null_cohes, null_pgp1, null_pgp2,
+                 null_con1, null_in1, null_res1)
+    
+    null_thePs <- c(null_x, null_cohes, null_pgp1, null_pgp2,
+                    null_con1)
+    
+    ## save global P
+    randGlobP[i,1] <- metap::sumlog(null_allPs)[[3]]
+    randGlobP[i,2] <- metap::sumlog(null_thePs)[[3]]
+  }
+  
+  return(randGlobP)
+  
+}
+p_nullPs <- multcom.fun(nsims=1000)
+save(p_nullPs, file="p_nullPs.Rdata")
+
+# the prespecified ps
+p_thep <- mean(p_nullPs[,2]<=theGlobP_un)
+p_thep_approx <- mean(p_nullPs[,2]<=theGlobP_approx)
+
+# all the ps
+p_allp <- mean(p_nullPs[,1]<=allGlobP_un)
+p_allp_approx <- mean(p_nullPs[,1]<=allGlobP_approx)
+
+(p_thedf <- data.frame(thecoef=thecoef, theGlobP=p_thep, theGlobP_approx=p_thep_approx,
+                      allcoef=allcoef, allGlobP=p_allp, allGlobP_approx=p_allp_approx))
+
+save(theGlobP_approx, file="theGlobP_approx.Rdata")
+save(p_thep_approx, file="p_thep_approx.Rdata")
+
+```
+
+Including only the hypotheses we pre-specified for the individual-level: Cumulative standardized coefficient of `r round(thecoef,4)`.  Global-p of `r round(p_thep,4)` to `r round(p_thep_approx,4)`.
+
+Including hypotheses we pre-specified at the community-level: Cumulative standardized coefficient of `r round(allcoef,4)`.  Global-p of `r round(p_allp,4)` to `r round(p_allp_approx,4)`.
+
+*********
+
+### If we only corrected for multiple tests
+
+**P-values** unadjusted, adjusted using FDR, adjusted using Holm.
+
+```{r multHyps, eval=F}
+# correcting thePs
+## individual pap only
+allPs2 <- p.adjust(p=allPs, method="fdr")
+allPs3 <- p.adjust(p=allPs, method="holm")
+## community pap also
+thePs2 <- p.adjust(p=thePs, method="fdr")
+thePs3 <- p.adjust(p=thePs, method="holm") # if we do family-wise, I'd want to specify families.
+
+# all
+data.frame(variable=c("x1", "cohes", "pgp1", "pgp2", "con1", "in1", "res1"), 
+      unadjusted=allPs,
+      FDR=allPs2, FWER=allPs3)
+
+# individual pap only
+(ps_df_p <- data.frame(variable=c("Trust", "Cohesion", "PGG Amount", "PGG Donate", "Contact"), 
+      unadjusted=thePs,
+      FDR=thePs2, FWER=thePs3))
+save(ps_df_p, file="ps_df_p.Rdata")
+
+# Global-P after correcting
+(theGlobP_fdr <- metap::sumlog(thePs2)[[3]])
+(allGlobP_fdr <- metap::sumlog(allPs2)[[3]])
+
+```
+-->
+
+
+### Save 
+
+For cross-level combined hypothesis test
+
+```{r}
+p_combP <- theGlobP_un
+save(p_combP,panel.df, file="g2-panelAnal.Rdata")
+
+```
+
+For referencing these values
+
+```{r}
+save.image("g2-panelAnalComplete.Rdata")
+```
+
+For appendices.  chris: have not added p_conp1.1 and conp_ind.1, alternative measures of contact.
+
+```{r save3}
+save(trustp_ind, inp_ind, conp_ind,
+     vio1p,
+     threat1p, emp1p, persp1p, expan1p,
+     file="z_appendices_ind.Rdata")
+
+```
+
+
+
+
+****************
+
+# Appendices (OLD, APPENDICES NOW ABOVE)
+
+ 1. [Clumping all treatment respondents together](#tr-co)
+ 2. [Mechanisms](#mech)
+ 3. [Survey Experiments](#survExps)
+
+Note: Currently cut for time.
+<!--
+
+## Treatment vs Control Analysis{#tr-co}
+
+### Intergroup Affect
+
+ 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will trust each other more and feel more positively towards the outgroup than individuals
+
+Variables: `r paste(xVars, collapse=", ")`
+
+```{r apstart, eval=F}
+# true pvals
+(p_x1 <- true.fun('x_cw', 'treatment'))
+
+```
+
+
+
+### Social Cohesion
+
+ 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will trust each other more and feel more positively towards the outgroup than individuals
+
+Cohesion1 Vars: `r paste(cohesVars1, collapse=", ")`
+
+Cohesion2 Vars: `r paste(cohesVars2, collapse=", ")`
+
+```{r, eval=F}
+# true pvals
+(p_cohes <- true.fun('cohes_cw', 'treatment'))
+
+
+```
+
+
+This index has two components.  The first set of questions are abstract things like "Are people in this area willing to help their neighbors across ethnic and religious lines?".  Before we ask these questions we say "I am going to ask you about people in this area, including people from the outgroup."
+
+The second set are concrete hypothetical situations that directly relate to the outgroup, like "If something unfortunate happened to someone from your group in this community, such as a serious illness or the death of a parent, how likely is it that some people in the community from the outgroup would get together to help them?"
+
+#### Cohesion 1, abstract questions
+
+```{r, eval=F}
+true.fun('cohes1_cw', 'treatment')
+```
+
+
+#### Cohesion 2, concrete hypotheticals
+
+```{r, eval=F}
+(p_cohes2 <- true.fun('cohes2_cw', 'treatment'))
+```
+
+
+### PGG
+
+ 2. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will cooperate more in the PGG than individuals who did not participate in these activities.
+
+#### Donation Amount
+
+```{r, eval=F}
+(p_pgp1 <- true.fun('pgp_amount_y1', 'treatment'))
+```
+
+
+#### Donate yes/no
+
+```{r pggmech, eval=F}
+(p_pgp2 <- true.fun('pgp_donate_y1', 'treatment'))
+```
+
+
+#### Donation variance
+
+```{r, eval=F}
+true.fun('pgp_meanDist_y1', 'treatment')
+```
+
+
+```{r, eval=F}
+sort(mosaic::mean(panel.df$pgp_amount_y1~panel.df$community))
+
+```
+
+### Intergroup Interaction
+
+ 3. Individuals involved in the planning and implementing of projects that benefit both farmers and
+pastoralists will interact more with the outgroup than individuals who did not participate in these
+activities.
+
+**Note: this is also a mechanism and is in the mechanism section.**
+
+Intergroup interaction variables: `r paste(contactVars[c(1:4,7)], collapse=", ")`
+
+```{r, eval=F}
+(p_con1 <- true.fun('contactOnly_cw', 'treatment'))
+```
+
+
+### Insecurity 
+
+**Not an individual-level hypotheses, but included here to match aggAnalysis doc**
+ 
+Insecurity Vars: `r paste(inVars, collapse=", ")`
+
+```{r inmech, eval=F}
+(p_in1 <- true.fun('in_cw', 'treatment'))
+```
+
+
+### Resolving Dispute
+
+**Not an individual-level hypotheses, but included here to match aggAnalysis doc**
+
+Resolve Vars: `r paste(resolveVars, collapse=", ")`
+
+```{r, eval=F}
+(p_res1 <- true.fun('resolve_cw', 'treatment'))
+```
+
+
+### Correcting for Multiple Hypothesis Tests
+
+#### False discovery rate on individual hypothesis tests
+
+With 5 tests, even the false discovery rate correction is going to increase these p-values.
+
+```{r, eval=F}
+data.frame(var=c("p_x1$truep", "p_cohes$truep", "p_pgp1$truep", "p_pgp2$truep", "p_con1$truep"), 
+                p = c(p_x1$truep, p_cohes$truep, p_pgp1$truep, p_pgp2$truep, p_con1$truep),
+                p_adjust= p.adjust(p=c(p_x1$truep, p_cohes$truep, p_pgp1$truep, p_pgp2$truep, p_con1$truep), method="fdr"))
+```
+
+#### NPC to test the multiple hypotheses simultaneously.
+
+NPC models - test all hypotheses together
+
+```{r app_npc, eval=F}
+# Inverse-covariance weighted indices
+p_npc <- NPC::NPC(panel.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c('x_cw', 'cohes_cw', 'pgp_amount_y1', 'pgp_donate_y1',
+                               'contactOnly_cw'), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=1000, seed=87565,
+             print.steps=FALSE)
+p_npc$p.values['NPC'] # cumulative
+p_npc # all of them
+```
+
+```{r, eval=F, include=F, echo=F}
+# equally weighted index
+npc <- NPC::NPC(panel.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c('x_index', 'cohes_index', 'pgp_amount_y1', 'pgp_donate_y1',
+                               'contactOnly_index', 'in_index', 'resolve_index'), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=2000, seed=sample(87565),
+             print.steps=FALSE)
+npc$p.values['NPC'] # cumulative
+npc$p.values # all of them
+
+
+#also with hyps specified in aggregate plan, not individual plan
+npc <- NPC::NPC(panel.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c('x_cw', 'cohes_cw', 'pgp_amount_y1', 'pgp_donate_y1',
+                               'contactOnly_cw', 'in_cw', 'resolve_cw'), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=1000, seed=87565,
+             print.steps=FALSE)
+npc$p.values['NPC'] # cumulative
+npc # all of them
+
+```
+
+
+```{r, eval=F, include=F, echo=F}
+# in_index and in_cw are...way different.
+cor(na.omit(panel.df[,c("in_cw", "in_index")])) # negatively correlated.
+# cohes stuff also fairly diff
+cor(na.omit(panel.df[,c("cohes_cw", "cohes_index")])) # only 0.50 correlated.
+# contactOnly stuff also fairly diff
+cor(na.omit(panel.df[,c("contactOnly_cw", "contactOnly_index")])) # 0.70 correlated.
+
+```
+
+
+
+## Mechanisms{#mech}
+
+Here we see if ECPN (1) increased perceptions of benefit, (2) decreased perceptions of outgroup threat, or (3) increased intergroup interaction.
+
+### Perceptions of Benefit
+
+```{r mechstart, eval=F}
+(p_bene1 <- true.fun('bene_cw', 'treatment'))
+```
+
+Treatment predicts an increase in perceptions of benefit, but not quite to a statistically significant amount (p-value below 0.05).
+
+```{r, eval=F}
+(p_bene2 <- true.fun('x_cw', 'bene_cw'))
+(p_bene3 <- true.fun('cohes_cw', 'bene_cw'))
+(p_bene3a <- true.fun('cohes1_cw', 'bene_cw'))
+(p_bene3b <- true.fun('cohes2_cw', 'bene_cw'))
+(p_bene4 <- true.fun('pgp_amount_y1', 'bene_cw'))
+(p_bene5 <- true.fun('pgp_donate_y1', 'bene_cw'))
+(p_bene6 <- true.fun('contactOnly_cw', 'bene_cw'))
+(p_bene7 <- true.fun('in_cw', 'bene_cw'))
+(p_bene8 <- true.fun('resolve_cw', 'bene_cw'))
+
+```
+
+
+### Perceptions of Threat
+
+```{r, eval=F}
+(p_threat1 <- true.fun('threat_cw', 'treatment'))
+```
+
+
+```{r, eval=F}
+(p_threat2 <- true.fun('x_cw', 'threat_cw'))
+(p_threat3 <- true.fun('cohes_cw', 'threat_cw'))
+(p_threat3a <- true.fun('cohes1_cw', 'threat_cw'))
+(p_threat3b <- true.fun('cohes2_cw', 'threat_cw'))
+(p_threat4 <- true.fun('pgp_amount_y1', 'threat_cw'))
+(p_threat5 <- true.fun('pgp_donate_y1', 'threat_cw'))
+(p_threat6 <- true.fun('contactOnly_cw', 'threat_cw'))
+(p_threat7 <- true.fun('in_cw', 'threat_cw'))
+(p_threat8 <- true.fun('resolve_cw', 'threat_cw'))
+
+```
+
+
+
+### Intergroup Interaction
+
+```{r, eval=F}
+p_con1 # from above
+```
+
+
+```{r, eval=F}
+(p_int2 <- true.fun('x_cw', 'contactOnly_cw'))
+(p_int3 <- true.fun('cohes_cw', 'contactOnly_cw'))
+(p_int3a <- true.fun('cohes1_cw', 'contactOnly_cw'))
+(p_int3b <- true.fun('cohes2_cw', 'contactOnly_cw'))
+(p_int4 <- true.fun('pgp_amount_y1', 'contactOnly_cw'))
+(p_int5 <- true.fun('pgp_donate_y1', 'contactOnly_cw'))
+(p_int7 <- true.fun('in_cw', 'contactOnly_cw'))
+(p_int8 <- true.fun('resolve_cw', 'contactOnly_cw'))
+
+```
+
+
+```{r, eval=F, include=F, echo=F}
+# me sneaking a peak at some unjustified IVs.
+
+# Quick ivreg does not suggest treatment works through these mechanisms. Also not accounting for clustering.
+# these say that we have weak instruments, and that endogeneity indeed was a problem.
+(iv1 = AER::ivreg(x_cw ~ treatment | contactOnly_cw , data = panel.df))
+summary(iv1, vcov = sandwich, diagnostics = TRUE)
+
+(iv2 = AER::ivreg(x_cw ~ treatment | bene_cw+threat_cw+contactOnly_cw , data = panel.df))
+summary(iv2, vcov = sandwich, diagnostics = TRUE)
+
+lm_robust(x_cw~treatment*contactOnly_cw+state, data=panel.df, clusters=psu) # also nothing
+```
+
+## Survey Experiments{#survExps}
+
+ADDED LATER
+
+Chris: could do svy experiments by grouping co, nonpart, and participants together and looking at the: (1) average change from 3-4 items on the list, (2) change in correlation between % outgroup and "yes" answers on rand exp, and (3) change in the support decrease in the endorsement exp.
+
+### List Exp
+
+```{r}
+table(panel.df$list_exp1a)
+
+
+```
+
+
+# Testing
+
+```{r, eval=F, include=F}
+# Lin Method
+
+As opposed to randomization infernece
+
+```{r}
+# outcome
+lm_lin(contactOnly_cw_y1 ~ treatment, covariates=~state+contactOnly_cw_y0, clusters=community, data=panel.df)
+
+# change
+lm_lin(contactOnly_cw ~ treatment, covariates=~state, clusters=community, data=panel.df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#####################
+# OLD com.fun
+####################
+com.fun1 <- function(var, nsims)
+{
+  lm1 <- lm(panel.df[,var] ~ tr_f+state, panel.df)
+  non <- coef(lm1)[2]
+  comm <- coef(lm1)[3]
+  both <- non+comm
+  
+  rand.coefs <- matrix(data=NA, nrow=nsims, ncol=3) # I think correct thing is to: (1) for treatment shuffle PSU-level treatment within state, (2) for committee shuffle committee within Community for the comm/non comparison.  To avoid committee people in non-treated areas, need to make "committee" column for "newtr" the same as committee for "treatment" before shuffling.
+  for(i in 1:nsims){
+    # randomly select for treatment PSUs within state
+    rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+    rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- panel.df
+    
+    # 10p had no preselected, need to add it as 0% committee so have a committee proportion for each tr site pair
+    rand.samp[nrow(rand.samp)+1,] <- NA
+    rand.samp$community <- as.character(rand.samp$community)
+    rand.samp[nrow(rand.samp), c("treatment", "community", "psu", "committee")] <- c(1,"10.pastoralists", 10, 0)
+    rand.samp[,"newtr"] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+    
+    # randomly select respondents to be committee members within newtr communities
+    committees <- droplevels(rand.samp[rand.samp$treatment %in% 1, c("committee", "community")])
+    toadd <- as.vector(prop.table(table(committees$community, committees$committee),1)[,"1"]) # prop of commit ppl in each tr community
+    tr.samp <- droplevels(rand.samp[rand.samp$newtr %in% 1,]) #simulated treatment people
+    tr.samp$newcomm <- randomizr::block_ra(blocks = tr.samp$community, block_prob = shuffle(as.numeric(toadd)))
+    rand.samp$newcomm <- tr.samp$newcomm[match(rand.samp$id_num, tr.samp$id_num)]
+    rand.samp$newcomm[is.na(rand.samp$newcomm)] <- 0 # make control ppl 0
+    rand.samp["new_tr_f"] <- droplevels(interaction(rand.samp[,"newtr"], rand.samp[,"newcomm"]))
+    
+    lm.null <- lm(rand.samp[,var] ~ new_tr_f+state, rand.samp)
+    #control <- coef(lm1)[1] # don't think I need this, actually.
+    #rand.coefs[i,1] <- coef(lm.null)[2]
+    #rand.coefs[i,2] <- coef(lm.null)[3]
+    rand.coefs[i,3] <- coef(lm.null)[2] + coef(lm.null)[3]
+   
+  }
+  
+  # now it's: "how many times are the non coef AND the comm coef greater than or equal to what we observed?"
+  #thep <- mean(rand.coefs[,1]>=non & rand.coefs[,2]>=comm) # reject unless BOTH bigger
+  #thep <- 1 - mean(non>rand.coefs[,1] & both>rand.coefs[,3] | comm>rand.coefs[,2] & both>rand.coefs[,3])
+  thep <- 1 - mean(both>=rand.coefs[,3]) #immediate above is equivalent to this
+  thedf <- data.frame(non=non, comm=comm, truep=thep)
+  rownames(thedf) <- paste0(var, "-", "trueP")
+  return(thedf)
+}
+
+
+# Controlling-for
+com.fun <- function(var, nsims)
+{
+  lm1 <- lm_lin(panel.df[,paste0(var,"_y1")] ~ tr_f, covariates=~state+panel.df[,paste0(var,"_y0")], panel.df)
+  #lm1 <- lm(panel.df[,paste0(var,"_y1")] ~ tr_f+state+panel.df[,paste0(var,"_y0")], panel.df)
+  non <- coef(lm1)[2]
+  comm <- coef(lm1)[3]
+  both <- non+comm
+  
+  rand.coefs <- matrix(data=NA, nrow=nsims, ncol=3) # I think correct thing is to: (1) for treatment shuffle PSU-level treatment within state, (2) for committee shuffle committee within Community for the comm/non comparison.  To avoid committee people in non-treated areas, need to make "committee" column for "newtr" the same as committee for "treatment" before shuffling.
+  for(i in 1:nsims){
+    # randomly select for treatment PSUs within state
+    rand.nas <- sample(unique(panel.df$psu[panel.df$state %in% "nas"]), size=6)
+    rand.ben <- sample(unique(panel.df$psu[panel.df$state %in% "ben"]), size=4)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- panel.df
+    
+    # 10p had no preselected, need to add it as 0% committee so have a committee proportion for each tr site pair
+    rand.samp[nrow(rand.samp)+1,] <- NA
+    rand.samp$community <- as.character(rand.samp$community)
+    rand.samp[nrow(rand.samp), c("treatment", "community", "psu", "committee")] <- c(1,"10.pastoralists", 10, 0)
+    rand.samp[,"newtr"] <- ifelse(rand.samp$psu %in% rand, 1, 0)
+    
+    # randomly select respondents to be committee members within newtr communities
+    committees <- droplevels(rand.samp[rand.samp$treatment %in% 1, c("committee", "community")])
+    toadd <- as.vector(prop.table(table(committees$community, committees$committee),1)[,"1"]) # prop of commit ppl in each tr community
+    tr.samp <- droplevels(rand.samp[rand.samp$newtr %in% 1,]) #simulated treatment people
+    tr.samp$newcomm <- randomizr::block_ra(blocks = tr.samp$community, block_prob = shuffle(as.numeric(toadd)))
+    rand.samp$newcomm <- tr.samp$newcomm[match(rand.samp$id_num, tr.samp$id_num)]
+    rand.samp$newcomm[is.na(rand.samp$newcomm)] <- 0 # make control ppl 0
+    rand.samp["new_tr_f"] <- droplevels(interaction(rand.samp[,"newtr"], rand.samp[,"newcomm"]))
+    
+    lm.null <- lm_lin(rand.samp[,paste0(var,"_y1")] ~ new_tr_f, covariates=~state+rand.samp[,paste0(var,"_y0")], rand.samp)
+    rand.coefs[i,3] <- coef(lm.null)[2] + coef(lm.null)[3]
+    
+  }
+  
+  thep <- 1 - mean(both>=rand.coefs[,3])
+  thedf <- data.frame(non=non, comm=comm, truep=thep)
+  rownames(thedf) <- paste0(var, "-", "trueP")
+  return(thedf)
+}
+
+```
+
+-->
+
+
