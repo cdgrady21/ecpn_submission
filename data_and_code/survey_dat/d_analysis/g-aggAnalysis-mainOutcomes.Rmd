@@ -25,7 +25,7 @@ load("../c_creating_dataframes/rand_df.Rdata")
 #True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
 load("true_fun.rda")
 
-library(NPC)
+#library(NPC)
 library(dplyr)
 library(mosaic)
 library(estimatr)
@@ -50,11 +50,10 @@ ben <- ag.df[ag.df$state %in% "ben",]
 
 # Variable list
 
-- Attitudes: attitude
+- Attitudes: attitude, endorsement experiment
 - Insecurity: in
 - Coordination: pgp_donate, pgp_amount, 
 - Contact: contactOnly, randExp/percExp, market/social observation
-- Affect: endorsement experiment
 
 # Testing Outcomes
 
@@ -122,9 +121,11 @@ analysis.fun <- function(var)
 
 ```
 
-loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.
+loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.  
 
-```{r}
+Note: takes awhile to run (like 10 minutes) so ran once and now loading.
+
+```{r, eval=F}
 # loop over all outcomes
 outcome_list <- c("attitude", "in", 'contactOnly',
                   'rMean', "end_exp",
@@ -135,6 +136,9 @@ for(i in 1:length(outcome_list))
   newList[[i]] <- analysis.fun(outcome_list[i])
 }
 save(newList, file="list_of_coefs_and_ps.Rda")
+```
+```{r}
+load("list_of_coefs_and_ps.Rda")
 ```
 
 
@@ -157,13 +161,12 @@ var_raw_diff <- true.fun1(paste0("contactOnly_raw", "_cw"), 'treatment')
 
 var_tab <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
                  var_cw_diff, var_cats_diff, var_raw_diff)
-
+save(var_tab, file="list_of_rank_bin_raw.Rda")
 ```
 
+Now NPC (NPC now defunct, not on CRAN)
 
-Now NPC
-
-```{r}
+```{r, eval=F}
 npc <- NPC::NPC(ag.df, tr.var = "treatment", tr.label = 1, 
                     clust.var = "psu", block.var = "state", 
                     y.vars = c("attitude_cw", "in_cw", 'contactOnly_cw',
