@@ -86,40 +86,48 @@ panel.df$tr_n <- as.numeric(panel.df$tr_f)
 - model: controlling-for ("cont") or differencing ("diff")
 
 ```{r}
-analysis.fun <- function(var)
+# matrices sooooo fast
+system.time(replicate(10000, data.frame(thecoef=c(NA, NA), truep=c(NA, NA))))
+system.time(replicate(10000, matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))))
+
+#chris: doesnt work with pgp
+analysis.fun <- function(var,nsims)
 {
   if(paste0(var, "_cw_y1") %in% names(panel.df))
   {
-    var_cw_cont <- true.fun(paste0(var, "_cw"), 'treatment')
-    var_ind_cont <- true.fun(paste0(var, "_index"), 'treatment')
-    var_cw_diff <- true.fun1(paste0(var, "_cw"), 'treatment')
-    var_ind_diff <- true.fun1(paste0(var, "_index"), 'treatment')
+    var_cw_cont <- comp.fun(paste0(var, "_cw"), nsims)
+    var_ind_cont <- comp.fun(paste0(var, "_index"), nsims)
+    var_cw_diff <- comp.fun1(paste0(var, "_cw"), nsims)
+    var_ind_diff <- comp.fun1(paste0(var, "_index"), nsims)
     
     which1 <- strat.fun(paste0(var, "_cw_y0"))
     thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
   }
   else if(grepl("pgp", var))
   {
-    var_cw_cont <- true.fun(var, 'treatment')
-    var_ind_cont <- NA
-    var_cw_diff <- NA
-    var_ind_diff <- NA
+    var_cw_cont <- comp.fun1(var, nsims)
+    var_ind_cont <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    var_cw_diff <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    var_ind_diff <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
     which1 <- NA
     thebase <- NA
   }
   else
   {
-    var_cw_cont <- true.fun(var, 'treatment')
-    var_ind_cont <- NA
-    var_cw_diff <- true.fun1(var, 'treatment')
-    var_ind_diff <- NA
+    var_cw_cont <- comp.fun(var, nsims)
+    var_ind_cont <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    var_cw_diff <- comp.fun1(var, nsims)
+    var_ind_diff <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
     
     which1 <- strat.fun(var)
     thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
   }
   
   var_tab <- rbind(var_cw_cont, var_ind_cont, var_cw_diff, var_ind_diff)
-  var_tab <- cbind (var_tab, c("cw_cont", "ind_cont", "cw_diff", "ind_diff"))
+  var_tab <- cbind (var_tab, c(rep("cw_cont", 2), 
+                               rep("ind_cont",2), 
+                               rep("cw_diff",2), 
+                               rep("ind_diff",2)))
   var_tab[4] <- thebase
   colnames(var_tab)[3:4] <- c("version", "base")
   var_tab[4] <- ifelse(var_tab[[4]] == var_tab[[3]], 1, 0)
@@ -127,11 +135,10 @@ analysis.fun <- function(var)
   return(var_tab)
 }
 
-#(trust_tab <- analysis.fun(var='attitude'))
-#(in_tab <- analysis.fun('in'))
-#con_tab <- analysis.fun('contactOnly')
-#r_tab <- analysis.fun(var='rMean')
-#pgp_tab <- analysis.fun(var='pgp_amount_end')
+#(trust_tab <- analysis.fun(var='attitude', nsims=100))
+#(in_tab <- analysis.fun('in', nsims=100))
+#(con_tab <- analysis.fun('contactOnly', nsims=100))
+#(pgp_tab <- analysis.fun(var='pgp_amount_y1', nsims=100))
 
 ```
 
@@ -142,38 +149,39 @@ Note: takes awhile to run (like 10 minutes) so ran once and now loading.
 ```{r, eval=F}
 # loop over all outcomes
 outcome_list <- c("attitude", "in", 'contactOnly',
-                  'rMean', "end_exp",
-                  "pgp_donate_end", "pgp_amount_end")
-newList <- vector(mode="list", length=length(outcome_list))
+                  #'rand_outcome', "end_exp", # dont make sense at ind-level
+                  "pgp_donate_y1", "pgp_amount_y1")
+newList_ind <- vector(mode="list", length=length(outcome_list))
 for(i in 1:length(outcome_list))
 {
-  newList[[i]] <- analysis.fun(outcome_list[i])
+  newList_ind[[i]] <- analysis.fun(outcome_list[i], nsims=3000)
 }
-save(newList, file="list_of_coefs_and_ps.Rda")
+save(newList_ind, file="list_of_coefs_and_ps_ind.Rda")
 ```
 ```{r}
-load("list_of_coefs_and_ps.Rda")
+load("list_of_coefs_and_ps_ind.Rda")
 ```
 
 
 Now do it for raw vs binary category vs ranked contact outcomes.
 
 ```{r}
-table(ag.df$contactOnly_raw_cw)
-table(ag.df$contactOnly_cats_cw)
-table(ag.df$contactOnly_cw)
+table(panel.df$contactOnly_raw_cw)
+table(panel.df$contactOnly_cats_cw)
+table(panel.df$contactOnly_cw)
 
-var_cw_cont <- true.fun(paste0("contactOnly", "_cw"), 'treatment')
-var_cats_cont <- true.fun(paste0("contactOnly_cats", "_cw"), 'treatment')
-var_raw_cont <- true.fun(paste0("contactOnly_raw", "_cw"), 'treatment')
+nsims=3000
+var_cw_cont <- comp.fun(paste0("contactOnly", "_cw"), nsims)
+var_cats_cont <- comp.fun(paste0("contactOnly_cats", "_cw"), nsims)
+var_raw_cont <- comp.fun(paste0("contactOnly_raw", "_cw"), nsims)
 
-var_cw_diff <- true.fun1(paste0("contactOnly", "_cw"), 'treatment')
-var_cats_diff <- true.fun1(paste0("contactOnly_cats", "_cw"), 'treatment')
-var_raw_diff <- true.fun1(paste0("contactOnly_raw", "_cw"), 'treatment')
+var_cw_diff <- comp.fun1(paste0("contactOnly", "_cw"), nsims)
+var_cats_diff <- comp.fun1(paste0("contactOnly_cats", "_cw"), nsims)
+var_raw_diff <- comp.fun1(paste0("contactOnly_raw", "_cw"), nsims)
 
-var_tab <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
+var_tab_ind <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
                  var_cw_diff, var_cats_diff, var_raw_diff)
-save(var_tab, file="list_of_rank_bin_raw.Rda")
+save(var_tab_ind, file="list_of_rank_bin_raw_ind.Rda")
 ```
 
 *************

@@ -286,8 +286,8 @@ strat.fun <- function(var, dat=panel.df){
 comp.fun1 <- function(var, nsims)
 {
   lm1 <- lm(panel.df[,var] ~ tr_f+state, panel.df)
-  obs.coef_nonpart <- coef(lm1)[2]
-  obs.coef_part <- coef(lm1)[3]
+  obs.coef_nonpart <- coef(lm1)['tr_f1.0']
+  obs.coef_part <- coef(lm1)['tr_f1.1']
   
   rand.coefs <- matrix(data=NA, nrow=nsims, ncol=2)
   colnames(rand.coefs) <- c("nonpart", "part")
@@ -385,7 +385,7 @@ comp.fun <- function(var, nsims)
 
 # controlling for or differencing?
 ## if all tr_f groups balanced at baseline, controlling-for.  Otherwise, differencing.
-strat.fun <- function(var, dat=panel.df){
+strategy.fun <- function(var, dat=panel.df){
   thesd <- sd(dat[[var]], na.rm=T)*.2
   thediff_part <- abs(sort(mosaic::mean(dat[[var]]~dat$tr_f, na.rm=T))[['0.0']]-sort(mosaic::mean(dat[[var]]~dat$tr_f, na.rm=T))[['1.1']])
   thediff_nonpart <- abs(sort(mosaic::mean(dat[[var]]~dat$tr_f, na.rm=T))[['0.0']]-sort(mosaic::mean(dat[[var]]~dat$tr_f, na.rm=T))[['1.0']])
@@ -399,7 +399,7 @@ strat.fun <- function(var, dat=panel.df){
   }
   else(return("Fail"))
 }
-strat.fun(var="contactOnly_cw_y0")
+#strategy.fun(var="contactOnly_cw_y0")
 
 
 
