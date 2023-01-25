@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.24)  24 JAN 2023 23:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.24)  24 JAN 2023 23:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -420,26 +420,26 @@ LaTeX Font Info:    External font `lmex10' loaded for size
  [1
 
 {c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 480.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 484.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [5] [6] [7] [8] [9] [10] [11] [12] (./ecpn_appendix.aux)
+) [5] [6] [7] [8] [9] [10] [11] (./ecpn_appendix.aux)
 Package rerunfilecheck Info: File `ecpn_appendix.out' has not changed.
-(rerunfilecheck)             Checksum: 4D68FDB6554B2D57E434D93363734F28;3068.
+(rerunfilecheck)             Checksum: 9E6BCB8DA8125EB15985C835FD5C0527;2187.
  ) 
 Here is how much of TeX's memory you used:
- 10669 strings out of 478051
- 168486 string characters out of 5839265
- 1877324 words of memory out of 5000000
- 30576 multiletter control sequences out of 15000+600000
+ 10654 strings out of 478051
+ 168116 string characters out of 5839265
+ 1876324 words of memory out of 5000000
+ 30569 multiletter control sequences out of 15000+600000
  562519 words of font info for 73 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,8n,76p,491b,580s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,8n,76p,491b,579s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on ecpn_appendix.pdf (12 pages, 197373 bytes).
+Output written on ecpn_appendix.pdf (11 pages, 194380 bytes).
 PDF statistics:
- 183 PDF objects out of 1000 (max. 8388607)
- 152 compressed objects within 2 object streams
- 48 named destinations out of 1000 (max. 500000)
- 97 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 162 PDF objects out of 1000 (max. 8388607)
+ 132 compressed objects within 2 object streams
+ 40 named destinations out of 1000 (max. 500000)
+ 73 words of extra memory for PDF output out of 10000 (max. 10000000)
 

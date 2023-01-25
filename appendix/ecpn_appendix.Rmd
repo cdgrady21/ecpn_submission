@@ -273,7 +273,7 @@ pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 \label{tab:pgg_tab_ind}
 \caption{\textbf{Individual Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
 \smallskip
-`r pgg_tab`
+`r pgg_tab_ind`
 \end{center}
 \end{table}
 
@@ -311,7 +311,7 @@ farmList
 
 
 **********
-
+<!--
 ## Old Appendix B: Results with Additive Indices
 
 These tables show results for self-report survey outcomes made with additive indices.  The tables include the coefficients and $p$-values with additive indices for community- and individual-level analyses.
@@ -346,8 +346,8 @@ table(panel.df$community, panel.df$committee, panel.df$treatment)
 ```
 
 We approximately 300 baseline respondents, roughly evenly spread throughout all communities (between 8 and 15 respondents per community). Participants are clustered in certain communities where they could more easily be identified during our endline survey.
-
-## Appendix D: Survey Questions
+-->
+## Appendix Z: Survey Questions
 
 **Attitudes**
 
