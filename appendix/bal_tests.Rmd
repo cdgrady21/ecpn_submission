@@ -24,7 +24,7 @@ demos_list <- c("age_base", "end_expTR_base", "rand_condition_base")
 bal_fmla <- formula(treatment ~ attitude_cw_base + in_cw_base + contactOnly_cw_base + rand_lm_base + rand_outcome_base + end_exp_base)
 #bal_fmla1 <- formula(treatment ~ attitude_index_base + in_index_base + contactOnly_index_base + rand_lm_base + rand_outcome_base + end_exp_base)
 
-xBalance(bal_fmla, strata = factor(ag.df$state), data=ag.df,
+bal_svy <- xBalance(bal_fmla, strata = factor(ag.df$state), data=ag.df,
          report=c("all"))
 
 ```
@@ -53,7 +53,13 @@ obs_fmla <- formula(treatment ~ pastoralists_index_rank_events + farmers_index_r
 obs_fmla1 <- formula(treatment ~ pastoralists_index_events + farmers_index_events
                     + pastoralists_index_raw_markets + farmers_index_raw_markets)
 
-xBalance(obs_fmla1, strata = factor(obs_df$State), data=obs_df,
+bal_obs <- xBalance(obs_fmla1, strata = factor(obs_df$State), data=obs_df,
          report=c("all"))
 
+```
+
+# save
+
+```{r}
+save(bal_svy, bal_obs, file="balTests.rda")
 ```

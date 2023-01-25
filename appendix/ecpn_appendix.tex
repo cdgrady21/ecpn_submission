@@ -6,8 +6,8 @@
 ]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{float}
 \usepackage{iftex}
+\usepackage{float}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
@@ -120,8 +120,7 @@ Desired appendices.
     raw vs ranked variables to create the index
   \end{itemize}
 \item
-  State-level differences \& farmer-pastoralist differences (ready for
-  reviewers)
+  \emph{State-level differences \& farmer-pastoralist differences}
 \item
   Survey questions
 \end{itemize}
@@ -163,9 +162,9 @@ as they were sampled.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{appendix-b-robustness-checks-for-analysis}{%
-\subsection{Appendix B: Robustness checks for
-analysis}\label{appendix-b-robustness-checks-for-analysis}}
+\hypertarget{appendix-b-robustness-checks-for-community-analysis}{%
+\subsection{Appendix B: Robustness checks for community
+analysis}\label{appendix-b-robustness-checks-for-community-analysis}}
 
 These tables shows results with different ways of making indices
 (additive vs inverse-covariance weighted), different models for
@@ -176,28 +175,30 @@ show the coefficient from OLS regression, true p-value from
 randomization inference, and a binary ``base'' indicator showing which
 method was used in the paper.
 
-index: inverse-covariance weights (``cw'') or additive (``ind''). model:
-controlling-for (``cont'') or differencing (``diff''). Note that not not
-all outcomes are indices, some outcomes are endline only, and only
-contact outcomes use count variables.
+The base method is always inverse-covariance weighted indices; the
+estimation method is controlling-for unless the baseline difference
+between the treatment and control groups is 0.20 standard deviations or
+more; the base method of handling count variables is dense rank. Only
+contact outcomes use count variables, only survey outcomes have a
+baseline and an endline and are measured with indices.
 
 \begin{table}[H]
 \begin{center}
 \label{tab:attitude_tab}
-\caption{\textbf{Attitudes.} Effect of ECPN on attitudes with alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
 \hline
   & coefficient & p-value & base\\
 \hline
-Controlling-for \& ICW & 0.116 & 0.044 & 1\\
+Controlling-for \& ICW & 0.116 & 0.045 & 1\\
 \hline
 Controlling-for \& Additive & 0.093 & 0.038 & 0\\
 \hline
-Differencing \& ICW & 0.100 & 0.142 & 0\\
+Differencing \& ICW & 0.100 & 0.145 & 0\\
 \hline
-Differencing \& Additive & 0.073 & 0.122 & 0\\
+Differencing \& Additive & 0.073 & 0.116 & 0\\
 \hline
 \end{tabular}
 
@@ -205,9 +206,536 @@ Differencing \& Additive & 0.073 & 0.122 & 0\\
 \end{center}
 \end{table}
 
-\hypertarget{appendix-b-results-with-additive-indices}{%
-\subsection{Appendix B: Results with Additive
-Indices}\label{appendix-b-results-with-additive-indices}}
+\begin{table}[H]
+\begin{center}
+\label{tab:security_tab}
+\caption{\textbf{Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for \& ICW & 0.098 & 0.032 & 0\\
+\hline
+Controlling-for \& Additive & -0.010 & 0.593 & 0\\
+\hline
+Differencing \& ICW & 0.159 & 0.020 & 1\\
+\hline
+Differencing \& Additive & 0.054 & 0.213 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:contact_tab}
+\caption{\textbf{Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for \& ICW \& Ranks & 0.013 & 0.424 & 0\\
+\hline
+Controlling-for \& Additive \& Ranks & 0.003 & 0.422 & 0\\
+\hline
+Differencing \& ICW \& Ranks & 0.138 & 0.060 & 1\\
+\hline
+Differencing \& Additive \& Ranks & 0.015 & 0.182 & 0\\
+\hline
+Controlling-for \& ICW \& Categories & 0.017 & 0.377 & 0\\
+\hline
+Controlling-for \& ICW \& Raw & -0.020 & 0.602 & 0\\
+\hline
+Differencing \& ICW \& Categories & 0.120 & 0.064 & 0\\
+\hline
+Differencing \& ICW \& Raw & 0.071 & 0.207 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:percExp_tab}
+\caption{\textbf{Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for & 0.093 & 0.051 & 0\\
+\hline
+Differencing & 0.062 & 0.239 & 1\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:endExp_tab}
+\caption{\textbf{Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for & 0.103 & 0.158 & 0\\
+\hline
+Differencing & 0.123 & 0.212 & 1\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pgg_tab}
+\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+Donation (binary) & 0.022 & 0.294\\
+\hline
+Donation amount & -35.124 & 0.852\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\hypertarget{appendix-c-robustness-checks-for-individual-analysis}{%
+\subsection{Appendix C: Robustness checks for individual
+analysis}\label{appendix-c-robustness-checks-for-individual-analysis}}
+
+These tables shows results with different ways of making indices
+(additive vs inverse-covariance weighted), different models for
+estimating effects (differencing vs controlling-for), and different ways
+of coding count variables (raw vs ranked). Each table is an outcome.
+Rows are results for different ways of creating the outcomes. Columns
+show the coefficient from OLS regression, true p-value from
+randomization inference, and a binary ``base'' indicator showing which
+method was used in the paper.
+
+The base method is always inverse-covariance weighted indices; the
+estimation method is controlling-for unless the baseline difference
+between the participants and control groups is 0.20 standard deviations
+or more; the base method of handling count variables is dense rank. Only
+contact outcomes use count variables, only survey outcomes have a
+baseline and an endline and are measured with indices.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:attitude_tab_ind}
+\caption{\textbf{Indiviaul Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Controlling-for \& ICW & 0.031 & 0.264 & 0\\
+\hline
+Part: Controlling-for \& ICW & 0.058 & 0.129 & 0\\
+\hline
+Non: Controlling-for \& Additive & 0.154 & 0.202 & 0\\
+\hline
+Part: Controlling-for \& Additive & 0.269 & 0.081 & 0\\
+\hline
+Non: Differencing \& ICW & 0.054 & 0.130 & 1\\
+\hline
+Part: Differencing \& ICW & 0.060 & 0.130 & 1\\
+\hline
+Non: Differencing \& Additive & 0.183 & 0.144 & 0\\
+\hline
+Part: Differencing \& Additive & 0.296 & 0.049 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:security_tab_ind}
+\caption{\textbf{Individual Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Controlling-for \& ICW & -0.022 & 0.681 & 0\\
+\hline
+Part: Controlling-for \& ICW & -0.024 & 0.675 & 0\\
+\hline
+Non: Controlling-for \& Additive & 0.015 & 0.467 & 0\\
+\hline
+Part: Controlling-for \& Additive & -0.007 & 0.540 & 0\\
+\hline
+Non: Differencing \& ICW & 0.045 & 0.178 & 1\\
+\hline
+Part: Differencing \& ICW & 0.050 & 0.186 & 1\\
+\hline
+Non: Differencing \& Additive & 0.083 & 0.244 & 0\\
+\hline
+Part: Differencing \& Additive & 0.146 & 0.123 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:contact_tab_ind}
+\caption{\textbf{Individual Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Controlling-for \& ICW \& Ranks & -0.029 & 0.735 & 0\\
+\hline
+Part: Controlling-for \& ICW \& Ranks & 0.062 & 0.094 & 0\\
+\hline
+Non: Controlling-for \& Additive \& Ranks & -0.024 & 0.771 & 0\\
+\hline
+Part: Controlling-for \& Additive \& Ranks & 0.041 & 0.094 & 0\\
+\hline
+Non: Differencing \& ICW \& Ranks & 0.002 & 0.492 & 1\\
+\hline
+Part: Differencing \& ICW \& Ranks & 0.098 & 0.018 & 1\\
+\hline
+Non: Differencing \& Additive \& Ranks & -0.005 & 0.580 & 0\\
+\hline
+Part: Differencing \& Additive \& Ranks & 0.063 & 0.017 & 0\\
+\hline
+Non: Controlling-for \& ICW \& Categories & -0.045 & 0.820 & 0\\
+\hline
+Part: Controlling-for \& ICW \& Categories & 0.063 & 0.240 & 0\\
+\hline
+Non: Controlling-for \& ICW \& Raw & -0.023 & 0.780 & 0\\
+\hline
+Part: Controlling-for \& ICW \& Raw & 0.044 & 0.140 & 0\\
+\hline
+Non: Differencing \& ICW \& Categories & 0.017 & 0.430 & 0\\
+\hline
+Part: Differencing \& ICW \& Categories & 0.130 & 0.060 & 0\\
+\hline
+Non: Differencing \& ICW \& Raw & -0.002 & 0.600 & 0\\
+\hline
+Part: Differencing \& ICW \& Raw & 0.066 & 0.050 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pgg_tab_ind}
+\caption{\textbf{Individual Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+Donation (binary) & 0.022 & 0.294\\
+\hline
+Donation amount & -35.124 & 0.852\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\hypertarget{appendix-d-balance-tests}{%
+\subsection{Appendix D: Balance Tests}\label{appendix-d-balance-tests}}
+
+\begin{verbatim}
+## $results
+## , , strata = strat
+## 
+##                                 stat
+## vars                              Control Treatment   adj.diff adj.diff.null.sd
+##   pastoralists_index_events      84.17723  50.96957 -33.207669         37.15460
+##   farmers_index_events           74.29650  66.71920  -7.577295         23.92461
+##   pastoralists_index_raw_markets 42.81793  21.07748 -21.740450         13.28139
+##   farmers_index_raw_markets      73.12578 119.42288  46.297101         69.66326
+##                                 stat
+## vars                               std.diff          z         p
+##   pastoralists_index_events      -0.6350832 -0.8937701 0.3714449
+##   farmers_index_events           -0.2074869 -0.3167155 0.7514595
+##   pastoralists_index_raw_markets -1.2565059 -1.6369106 0.1016492
+##   farmers_index_raw_markets       0.4507416  0.6645842 0.5063165
+## 
+## attr(,"originals")
+## [1] "pastoralists_index_events"      "farmers_index_events"          
+## [3] "pastoralists_index_raw_markets" "farmers_index_raw_markets"     
+## 
+## $overall
+##       chisquare df   p.value
+## strat  5.493953  4 0.2402615
+## 
+## attr(,"fmla")
+## treatment ~ pastoralists_index_events + farmers_index_events + 
+##     pastoralists_index_raw_markets + farmers_index_raw_markets
+## attr(,"class")
+## [1] "xbal" "list"
+## attr(,"report")
+## [1] "adj.means"              "adj.mean.diffs"         "adj.mean.diffs.null.sd"
+## [4] "chisquare.test"         "std.diffs"              "z.scores"              
+## [7] "p.values"
+\end{verbatim}
+
+\begin{verbatim}
+## $results
+## , , strata = strat
+## 
+##                      stat
+## vars                       Control    Treatment      adj.diff adj.diff.null.sd
+##   attitude_cw_base     0.542222393  0.565609444  0.0233870504     0.0654220532
+##   in_cw_base          -0.458973498 -0.537499573 -0.0785260756     0.0705834856
+##   contactOnly_cw_base  0.495640082  0.336429250 -0.1592108323     0.1041997069
+##   rand_lm_base        -0.001855586 -0.002639292 -0.0007837057     0.0008508652
+##   rand_outcome_base    0.443022420  0.473606928  0.0305845084     0.0563078296
+##   end_exp_base        -0.212108532 -0.250012095 -0.0379035631     0.1686690404
+##                      stat
+## vars                     std.diff          z         p
+##   attitude_cw_base     0.09798240  0.3574796 0.7207328
+##   in_cw_base          -0.24640254 -1.1125276 0.2659114
+##   contactOnly_cw_base -0.58471858 -1.5279393 0.1265276
+##   rand_lm_base        -0.33434388 -0.9210691 0.3570143
+##   rand_outcome_base    0.20555272  0.5431662 0.5870154
+##   end_exp_base        -0.06657472 -0.2247215 0.8221959
+## 
+## attr(,"originals")
+## [1] "attitude_cw_base"    "in_cw_base"          "contactOnly_cw_base"
+## [4] "rand_lm_base"        "rand_outcome_base"   "end_exp_base"       
+## 
+## $overall
+##       chisquare df   p.value
+## strat   6.31019  6 0.3893542
+## 
+## attr(,"fmla")
+## treatment ~ attitude_cw_base + in_cw_base + contactOnly_cw_base + 
+##     rand_lm_base + rand_outcome_base + end_exp_base
+## attr(,"class")
+## [1] "xbal" "list"
+## attr(,"report")
+## [1] "adj.means"              "adj.mean.diffs"         "adj.mean.diffs.null.sd"
+## [4] "chisquare.test"         "std.diffs"              "z.scores"              
+## [7] "p.values"
+\end{verbatim}
+
+\hypertarget{appendix-e-placebo-tests}{%
+\subsection{Appendix E: Placebo tests}\label{appendix-e-placebo-tests}}
+
+\begin{verbatim}
+## [[1]]
+##                              coef  truep  version base
+## vio_cw~treatment      0.009773392 0.4655  cw_cont    0
+## vio_index~treatment   0.003920160 0.4414 ind_cont    0
+## vio_cw~treatment1    -0.067354329 0.6866  cw_diff    1
+## vio_index~treatment1 -0.026803609 0.6788 ind_diff    0
+## 
+## [[2]]
+##                                            coef  truep  version base
+## violence_group.criminals~treatment   0.03363271 0.2520  cw_cont    0
+## 2                                            NA     NA ind_cont    0
+## violence_group.criminals~treatment1 -0.09150519 0.7917  cw_diff    1
+## 4                                            NA     NA ind_diff    0
+## 
+## [[3]]
+##                                               coef  truep  version base
+## violence_group.defend_group~treatment  -0.02614133 0.6587  cw_cont    1
+## 2                                               NA     NA ind_cont    0
+## violence_group.defend_group~treatment1 -0.02614133 0.6632  cw_diff    0
+## 4                                               NA     NA ind_diff    0
+## 
+## [[4]]
+##                                                  coef  truep  version base
+## violence_group.defend_religion~treatment  -0.03122685 0.6621  cw_cont    1
+## 2                                                  NA     NA ind_cont    0
+## violence_group.defend_religion~treatment1 -0.03122685 0.6715  cw_diff    0
+## 4                                                  NA     NA ind_diff    0
+## 
+## [[5]]
+##                                              coef  truep  version base
+## violence_group.government~treatment   0.004400951 0.4362  cw_cont    1
+## 2                                              NA     NA ind_cont    0
+## violence_group.government~treatment1 -0.012312079 0.6405  cw_diff    0
+## 4                                              NA     NA ind_diff    0
+## 
+## [[6]]
+##                                                    coef  truep  version base
+## violence_group.maintain_culture~treatment  -0.003939306 0.5576  cw_cont    1
+## 2                                                    NA     NA ind_cont    0
+## violence_group.maintain_culture~treatment1 -0.011053448 0.5846  cw_diff    0
+## 4                                                    NA     NA ind_diff    0
+## 
+## [[7]]
+##                                             coef  truep  version base
+## violence_group.retaliate~treatment  -0.006613703 0.6585  cw_cont    1
+## 2                                             NA     NA ind_cont    0
+## violence_group.retaliate~treatment1  0.011472645 0.3869  cw_diff    0
+## 4                                             NA     NA ind_diff    0
+## 
+## [[8]]
+##                                                  coef  truep  version base
+## outgroup_atts_group.trust_rel~treatment   0.016943300 0.3493  cw_cont    1
+## 2                                                  NA     NA ind_cont    0
+## outgroup_atts_group.trust_rel~treatment1 -0.002230286 0.5189  cw_diff    0
+## 4                                                  NA     NA ind_diff    0
+## 
+## [[9]]
+##                        coef  truep  version base
+## radio~treatment  0.02068120 0.4295  cw_cont    1
+## 2                        NA     NA ind_cont    0
+## radio~treatment1 0.02137291 0.4412  cw_diff    0
+## 4                        NA     NA ind_diff    0
+## 
+## [[10]]
+##                               coef  truep  version base
+## disp_index~treatment  0.0202398376 0.3731  cw_cont    1
+## 2                               NA     NA ind_cont    0
+## disp_index~treatment1 0.0007507051 0.4881  cw_diff    0
+## 4                               NA     NA ind_diff    0
+\end{verbatim}
+
+\hypertarget{appendix-f-state-level-differences}{%
+\subsection{Appendix F: State-level
+differences}\label{appendix-f-state-level-differences}}
+
+\begin{verbatim}
+## $attitude_cw
+##                            term   estimate    p.value
+## 1                   (Intercept) -0.2498650 0.09501665
+## 2          ag.df[, "treatment"]  0.2057339 0.23320131
+## 3                      statenas  0.2725481 0.06919022
+## 4 ag.df[, "treatment"]:statenas -0.1757783 0.31539114
+## 
+## $in_cw
+##                            term    estimate   p.value
+## 1                   (Intercept)  0.12092800 0.2973856
+## 2          ag.df[, "treatment"]  0.07915428 0.5007593
+## 3                      statenas -0.10960567 0.4093834
+## 4 ag.df[, "treatment"]:statenas  0.13322806 0.3833034
+## 
+## $contactOnly_cw
+##                            term   estimate    p.value
+## 1                   (Intercept) -0.3344703 0.03594430
+## 2          ag.df[, "treatment"]  0.2004255 0.19018537
+## 3                      statenas  0.3780055 0.01138129
+## 4 ag.df[, "treatment"]:statenas -0.1044108 0.46866542
+## 
+## $rMean
+##                            term   estimate    p.value
+## 1                   (Intercept) -0.3264061 0.14061932
+## 2          ag.df[, "treatment"]  0.2127052 0.18992279
+## 3                      statenas  0.5495802 0.02713233
+## 4 ag.df[, "treatment"]:statenas -0.2509537 0.15763238
+## 
+## $end_exp
+##                            term     estimate   p.value
+## 1                   (Intercept) -0.025911144 0.8457171
+## 2          ag.df[, "treatment"]  0.008160342 0.9723655
+## 3                      statenas -0.321998592 0.1198422
+## 4 ag.df[, "treatment"]:statenas  0.190593087 0.4883455
+## 
+## $pgp_donate_end
+##                            term    estimate    p.value
+## 1                   (Intercept)  0.89125000 0.05078586
+## 2          ag.df[, "treatment"]  0.07833333 0.38398024
+## 3                      statenas  0.09548203 0.30127069
+## 4 ag.df[, "treatment"]:statenas -0.09318894 0.25682147
+## 
+## $pgp_amount_end
+##                            term  estimate   p.value
+## 1                   (Intercept) 240.28750 0.2253282
+## 2          ag.df[, "treatment"]  15.76042 0.8763263
+## 3                      statenas 107.28268 0.3839096
+## 4 ag.df[, "treatment"]:statenas -84.80653 0.4419010
+\end{verbatim}
+
+\hypertarget{appendix-g-farmer-pastoralist-differences}{%
+\subsection{Appendix G: Farmer-pastoralist
+differences}\label{appendix-g-farmer-pastoralist-differences}}
+
+\begin{verbatim}
+## $attitude_cw
+##                                 term    estimate   p.value
+## 1               ag.df[, "treatment"]  0.14549900 0.1782298
+## 2                      farm_pastpast -0.00949469 0.8454740
+## 3 ag.df[, "treatment"]:farm_pastpast -0.09046408 0.2780316
+## 
+## $in_cw
+##                                 term    estimate   p.value
+## 1               ag.df[, "treatment"]  0.14870533 0.2294206
+## 2                      farm_pastpast -0.11217626 0.4916309
+## 3 ag.df[, "treatment"]:farm_pastpast  0.02077157 0.9045019
+## 
+## $contactOnly_cw
+##                                 term   estimate   p.value
+## 1               ag.df[, "treatment"] 0.12245873 0.3727152
+## 2                      farm_pastpast 0.07482787 0.7649711
+## 3 ag.df[, "treatment"]:farm_pastpast 0.03064061 0.9105597
+## 
+## $rMean
+##                                 term    estimate   p.value
+## 1               ag.df[, "treatment"]  0.06916678 0.5540888
+## 2                      farm_pastpast -0.14181940 0.2513859
+## 3 ag.df[, "treatment"]:farm_pastpast -0.01406759 0.9132141
+## 
+## $end_exp
+##                                 term   estimate   p.value
+## 1               ag.df[, "treatment"]  0.2194837 0.3450349
+## 2                      farm_pastpast  0.5257106 0.1742928
+## 3 ag.df[, "treatment"]:farm_pastpast -0.1939351 0.6258698
+## 
+## $pgp_donate_end
+##                                 term    estimate   p.value
+## 1               ag.df[, "treatment"]  0.05421409 0.4190902
+## 2                      farm_pastpast  0.09507843 0.2377855
+## 3 ag.df[, "treatment"]:farm_pastpast -0.06358824 0.3859465
+## 
+## $pgp_amount_end
+##                                 term   estimate   p.value
+## 1               ag.df[, "treatment"] -46.765628 0.5440105
+## 2                      farm_pastpast   9.819108 0.9082086
+## 3 ag.df[, "treatment"]:farm_pastpast  23.284255 0.7835737
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{old-appendix-b-results-with-additive-indices}{%
+\subsection{Old Appendix B: Results with Additive
+Indices}\label{old-appendix-b-results-with-additive-indices}}
 
 These tables show results for self-report survey outcomes made with
 additive indices. The tables include the coefficients and \(p\)-values
@@ -233,10 +761,6 @@ Contact & 0.054 & 0.193 & 0.070 & 0.143\\
 \end{center}
 \end{table}
 
-\hypertarget{appendix-c-placebo-analysis}{%
-\subsection{Appendix C: Placebo
-Analysis}\label{appendix-c-placebo-analysis}}
-
 \hypertarget{old-appendix-c-mechanisms-and-placebo-analysis}{%
 \subsection{OLD Appendix C: Mechanisms and Placebo
 Analysis}\label{old-appendix-c-mechanisms-and-placebo-analysis}}
@@ -245,9 +769,9 @@ These tables show results for mechanism and placebo outcomes using
 inverse-covariance weighted indices. The tables include the coefficients
 and \(p\)-values for community- and individual-level analyses.
 
-\hypertarget{appendix-x-individual-level-analysis}{%
-\subsection{Appendix X: Individual-level
-analysis}\label{appendix-x-individual-level-analysis}}
+\hypertarget{old-appendix-x-individual-level-analysis}{%
+\subsection{Old Appendix X: Individual-level
+analysis}\label{old-appendix-x-individual-level-analysis}}
 
 We approximately 300 baseline respondents, roughly evenly spread
 throughout all communities (between 8 and 15 respondents per community).
@@ -258,7 +782,7 @@ easily be identified during our endline survey.
 \subsection{Appendix D: Survey
 Questions}\label{appendix-d-survey-questions}}
 
-\textbf{Outgroup Affect}
+\textbf{Attitudes}
 
 \begin{itemize}
 \tightlist

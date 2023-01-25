@@ -125,12 +125,14 @@ loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can
 
 Note: takes awhile to run (like 10 minutes) so ran once and now loading.
 
-```{r, eval=F}
+```{r}
 # loop over all outcomes
 outcome_list <- c("attitude", "in", 'contactOnly',
                   'rMean', "end_exp",
                   "pgp_donate_end", "pgp_amount_end")
 newList <- vector(mode="list", length=length(outcome_list))
+```
+```{r, eval=F}
 for(i in 1:length(outcome_list))
 {
   newList[[i]] <- analysis.fun(outcome_list[i])
@@ -146,7 +148,7 @@ load("list_of_coefs_and_ps.Rda")
 
 Now do it for raw vs binary category vs ranked contact outcomes.
 
-```{r}
+```{r, eval=F}
 table(ag.df$contactOnly_raw_cw)
 table(ag.df$contactOnly_cats_cw)
 table(ag.df$contactOnly_cw)
@@ -162,6 +164,9 @@ var_raw_diff <- true.fun1(paste0("contactOnly_raw", "_cw"), 'treatment')
 var_tab <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
                  var_cw_diff, var_cats_diff, var_raw_diff)
 save(var_tab, file="list_of_rank_bin_raw.Rda")
+```
+```{r}
+load("list_of_rank_bin_raw.Rda")
 ```
 
 Now NPC (NPC now defunct, not on CRAN)
@@ -179,6 +184,42 @@ npc # all of them
 ```
 
 ******************
+
+# State-level diffs
+
+```{r}
+outcome_list_state <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(outcome_list)])
+stateList <- vector(mode="list", length=length(outcome_list_state))
+for(i in 1:length(outcome_list_state))
+{
+  thelm <- lm_robust(ag.df[,outcome_list_state[i]]~ag.df[,"treatment"]*state,
+                            clusters = psu, data=ag.df)
+  stateList[[i]] <- tidy(thelm)[, c(1,2,5)]
+}
+names(stateList) <- outcome_list_state
+save(stateList, file="state_list.Rda")
+```
+
+
+# Farmer-pastoralist diffs
+
+```{r}
+ag.df$farm_past <- ifelse(grepl(".farmers", ag.df$comm), "farm", "past")
+#table(ag.df$comm, ag.df$farm_past)
+
+farmList <- vector(mode="list", length=length(outcome_list_state))
+for(i in 1:length(outcome_list_state))
+{
+  thelm <- lm_robust(ag.df[,outcome_list_state[i]]~ag.df[,"treatment"]*farm_past,
+                            clusters = psu, fixed_effects = state, data=ag.df)
+  farmList[[i]] <- tidy(thelm)[, c(1,2,5)]
+}
+names(farmList) <- outcome_list_state
+save(farmList, file="farm_list.Rda")
+
+```
+
+
 
 # Placebos
 

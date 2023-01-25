@@ -156,8 +156,8 @@ endExp_tab <- knitr::kable(endExp_tab, format="latex")
 \end{table}
 
 ```{r}
-pgg_tab <- rbind(newList[[6]][1,c(1:2,4)], newList[[7]][1,c(1:2,4)])
-colnames(pgg_tab) <- c("coefficient", "p-value", "base")
+pgg_tab <- rbind(newList[[6]][1,c(1:2)], newList[[7]][1,c(1:2)])
+colnames(pgg_tab) <- c("coefficient", "p-value")
 rownames(pgg_tab) <- c("Donation (binary)",
                             "Donation amount")
 pgg_tab <- round(pgg_tab,3)
@@ -168,7 +168,7 @@ pgg_tab <- knitr::kable(pgg_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:pgg_tab}
-\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
 \smallskip
 `r pgg_tab`
 \end{center}
@@ -259,69 +259,60 @@ contact_tab_ind <- knitr::kable(contact_tab_ind, format="latex")
 \end{table}
 
 ```{r}
-# chris: here, no percExp for ind.
-percExp_tab <- newList_ind[[4]][c(1,3),c(1:2,4)]
-colnames(percExp_tab) <- c("coefficient", "p-value", "base")
-rownames(percExp_tab) <- c("Controlling-for",
-                            "Differencing")
-percExp_tab <- round(percExp_tab,3)
-percExp_tab <- knitr::kable(percExp_tab, format="latex")
+pgg_tab_ind <- rbind(newList_ind[[4]][c(1,2),c(1:2)], newList_ind[[5]][c(1,2),c(1:2)])
+colnames(pgg_tab_ind) <- c("coefficient", "p-value")
+rownames(pgg_tab_ind) <- c("Non: Donation (binary)", "Part: Donation (binary)",
+                            "Non: Donation amount", "Part: Donation amount")
+pgg_tab_ind <- round(pgg_tab_ind,3)
+pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 
 ```
 
 \begin{table}[H]
 \begin{center}
-\label{tab:percExp_tab}
-\caption{\textbf{Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
-\smallskip
-`r percExp_tab`
-\end{center}
-\end{table}
-
-```{r}
-endExp_tab <- newList_ind[[5]][c(1,3),c(1:2,4)]
-colnames(endExp_tab) <- c("coefficient", "p-value", "base")
-rownames(endExp_tab) <- c("Controlling-for",
-                            "Differencing")
-endExp_tab <- round(endExp_tab,3)
-endExp_tab <- knitr::kable(endExp_tab, format="latex")
-
-```
-
-\begin{table}[H]
-\begin{center}
-\label{tab:endExp_tab}
-\caption{\textbf{Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
-\smallskip
-`r endExp_tab`
-\end{center}
-\end{table}
-
-```{r}
-pgg_tab <- rbind(newList_ind[[6]][1,c(1:2,4)], newList_ind[[7]][1,c(1:2,4)])
-colnames(pgg_tab) <- c("coefficient", "p-value", "base")
-rownames(pgg_tab) <- c("Donation (binary)",
-                            "Donation amount")
-pgg_tab <- round(pgg_tab,3)
-pgg_tab <- knitr::kable(pgg_tab, format="latex")
-
-```
-
-\begin{table}[H]
-\begin{center}
-\label{tab:pgg_tab}
-\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\label{tab:pgg_tab_ind}
+\caption{\textbf{Individual Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
 \smallskip
 `r pgg_tab`
 \end{center}
 \end{table}
 
 
+## Appendix D: Balance Tests
+
+```{r}
+load("balTests.rda")
+bal_obs
+bal_svy
+```
+
+## Appendix E: Placebo tests
+
+```{r}
+load("../data_and_code/survey_dat/d_analysis/pl_list_of_coefs_and_ps.Rda")
+
+placeboList
+```
+
+## Appendix F: State-level differences
+
+```{r}
+load("../data_and_code/survey_dat/d_analysis/state_list.Rda")
+stateList
+
+```
+
+## Appendix G: Farmer-pastoralist differences
+
+```{r}
+load("../data_and_code/survey_dat/d_analysis/farm_list.Rda")
+farmList
+```
 
 
 **********
 
-## Appendix B: Results with Additive Indices
+## Old Appendix B: Results with Additive Indices
 
 These tables show results for self-report survey outcomes made with additive indices.  The tables include the coefficients and $p$-values with additive indices for community- and individual-level analyses.
 
@@ -337,9 +328,6 @@ load("../data_and_code/survey_dat/d_analysis/diss_appendix/add_ind_tab.Rdata")
 \end{table}
 
 
-## Appendix C: Placebo Analysis
-
-
 ## OLD Appendix C: Mechanisms and Placebo Analysis
 
 These tables show results for mechanism and placebo outcomes using inverse-covariance weighted indices.  The tables include the coefficients and $p$-values for community- and individual-level analyses.
@@ -349,7 +337,7 @@ load("paper1_files/mech_ind_tab.Rdata")
 ```
 
 
-## Appendix X: Individual-level analysis
+## Old Appendix X: Individual-level analysis
 
 ```{r, eval=F}
 load("../b_creating_outcomes/f2-panelData.Rdata")
