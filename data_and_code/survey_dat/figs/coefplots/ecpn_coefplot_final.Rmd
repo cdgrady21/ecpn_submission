@@ -106,7 +106,7 @@ res$varF <-
          levels = c("Self-reported Contact", "Contact Willingness",
                     "Pastoralists in Market",
                     "Farmers in Market", "Outgroup Event Attendance",
-                    "Self-reported Attitudes", "Perceptions of Insecurity",
+                    "Self-reported Attitudes", "Perceptions of Security",
                     "Public Goods Amount", "Public Goods Donation", "Endorsement Experiment"))
 
 ggplot(data = res, aes(x = varF, y = coef_sd, color = Data)) +
@@ -150,7 +150,7 @@ outcome_ind <- rbind(part,non)
 outcome_ind$var <- 
   factor(outcome_ind$var, 
          levels = c("Self-reported Attitudes",
-                    "Perceptions of Insecurity",
+                    "Perceptions of Security",
                     "Self-reported Contact"))
 outcome_ind$Group <- factor(outcome_ind$Group, levels=
                             c("Non", "Part"))

@@ -142,7 +142,7 @@ analysis.fun <- function(var,nsims)
 
 ```
 
-loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.  
+loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.
 
 Note: takes awhile to run (like 10 minutes) so ran once and now loading.
 
@@ -165,10 +165,10 @@ load("list_of_coefs_and_ps_ind.Rda")
 
 Now do it for raw vs binary category vs ranked contact outcomes.
 
-```{r}
-table(panel.df$contactOnly_raw_cw)
-table(panel.df$contactOnly_cats_cw)
-table(panel.df$contactOnly_cw)
+```{r, eval=F}
+#table(panel.df$contactOnly_raw_cw)
+#table(panel.df$contactOnly_cats_cw)
+#table(panel.df$contactOnly_cw)
 
 nsims=3000
 var_cw_cont <- comp.fun(paste0("contactOnly", "_cw"), nsims)
@@ -183,6 +183,38 @@ var_tab_ind <- rbind(var_cw_cont, var_cats_cont, var_raw_cont,
                  var_cw_diff, var_cats_diff, var_raw_diff)
 save(var_tab_ind, file="list_of_rank_bin_raw_ind.Rda")
 ```
+```{r}
+load("list_of_rank_bin_raw_ind.Rda")
+```
+
+# Placebos
+
+```{r, eval=F}
+# loop over all placebo outcomes
+placebo_list <- c("vio", 
+                  "violence_group.criminals",
+                  "violence_group.defend_group",
+                  "violence_group.defend_religion",
+                  "violence_group.government", 
+                  "violence_group.maintain_culture",
+                  "violence_group.retaliate",
+                  'outgroup_atts_group.trust_rel',
+                  "radio",
+                  "disp_index")
+#analysis.fun(var=placebo_list[1], nsims=100)
+#analysis.fun(var=placebo_list[10],nsims=100)
+
+placeboList_ind <- vector(mode="list", length=length(placebo_list))
+for(i in 1:length(placebo_list))
+{
+  placeboList_ind[[i]] <- analysis.fun(placebo_list[i], nsims=3000)
+}
+save(placeboList_ind, file="pl_list_of_coefs_and_ps_ind.Rda")
+```
+```{r}
+load("pl_list_of_coefs_and_ps_ind.Rda")
+```
+
 
 *************
 

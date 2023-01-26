@@ -64,7 +64,7 @@ attitude_tab <- knitr::kable(attitude_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:attitude_tab}
-\caption{\textbf{Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r attitude_tab`
 \end{center}
@@ -83,7 +83,7 @@ security_tab <- knitr::kable(security_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:security_tab}
-\caption{\textbf{Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r security_tab`
 \end{center}
@@ -111,7 +111,7 @@ contact_tab <- knitr::kable(contact_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:contact_tab}
-\caption{\textbf{Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r contact_tab`
 \end{center}
@@ -130,7 +130,7 @@ percExp_tab <- knitr::kable(percExp_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:percExp_tab}
-\caption{\textbf{Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r percExp_tab`
 \end{center}
@@ -149,7 +149,7 @@ endExp_tab <- knitr::kable(endExp_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:endExp_tab}
-\caption{\textbf{Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r endExp_tab`
 \end{center}
@@ -168,11 +168,18 @@ pgg_tab <- knitr::kable(pgg_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:pgg_tab}
-\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
+\caption{\textbf{Community Public Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
 \smallskip
 `r pgg_tab`
 \end{center}
 \end{table}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/pggComm_plot.png}
+\caption{\label{fig:pgg_plot_comm} \textbf{Community Public Goods Game} This figure shows the proportion of each experimental group who donated and their average donation amount. Orange shows the treatment communities; blue shows control communities.}
+\end{center}
+\end{figure}
 
 
 ## Appendix C: Robustness checks for individual analysis
@@ -201,7 +208,7 @@ attitude_tab_ind <- knitr::kable(attitude_tab_ind, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:attitude_tab_ind}
-\caption{\textbf{Indiviaul Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Individual Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r attitude_tab_ind`
 \end{center}
@@ -277,6 +284,13 @@ pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 \end{center}
 \end{table}
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/pggPan_plot.png}
+\caption{\label{fig:pgg_plot_ind} \textbf{Individual Public Goods Game} This figure shows the proportion of each experimental group who donated and their average donation amount. Orange shows the full participants; red shows the nonparticipants in intervention communities; blue shows people in control communities.}
+\end{center}
+\end{figure}
+
 
 ## Appendix D: Balance Tests
 
@@ -288,10 +302,71 @@ bal_svy
 
 ## Appendix E: Placebo tests
 
+Several of our outcomes are survey self-reports, and all self-reports could be affected by social desirability bias. Our survey results are suspect if respondents in treatment communities learned the ``correct'' answers better than respondents in control communities. If social desirability accounts for the effect in survey self-reports, we would also expect differences between treatment and control for other normatively desirable attitudes. 
+
+To test social desirability effects, we conduct a placebo analysis using attitudes about violence as a placebo. Attitudes about violence are a good candidate for a placebo because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way. We measure attitudes about violence with a six question index asking respondents if it is always, sometimes, rarely, or never justified to use violence in certain situations, such as retaliating against violence or bringing criminals to justice.
+
 ```{r}
 load("../data_and_code/survey_dat/d_analysis/pl_list_of_coefs_and_ps.Rda")
+load("../data_and_code/survey_dat/d_analysis/pl_list_of_coefs_and_ps_ind.Rda")
+#placeboList
+#placeboList_ind
+```
 
-placeboList
+### Community.
+
+```{r}
+pl_vio_tab <- placeboList[[1]][,c(1:2,4)]
+colnames(pl_vio_tab) <- c("coefficient", "p-value", "base")
+rownames(pl_vio_tab) <- c("Controlling-for & ICW", "Controlling-for & Additive",
+                            "Differencing & ICW", "Differencing & Additive")
+pl_vio_tab <- round(pl_vio_tab,3)
+pl_vio_tab <- knitr::kable(pl_vio_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_tab}
+\caption{\textbf{Community Placebo: Attitudes towards violence.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_vio_tab`
+\end{center}
+\end{table}
+
+Components of violence index.
+
+```{r}
+pl_vio_tab1 <- rbind(placeboList[[2]][c(1,3),c(1:2,4)],
+                     placeboList[[3]][c(1,3),c(1:2,4)],
+                     placeboList[[4]][c(1,3),c(1:2,4)],
+                     placeboList[[5]][c(1,3),c(1:2,4)],
+                     placeboList[[6]][c(1,3),c(1:2,4)],
+                     placeboList[[7]][c(1,3),c(1:2,4)])
+colnames(pl_vio_tab1) <- c("coefficient", "p-value", "base")
+rownames(pl_vio_tab1) <- c("Bring criminals to justice: Controlling-for", "Bring criminals to justice: Differencing",
+                           "Defend one’s group: Controlling-for", "Defend one’s group: Differencing",
+                           "Defend one’s religion: Controlling-for", "Defend one’s religion: Differencing",
+                           "Force the government to change their policies: Controlling-for", "Force the government to change their policies: Differencing",
+                           "Maintain culture and traditions: Controlling-for", "Maintain culture and traditions: Differencing",
+                           "Retaliate against violence: Controlling-for", "Retaliate against violence: Differencing")
+pl_vio_tab1 <- round(pl_vio_tab1,3)
+pl_vio_tab1 <- knitr::kable(pl_vio_tab1, format="latex")
+
+```
+
+
+### Individual
+
+```{r}
+pl_tab_ind <- placeboList_ind[[1]][,c(1:2,4)]
+colnames(pl_tab_ind) <- c("coefficient", "p-value", "base")
+rownames(pl_tab_ind) <- c("Non: Controlling-for & ICW", "Part: Controlling-for & ICW", 
+                                "Non: Controlling-for & Additive", "Part: Controlling-for & Additive",
+                                "Non: Differencing & ICW", "Part: Differencing & ICW", 
+                                "Non: Differencing & Additive", "Part: Differencing & Additive")
+pl_tab_ind <- round(pl_tab_ind,3)
+pl_tab_ind <- knitr::kable(pl_tab_ind, format="latex")
 ```
 
 ## Appendix F: State-level differences
