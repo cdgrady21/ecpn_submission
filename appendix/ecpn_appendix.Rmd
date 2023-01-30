@@ -1,5 +1,5 @@
 ---
-title: "ecpn_appendix"
+title: "Promoting Peace Amid Intergroup Conflict: An Intergroup Contact Field Experiment in Nigeria_Supplementary Information"
 output:
   pdf_document: default
   html_document: default
@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = FALSE)
 rm(list=ls())
 # not included: Individual-levl balance between part/nonpart/control == unneeded because exploratory & no assumption of balance.
 ```
+
+# Supplementary Information
 
 ## Appendix A: Randomization Inference and Bootstrapping
 
@@ -116,14 +118,14 @@ percExp_tab <- knitr::kable(percExp_tab, format="latex")
 `r percExp_tab`
 \end{center}
 \end{table}
-
+<!--
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=.8\textwidth]{figs/randComm_plot.png}
 \caption{\label{fig:percExp_plot_comm} \textbf{Community Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the treatment communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
 \end{center}
 \end{figure}
-
+-->
 
 ```{r}
 endExp_tab <- newList[[5]][c(1,3),c(1:2,4)]
@@ -162,14 +164,16 @@ pgg_tab <- knitr::kable(pgg_tab, format="latex")
 `r pgg_tab`
 \end{center}
 \end{table}
-
+<!--
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=.8\textwidth]{figs/pggComm_plot.png}
 \caption{\label{fig:pgg_plot_comm} \textbf{Community Public Goods Game} This figure shows the proportion of each experimental group who donated and their average donation amount. Orange shows the treatment communities; blue shows control communities.}
 \end{center}
 \end{figure}
+-->
 
+**********
 
 ## Appendix C: Robustness checks for individual analysis
 
@@ -272,7 +276,7 @@ pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 `r pgg_tab_ind`
 \end{center}
 \end{table}
-
+<!--
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=.8\textwidth]{figs/pggPan_plot.png}
@@ -287,8 +291,9 @@ pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 \caption{\label{fig:percExp_plot_ind} \textbf{Individual Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the full participants; green shows participants in intervention communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
 \end{center}
 \end{figure}
+-->
 
-
+**********
 
 ## Appendix D: Balance Tests
 
@@ -338,6 +343,8 @@ bal_svy_tab2 <- knitr::kable(round(bal_svy$overall, 3), format="latex")
 `r bal_svy_tab2`
 \end{center}
 \end{table}
+
+**********
 
 ## Appendix E: Placebo tests
 
@@ -547,6 +554,7 @@ pl_rad_ind <- knitr::kable(pl_rad_ind, format="latex")
 \end{center}
 \end{table}
 
+**********
 
 ## Appendix F: State-level differences
 
@@ -582,6 +590,7 @@ state_tab <- knitr::kable(state_tab, format="latex")
 \end{center}
 \end{table}
 
+**********
 
 ## Appendix G: Farmer-pastoralist differences
 
@@ -617,44 +626,8 @@ farm_tab <- knitr::kable(farm_tab, format="latex")
 \end{center}
 \end{table}
 
-
 **********
-<!--
-## Old Appendix B: Results with Additive Indices
 
-These tables show results for self-report survey outcomes made with additive indices.  The tables include the coefficients and $p$-values with additive indices for community- and individual-level analyses.
-
-```{r, echo=F}
-load("../data_and_code/survey_dat/d_analysis/diss_appendix/add_ind_tab.Rdata")
-```
-
-\begin{table}[H]
-\begin{center}
-`r add_ind_tab`
-\caption{\label{tab:add_ind_tab}\textbf{Effect of ECPN on main outcomes with additive indices.} The first and second columns are coefficients and $p$-values for aggregate community-level analyses.  The third and fourth columns are coefficients and $p$-values for individual-level analyses.}
-\end{center}
-\end{table}
-
-
-## OLD Appendix C: Mechanisms and Placebo Analysis
-
-These tables show results for mechanism and placebo outcomes using inverse-covariance weighted indices.  The tables include the coefficients and $p$-values for community- and individual-level analyses.
-
-```{r, echo=F, eval=F}
-load("paper1_files/mech_ind_tab.Rdata")
-```
-
-
-## Old Appendix X: Individual-level analysis
-
-```{r, eval=F}
-load("../b_creating_outcomes/f2-panelData.Rdata")
-table(panel.df$community, panel.df$committee, panel.df$treatment)
-
-```
-
-We approximately 300 baseline respondents, roughly evenly spread throughout all communities (between 8 and 15 respondents per community). Participants are clustered in certain communities where they could more easily be identified during our endline survey.
--->
 ## Appendix Z: Survey Questions
 
 **Attitudes**

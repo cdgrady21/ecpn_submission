@@ -22,54 +22,21 @@ load('ind.coefs.Rdata')
 #load('ind2.coefs_orig.Rdata')
 
 ## add obs data to coefs
-#load("../../obsDat/figs/marketCoefs1.rda") # no FEs, should be unbiased
-#load("../../obsDat/figs/eventCoefs1.rda") # no FEs
-load("../../obs_dat/figs/obsDat_fig_dat.rda")
+#load("../../../obsDat/figs/marketCoefs1.rda") # no FEs, should be unbiased
+#load("../../../obsDat/figs/eventCoefs1.rda") # no FEs
+load("../../../obs_dat/figs/obsDat_fig_dat.rda")
 
-
-```
-```{r, eval=F}
-# OLD adding non-bootstrap obs data
-load("../../obsDat/analysis/marketMedian.Rdata")
-load("../../obsDat/analysis/eventsMedian.Rdata")
-
-marks <- as.data.frame(markMed.thing[c("pastoralists_index", "farmers_index"),])
-marks$sd <- NA
-marks["pastoralists_index","sd"] <- sd(markets$pastoralists_index, na.rm=T)
-marks["farmers_index","sd"] <- sd(markets$farmers_index, na.rm=T)
-
-evs <- as.data.frame(eventsMed.thing[c("attend_total", "eat_total"),])
-evs$sd <- NA
-evs["attend_total","sd"] <- sd(events$attend_total, na.rm=T)
-evs["eat_total","sd"] <- sd(events$eat_total, na.rm=T)
-
-markEvs <- rbind(marks,evs)
-markEvs[,c("ll", "ul")] <- markEvs[,c("lower", "upper")]; markEvs[,c("lower", "upper")] <- NULL
-addNames <- setdiff(names(ag.coefs), names(markEvs))
-markEvs[,addNames] <- NA
-markEvs$var <- rownames(markEvs)
-markEvs$size <- markEvs$coef/markEvs$sd
-markEvs[,c("ll_size", "ul_size")] <- markEvs[,c("ll", "ul")]/markEvs$sd
-markEvs <- markEvs[c(names(ag.coefs))]
-
-ag.coefs <- rbind(ag.coefs, markEvs)
 
 ```
 
 # Coefplots
 
-1. Aggregate Survey outcomes
-2. Aggregate + observational outcomes
-3. Individual-level survey outcomes
-
-Survey Outcomes: 
-  - voluntary intergroup contact ()
-  - feelings of physical security
-  - intergroup attitudes
+1. Community: Aggregate + observational outcomes
+2. Individual-level survey outcomes
 
 ***************
 
-2. Aggregate + observational outcomes
+1. Aggregate + observational outcomes
 
 Order: Contact, Perceptions Security, Attitudes, PGG.
 
@@ -79,7 +46,7 @@ outcome <- outcome[grepl("Trust|contact|in_cw|end_exp|rMean|pgp", outcome$var),]
 outcome <- outcome[,c("var", "size", "ll_size", "ul_size")]
 names(outcome) <- c("var", "coef_sd", "ll_sd", "ul_sd")
 outcome$var <- c("Self-reported Attitudes", "Self-reported Contact", 
-                 "Perceptions of Insecurity",
+                 "Perceptions of Security",
                  "Public Goods Amount", "Public Goods Donation",
                  "Contact Willingness", "Endorsement Experiment")
 outcome$outcome_type <- c("atts", "con", "in","pgg", "pgg", "con", "atts")
@@ -93,14 +60,14 @@ outcome2$df <- NULL
 outcome$Data <- "Survey"
 outcome$Data[outcome$outcome_type %in% "pgg"] <- "Behavior"
 svyObs_outcomes <- rbind(outcome, outcome2)
-svyObs_outcomes$hypothesis <- c("Attitudes", "Contact", "Insecurity", 
+svyObs_outcomes$hypothesis <- c("Attitudes", "Contact", "Security", 
                                 "Cooperation", "Cooperation", "Contact",
                                 "Attitudes", 
                                 "Contact", "Contact", "Contact")
 res <- svyObs_outcomes
 res$hypothesisF <-
   factor(res$hypothesis,
-         levels = c("Contact", "Insecurity", "Attitudes", "Cooperation"))
+         levels = c("Contact", "Security", "Attitudes", "Cooperation"))
 res$varF <-
   factor(res$var,
          levels = c("Self-reported Contact", "Contact Willingness",
@@ -121,12 +88,12 @@ ggplot(data = res, aes(x = varF, y = coef_sd, color = Data)) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 
-ggsave("coef_agg.png", height=6)
+ggsave("coef_agg.png", height=6, width = 5)
 
 
 ```
 
-3. Individual-level survey outcomes
+2. Individual-level survey outcomes
 
 Survey Outcomes: 
   - voluntary intergroup contact
@@ -137,10 +104,11 @@ Need two point estimates & CI per outcome.
 
 ```{r}
 outcome_ind <- ind.coefs
-outcome_ind <- outcome_ind[grepl("Trust|contact|in_cw", outcome_ind$var),]
+outcome_ind <- outcome_ind[grepl("Trust|contact|in_cw|pgp", outcome_ind$var),]
 outcome_ind <- outcome_ind[,c(1,grep("^size.*(non|part)", names(outcome_ind)))]
 outcome_ind$var <- c("Self-reported Attitudes", "Self-reported Contact", 
-                 "Perceptions of Insecurity")
+                 "Perceptions of Security", "Public Goods Amount",
+                 "Public Goods Donation")
 part <- outcome_ind[,c(1,grep("part", names(outcome_ind)))]
 non <- outcome_ind[,c(1,grep("non", names(outcome_ind)))]
 names(part) <- gsub("_part", "", names(part))
@@ -149,13 +117,23 @@ part$Group <- "Part"; non$Group <- "Non"
 outcome_ind <- rbind(part,non)
 outcome_ind$var <- 
   factor(outcome_ind$var, 
-         levels = c("Self-reported Attitudes",
+         levels = c("Public Goods Amount",
+                    "Public Goods Donation",
+                    "Self-reported Attitudes",
                     "Perceptions of Security",
                     "Self-reported Contact"))
 outcome_ind$Group <- factor(outcome_ind$Group, levels=
                             c("Non", "Part"))
+outcome_ind$dat_source <-
+  factor(c("Survey", "Survey", "Survey",
+           "Behavior", "Behavior",
+           "Survey", "Survey", "Survey",
+           "Behavior", "Behavior"),
+         levels = c("Survey", "Behavior"))
+
 
 ggplot(data = outcome_ind, aes(x = var, y = size, color = Group)) +
+  facet_grid(vars(dat_source), scales="free", space = "free")+
   geom_point(position = position_dodge(width = .3)) +
   geom_errorbar(aes(ymin = size_ll, ymax = size_ul, color = Group), width = 0, position = position_dodge(width = .3)) +
   geom_hline(yintercept = 0, linetype = 2, color = "gray")+
