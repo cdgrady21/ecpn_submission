@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  30 JAN 2023 18:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  30 JAN 2023 18:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -406,46 +406,50 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 LaTeX Font Info:    Trying to load font information for U+msb on input line 73.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) (./ecpn_appendix.toc
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 2.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 2.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 2.
 )
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 82.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 82.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 82.
+\tf@toc=\write4
+\openout4 = `ecpn_appendix.toc'.
+
  [1
 
-{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
-Overfull \hbox (152.71764pt too wide) in paragraph at lines 443--456
+{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4]
+Overfull \hbox (152.71764pt too wide) in paragraph at lines 447--460
  [] 
  []
 
-[4]
-Overfull \hbox (160.91078pt too wide) in paragraph at lines 485--500
+[5]
+Overfull \hbox (160.91078pt too wide) in paragraph at lines 489--504
  [] 
  []
 
-[5] [6] [7] [8] [9]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 925.
+[6] [7] [8] [9] [10]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 929.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [10] [11] [12] (./ecpn_appendix.aux)
+) [11] [12] [13] (./ecpn_appendix.aux)
 Package rerunfilecheck Info: File `ecpn_appendix.out' has not changed.
-(rerunfilecheck)             Checksum: A6E1390A68DA24320DA483C4D30A628A;2477.
+(rerunfilecheck)             Checksum: 5993FCDE1A148DB6D004CE453354015F;2268.
  ) 
 Here is how much of TeX's memory you used:
- 10648 strings out of 478025
- 167874 string characters out of 5838745
- 1873299 words of memory out of 5000000
- 30574 multiletter control sequences out of 15000+600000
+ 10654 strings out of 478025
+ 167961 string characters out of 5838745
+ 1871299 words of memory out of 5000000
+ 30575 multiletter control sequences out of 15000+600000
  562200 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  75i,8n,76p,536b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}<c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb>
-Output written on ecpn_appendix.pdf (12 pages, 178781 bytes).
+Output written on ecpn_appendix.pdf (13 pages, 180101 bytes).
 PDF statistics:
- 188 PDF objects out of 1000 (max. 8388607)
- 159 compressed objects within 2 object streams
- 59 named destinations out of 1000 (max. 500000)
- 89 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 198 PDF objects out of 1000 (max. 8388607)
+ 168 compressed objects within 2 object streams
+ 61 named destinations out of 1000 (max. 500000)
+ 73 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,0 +1,11 @@
+\contentsline {section}{Supplementary Information}{1}{section*.2}%
+\contentsline {subsection}{Appendix A: Randomization Inference and Bootstrapping}{1}{section*.3}%
+\contentsline {subsection}{Appendix B: Robustness checks for community analysis}{2}{section*.4}%
+\contentsline {subsection}{Appendix C: Robustness checks for individual analysis}{3}{section*.5}%
+\contentsline {subsection}{Appendix D: Balance Tests}{5}{section*.6}%
+\contentsline {subsection}{Appendix E: Placebo tests}{6}{section*.7}%
+\contentsline {subsubsection}{Community.}{7}{section*.8}%
+\contentsline {subsubsection}{Individual}{8}{section*.9}%
+\contentsline {subsection}{Appendix F: State-level differences}{10}{section*.10}%
+\contentsline {subsection}{Appendix G: Farmer-pastoralist differences}{10}{section*.11}%
+\contentsline {subsection}{Appendix Z: Survey Questions}{11}{section*.12}%

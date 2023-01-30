@@ -1,8 +1,12 @@
 ---
 title: "Promoting Peace Amid Intergroup Conflict: An Intergroup Contact Field Experiment in Nigeria_Supplementary Information"
 output:
-  pdf_document: default
-  html_document: default
+  pdf_document:
+    toc: true
+    toc_depth: 2
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +21,7 @@ rm(list=ls())
 
 Randomization inference and bootstrapping are nonparametric methods to generate $p$-values (randomization inference) and confidence intervals (bootstrapping).  With *randomization inference*, we first shuffle the treatment variable to break the relationship between treatment and outcomes.  Next we regress outcomes on treatment using our regression equation and store the resulting coefficient.  Lastly, we repeat that process 10,000 times to create the distribution of coefficients we would observe if treatment had no effect on outcomes -- the null hypothesis.  Our $p$-value is the proportion of the null distribution that is greater than or equal to our observed coefficient.  
 
-*Bootstrapping* for standard errors is similar, but instead of shuffling the treatment indicator we resample units with replacement.  By resampling with replacement, we create the empirical distribution of our data and the range of possible treatment effects we might observe if we repeated the experiment 10,000 times.  The treatment effect at the 2.5th percentile and at the 97.5th percentile are equivalent to a 95\% confidence interval [@efron1994introduction].
+*Bootstrapping* for standard errors is similar, but instead of shuffling the treatment indicator we resample units with replacement.  By resampling with replacement, we create the empirical distribution of our data and the range of possible treatment effects we might observe if we repeated the experiment 10,000 times.  The treatment effect at the 2.5th percentile and at the 97.5th percentile are equivalent to a 95\% confidence interval <!--[@efron1994introduction]-->.
 
 In each of these procedures, we mimic our randomization process by randomizing/resampling the intervention to communities in site-level clusters and within state blocks. This means that both communities in an implementation site (farmers and pastoralists) will always be treated/sampled together and that assignment to the intervention and resampling are conducted separately in Nassarawa and Benue, just as the intervention was assigned in this study.  This procedure ensures that our null distribution (for $p$-values) is created by randomizing the intervention between exchangeable units and that our empirical distribution (for confidence intervals) is created by resampling units as they were sampled.
 
