@@ -215,43 +215,11 @@ After this point, less important plots.
 **************************
 
 
-
-
-
-## List Experiment
-
-High values are bad here.
-
-ECPN sites decreased less than control sites on list experiment.  A measure of prejudice where high values mean a greater proportion of people expressing anger at "interacting with the outgroup in the market."
-
-<!--Lots of places have negative prejudice at endline (fewer angry with 4 item list than 3 item list).-->
-
-```{r}
-(listComm.plot <- plot.fun(var='list_exp', thedf=plot.df, time='survey', title="List Experiment", 
-         xlab="Survey", ylab="Average Difference Between 3 Item and 4 Item List",
-         ymin=-0.35, ymax=0.35))
-
-png(file="listComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
-par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
-listComm.plot
-dev.off()
-
-```
-
-
 ## Percent Experiment
 
-ECPN sites and control sites stayed the same on the percent experiment.  This percent experiment is a measure of prejudice where lower scores indicate less willingness to join a group/live in a community as the percentage of outgroup members in the community increase from 5/25/50/75 percent.
+This percent experiment is a measure of prejudice where lower scores indicate less willingness to join a group/live in a community as the percentage of outgroup members in the community increase from 5/25/50/75 percent.
 
-```{r}
-(randComm.plot <- plot.fun(var='rand_lm', thedf=plot.df, time='survey', title="Percent Experiment", 
-         xlab="Survey", ylab="Average Change in Relationship Between % Outgroup Members and Joining Group/Living in Community",
-         ymin=-0.004, ymax=0.004))
-
-```
-
-Making a better graph by showing the 75% to 5% drop for TR and Co at baseline and endline (4 lines, each with 4 points).
+Making a graph by showing the 75% to 5% drop for TR and Co at baseline and endline (4 lines, each with 4 points).
 
 ```{r}
 rand.df$tr2 <- ifelse(rand.df$treatment %in% 1, "Treatment", "Control")
@@ -415,6 +383,38 @@ png(file="endComm_plot.png", bg="transparent", units="in",
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 endComm.plot
 dev.off()
+```
+
+Barplot is not helpful.
+```{r, eval=F}
+end.df <- ag.df %>% select(end_expTR_base, end_expTR_end,
+                           end_exp1c_base, end_exp1c_end, 
+                           treatment)
+end.df <- reshape2::melt(end.df, id="treatment")
+end.df$time <- ifelse(grepl("base", end.df$variable), "baseline", "endline")
+end.df <- end.df %>% dplyr::group_by(treatment,variable, time) %>% 
+  summarise(Value=mean(value)) %>%
+  as.data.frame()
+
+end.df$Treatment <- as.factor(ifelse(end.df$treatment %in% 1, "ECPN", "Non-ECPN"))
+end.df$Treatment <- ordered(end.df$Treatment, levels = c("ECPN", "Non-ECPN"))
+levels(end.df$variable) <- c("Endorse", "Endorse", "CO", "CO")
+#end.df$variable <- ordered(end.df$variable, levels = c("CO", "Endorse"))
+
+(endComm.plot <- ggplot(data=end.df[end.df$Treatment %in% "ECPN",], aes(x=time, y=Value, fill=variable)) +
+  geom_bar(stat="identity", position="dodge")+
+  ggtitle("Community Endorsement Experiment") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab("Agreement"))
+
+png(file="pggComm_plot.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+pggComm.plot
+dev.off()
+
 ```
 
 Individual-level graph. chris: here.

@@ -1,8 +1,8 @@
 library(RItools)
 rm(list=ls())
-load("../d_analysis/panel_balance1.rda")
-load("../d_analysis/panel_balance2.rda")
-load("../d_analysis/panel_balance3.rda")
+load("../d_analysis/diss_appendix/panel_balance1.rda")
+load("../d_analysis/diss_appendix/panel_balance2.rda")
+load("../d_analysis/diss_appendix/panel_balance3.rda")
 
 xbLabs <- bal1
 varlabs  <- c("Trust","Other","Clash",

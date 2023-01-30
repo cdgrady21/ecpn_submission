@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.24)  24 JAN 2023 23:39
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  29 JAN 2023 22:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **ecpn_appendix.tex
 (./ecpn_appendix.tex
 LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2023-01-16> (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
+L3 programming layer <2023-01-24> (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
 (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size10.clo
 File: size10.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
@@ -128,8 +128,6 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
 (Font)                  OT1/cmr/bx/it --> OT1/lmr/bx/it on input line 37.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 (Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
-) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
-Package: iftex 2022/02/03 v1.0f TeX engine tests
 ) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count271
@@ -137,6 +135,8 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \float@box=\box53
 \@float@everytoks=\toks22
 \@floatcapt=\box54
+) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
 ) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 LaTeX Font Info:    Trying to load font information for T1+lmr on input line 112.
@@ -407,39 +407,69 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 72.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 81.
- (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 133.
+(Font)              <10> on input line 78.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 133.
+(Font)              <7> on input line 78.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 133.
+(Font)              <5> on input line 78.
  [1
 
-{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 484.
- (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
-File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [5] [6] [7] [8] [9] [10] [11] (./ecpn_appendix.aux)
+{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+<figs/randComm_plot.png, id=56, 578.16pt x 433.62pt>
+File: figs/randComm_plot.png Graphic file (type png)
+<use figs/randComm_plot.png>
+Package pdftex.def Info: figs/randComm_plot.png  used on input line 232.
+(pdftex.def)             Requested size: 375.79955pt x 281.84966pt.
+ [2]
+<figs/pggComm_plot.png, id=66, 578.16pt x 433.62pt>
+File: figs/pggComm_plot.png Graphic file (type png)
+<use figs/pggComm_plot.png>
+Package pdftex.def Info: figs/pggComm_plot.png  used on input line 279.
+(pdftex.def)             Requested size: 375.79955pt x 281.84966pt.
+ [3 <./figs/randComm_plot.png>] [4 <./figs/pggComm_plot.png>] [5]
+<figs/pggPan_plot.png, id=88, 578.16pt x 433.62pt>
+File: figs/pggPan_plot.png Graphic file (type png)
+<use figs/pggPan_plot.png>
+Package pdftex.def Info: figs/pggPan_plot.png  used on input line 442.
+(pdftex.def)             Requested size: 375.79955pt x 281.84966pt.
+ [6]
+<figs/randPan_plot.png, id=95, 578.16pt x 433.62pt>
+File: figs/randPan_plot.png Graphic file (type png)
+<use figs/randPan_plot.png>
+Package pdftex.def Info: figs/randPan_plot.png  used on input line 449.
+(pdftex.def)             Requested size: 375.79955pt x 281.84966pt.
+ [7 <./figs/pggPan_plot.png>]
+Overfull \hbox (152.71764pt too wide) in paragraph at lines 463--476
+ [] 
+ []
+
+
+Overfull \hbox (160.91078pt too wide) in paragraph at lines 505--520
+ [] 
+ []
+
+[8 <./figs/randPan_plot.png>] [9] [10] [11] [12] [13]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 939.
+ (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [14] [15] (./ecpn_appendix.aux)
 Package rerunfilecheck Info: File `ecpn_appendix.out' has not changed.
-(rerunfilecheck)             Checksum: 9E6BCB8DA8125EB15985C835FD5C0527;2187.
+(rerunfilecheck)             Checksum: 2C8AF34E74EC1CD5BB26BA35EDABE31F;2223.
  ) 
 Here is how much of TeX's memory you used:
- 10654 strings out of 478051
- 168116 string characters out of 5839265
- 1876324 words of memory out of 5000000
- 30569 multiletter control sequences out of 15000+600000
- 562519 words of font info for 73 fonts, out of 8000000 for 9000
+ 10685 strings out of 478025
+ 168628 string characters out of 5838745
+ 1871299 words of memory out of 5000000
+ 30600 multiletter control sequences out of 15000+600000
+ 556203 words of font info for 70 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,8n,76p,491b,579s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on ecpn_appendix.pdf (11 pages, 194380 bytes).
+ 75i,8n,76p,757b,499s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}<c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb>
+Output written on ecpn_appendix.pdf (15 pages, 419065 bytes).
 PDF statistics:
- 162 PDF objects out of 1000 (max. 8388607)
- 132 compressed objects within 2 object streams
- 40 named destinations out of 1000 (max. 500000)
- 73 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 209 PDF objects out of 1000 (max. 8388607)
+ 169 compressed objects within 2 object streams
+ 64 named destinations out of 1000 (max. 500000)
+ 101 words of extra memory for PDF output out of 10000 (max. 10000000)
 

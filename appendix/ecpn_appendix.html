@@ -380,8 +380,8 @@ baseline outcomes (Separate for svy and obs)</li>
 method</li>
 <li>raw vs ranked variables to create the index</li>
 </ul></li>
-<li>State-level differences &amp; farmer-pastoralist differences (ready
-for reviewers)</li>
+<li><em>State-level differences &amp; farmer-pastoralist
+differences</em></li>
 <li>Survey questions</li>
 </ul>
 <div id="appendix-a-randomization-inference-and-bootstrapping" class="section level2">
@@ -415,9 +415,10 @@ null distribution (for <span class="math inline">\(p\)</span>-values) is
 created by randomizing the intervention between exchangeable units and
 that our empirical distribution (for confidence intervals) is created by
 resampling units as they were sampled.</p>
+<hr />
 </div>
-<div id="appendix-b-robustness-checks-for-analysis" class="section level2">
-<h2>Appendix B: Robustness checks for analysis</h2>
+<div id="appendix-b-robustness-checks-for-community-analysis" class="section level2">
+<h2>Appendix B: Robustness checks for community analysis</h2>
 <p>These tables shows results with different ways of making indices
 (additive vs inverse-covariance weighted), different models for
 estimating effects (differencing vs controlling-for), and different ways
@@ -426,94 +427,236 @@ Rows are results for different ways of creating the outcomes. Columns
 show the coefficient from OLS regression, true p-value from
 randomization inference, and a binary “base” indicator showing which
 method was used in the paper.</p>
-<p>index: inverse-covariance weights (“cw”) or additive (“ind”). model:
-controlling-for (“cont”) or differencing (“diff”). Note that not not all
-outcomes are indices, some outcomes are endline only, and only contact
-outcomes use count variables.</p>
-<pre><code>## [[1]]
-##                                 coef  truep  version base
-## attitude_cw~treatment     0.11601349 0.0443  cw_cont    1
-## attitude_index~treatment  0.09280439 0.0378 ind_cont    0
-## attitude_cw~treatment1    0.10026696 0.1421  cw_diff    0
-## attitude_index~treatment1 0.07306274 0.1218 ind_diff    0
-## 
-## [[2]]
-##                            coef  truep  version base
-## in_cw~treatment      0.09790809 0.0304  cw_cont    0
-## in_index~treatment  -0.01045169 0.5934 ind_cont    0
-## in_cw~treatment1     0.15909111 0.0229  cw_diff    1
-## in_index~treatment1  0.05375752 0.2068 ind_diff    0
-## 
-## [[3]]
-##                                     coef  truep  version base
-## contactOnly_cw~treatment     0.012937275 0.4182  cw_cont    0
-## contactOnly_index~treatment  0.003357323 0.4207 ind_cont    0
-## contactOnly_cw~treatment1    0.137779036 0.0624  cw_diff    1
-## contactOnly_index~treatment1 0.014713596 0.1825 ind_diff    0
-## 
-## [[4]]
-##                        coef  truep  version base
-## rMean~treatment  0.09327385 0.0491  cw_cont    0
-## 2                        NA     NA ind_cont    0
-## rMean~treatment1 0.06213299 0.2420  cw_diff    1
-## 4                        NA     NA ind_diff    0
-## 
-## [[5]]
-##                         coef  truep  version base
-## end_exp~treatment  0.1225162 0.2161  cw_cont    0
-## 2                         NA     NA ind_cont    0
-## end_exp~treatment1 0.1225162 0.2098  cw_diff    1
-## 4                         NA     NA ind_diff    0
-## 
-## [[6]]
-##                                coef truep  version base
-## pgp_donate_end~treatment 0.02241997 0.284  cw_cont   NA
-## 2                                NA    NA ind_cont   NA
-## 3                                NA    NA  cw_diff   NA
-## 4                                NA    NA ind_diff   NA
-## 
-## [[7]]
-##                              coef  truep  version base
-## pgp_amount_end~treatment -35.1235 0.8435  cw_cont   NA
-## 2                              NA     NA ind_cont   NA
-## 3                              NA     NA  cw_diff   NA
-## 4                              NA     NA ind_diff   NA</code></pre>
-<pre><code>##                                       coef  truep
-## contactOnly_cw~treatment        0.01293728 0.4204
-## contactOnly_cats_cw~treatment   0.01695302 0.3772
-## contactOnly_raw_cw~treatment   -0.01988471 0.6021
-## contactOnly_cw~treatment1       0.13777904 0.0653
-## contactOnly_cats_cw~treatment1  0.12048417 0.0640
-## contactOnly_raw_cw~treatment1   0.07120127 0.2072</code></pre>
+<p>The base method is always inverse-covariance weighted indices; the
+estimation method is controlling-for unless the baseline difference
+between the treatment and control groups is 0.20 standard deviations or
+more; the base method of handling count variables is dense rank. Only
+contact outcomes use count variables, only survey outcomes have a
+baseline and an endline and are measured with indices.</p>
 </div>
-<div id="appendix-b-results-with-additive-indices" class="section level2">
-<h2>Appendix B: Results with Additive Indices</h2>
-<p>These tables show results for self-report survey outcomes made with
-additive indices. The tables include the coefficients and <span class="math inline">\(p\)</span>-values with additive indices for
-community- and individual-level analyses.</p>
+<div id="appendix-c-robustness-checks-for-individual-analysis" class="section level2">
+<h2>Appendix C: Robustness checks for individual analysis</h2>
+<p>These tables shows results with different ways of making indices
+(additive vs inverse-covariance weighted), different models for
+estimating effects (differencing vs controlling-for), and different ways
+of coding count variables (raw vs ranked). Each table is an outcome.
+Rows are results for different ways of creating the outcomes. Columns
+show the coefficient from OLS regression, true p-value from
+randomization inference, and a binary “base” indicator showing which
+method was used in the paper.</p>
+<p>The base method is always inverse-covariance weighted indices; the
+estimation method is controlling-for unless the baseline difference
+between the participants and control groups is 0.20 standard deviations
+or more; the base method of handling count variables is dense rank. Only
+contact outcomes use count variables, only survey outcomes have a
+baseline and an endline and are measured with indices.</p>
 </div>
-<div id="appendix-c-placebo-analysis" class="section level2">
-<h2>Appendix C: Placebo Analysis</h2>
+<div id="appendix-d-balance-tests" class="section level2">
+<h2>Appendix D: Balance Tests</h2>
+<pre><code>## $results
+## , , strata = strat
+## 
+##                      stat
+## vars                       Control    Treatment      adj.diff adj.diff.null.sd
+##   attitude_cw_base     0.542222393  0.565609444  0.0233870504     0.0654220532
+##   in_cw_base          -0.458973498 -0.537499573 -0.0785260756     0.0705834856
+##   contactOnly_cw_base  0.495640082  0.336429250 -0.1592108323     0.1041997069
+##   rand_lm_base        -0.001855586 -0.002639292 -0.0007837057     0.0008508652
+##   rand_outcome_base    0.443022420  0.473606928  0.0305845084     0.0563078296
+##   end_exp_base        -0.212108532 -0.250012095 -0.0379035631     0.1686690404
+##                      stat
+## vars                     std.diff          z         p
+##   attitude_cw_base     0.09798240  0.3574796 0.7207328
+##   in_cw_base          -0.24640254 -1.1125276 0.2659114
+##   contactOnly_cw_base -0.58471858 -1.5279393 0.1265276
+##   rand_lm_base        -0.33434388 -0.9210691 0.3570143
+##   rand_outcome_base    0.20555272  0.5431662 0.5870154
+##   end_exp_base        -0.06657472 -0.2247215 0.8221959
+## 
+## attr(,&quot;originals&quot;)
+## [1] &quot;attitude_cw_base&quot;    &quot;in_cw_base&quot;          &quot;contactOnly_cw_base&quot;
+## [4] &quot;rand_lm_base&quot;        &quot;rand_outcome_base&quot;   &quot;end_exp_base&quot;       
+## 
+## $overall
+##       chisquare df   p.value
+## strat   6.31019  6 0.3893542
+## 
+## attr(,&quot;fmla&quot;)
+## treatment ~ attitude_cw_base + in_cw_base + contactOnly_cw_base + 
+##     rand_lm_base + rand_outcome_base + end_exp_base
+## attr(,&quot;class&quot;)
+## [1] &quot;xbal&quot; &quot;list&quot;
+## attr(,&quot;report&quot;)
+## [1] &quot;adj.means&quot;              &quot;adj.mean.diffs&quot;         &quot;adj.mean.diffs.null.sd&quot;
+## [4] &quot;chisquare.test&quot;         &quot;std.diffs&quot;              &quot;z.scores&quot;              
+## [7] &quot;p.values&quot;</code></pre>
 </div>
-<div id="old-appendix-c-mechanisms-and-placebo-analysis" class="section level2">
-<h2>OLD Appendix C: Mechanisms and Placebo Analysis</h2>
-<p>These tables show results for mechanism and placebo outcomes using
-inverse-covariance weighted indices. The tables include the coefficients
-and <span class="math inline">\(p\)</span>-values for community- and
-individual-level analyses.</p>
+<div id="appendix-e-placebo-tests" class="section level2">
+<h2>Appendix E: Placebo tests</h2>
+<p>Several of our outcomes are survey self-reports, and all self-reports
+could be affected by social desirability bias. Our survey results are
+suspect if respondents in treatment communities learned the ``correct’’
+answers better than respondents in control communities. If social
+desirability accounts for the effect in survey self-reports, we would
+also expect differences between treatment and control for other
+normatively desirable attitudes.</p>
+<p>To test social desirability effects, we conduct a placebo analysis
+using attitudes about violence as a placebo. Attitudes about violence
+are a good candidate for a placebo because intergroup contact should not
+affect general attitudes about violence, but respondents may feel social
+pressure to answer violence questions in a desirable way. We measure
+attitudes about violence with a six question index asking respondents if
+it is always, sometimes, rarely, or never justified to use violence in
+certain situations, such as retaliating against violence or bringing
+criminals to justice.</p>
+<div id="community." class="section level3">
+<h3>Community.</h3>
+<p>Components of violence index.</p>
 </div>
-<div id="appendix-x-individual-level-analysis" class="section level2">
-<h2>Appendix X: Individual-level analysis</h2>
-<pre class="r"><code>load(&quot;../b_creating_outcomes/f2-panelData.Rdata&quot;)
-table(panel.df$community, panel.df$committee, panel.df$treatment)</code></pre>
-<p>We approximately 300 baseline respondents, roughly evenly spread
-throughout all communities (between 8 and 15 respondents per community).
-Participants are clustered in certain communities where they could more
-easily be identified during our endline survey.</p>
+<div id="individual" class="section level3">
+<h3>Individual</h3>
 </div>
-<div id="appendix-d-survey-questions" class="section level2">
-<h2>Appendix D: Survey Questions</h2>
-<p><strong>Outgroup Affect</strong></p>
+</div>
+<div id="appendix-f-state-level-differences" class="section level2">
+<h2>Appendix F: State-level differences</h2>
+<pre><code>## $attitude_cw
+##                            term   estimate    p.value
+## 1                   (Intercept) -0.2498650 0.09501665
+## 2          ag.df[, &quot;treatment&quot;]  0.2057339 0.23320131
+## 3                      statenas  0.2725481 0.06919022
+## 4 ag.df[, &quot;treatment&quot;]:statenas -0.1757783 0.31539114
+## 
+## $in_cw
+##                            term    estimate   p.value
+## 1                   (Intercept)  0.12092800 0.2973856
+## 2          ag.df[, &quot;treatment&quot;]  0.07915428 0.5007593
+## 3                      statenas -0.10960567 0.4093834
+## 4 ag.df[, &quot;treatment&quot;]:statenas  0.13322806 0.3833034
+## 
+## $contactOnly_cw
+##                            term   estimate    p.value
+## 1                   (Intercept) -0.3344703 0.03594430
+## 2          ag.df[, &quot;treatment&quot;]  0.2004255 0.19018537
+## 3                      statenas  0.3780055 0.01138129
+## 4 ag.df[, &quot;treatment&quot;]:statenas -0.1044108 0.46866542
+## 
+## $rMean
+##                            term   estimate    p.value
+## 1                   (Intercept) -0.3264061 0.14061932
+## 2          ag.df[, &quot;treatment&quot;]  0.2127052 0.18992279
+## 3                      statenas  0.5495802 0.02713233
+## 4 ag.df[, &quot;treatment&quot;]:statenas -0.2509537 0.15763238
+## 
+## $end_exp
+##                            term     estimate   p.value
+## 1                   (Intercept) -0.025911144 0.8457171
+## 2          ag.df[, &quot;treatment&quot;]  0.008160342 0.9723655
+## 3                      statenas -0.321998592 0.1198422
+## 4 ag.df[, &quot;treatment&quot;]:statenas  0.190593087 0.4883455
+## 
+## $pgp_donate_end
+##                            term    estimate    p.value
+## 1                   (Intercept)  0.89125000 0.05078586
+## 2          ag.df[, &quot;treatment&quot;]  0.07833333 0.38398024
+## 3                      statenas  0.09548203 0.30127069
+## 4 ag.df[, &quot;treatment&quot;]:statenas -0.09318894 0.25682147
+## 
+## $pgp_amount_end
+##                            term  estimate   p.value
+## 1                   (Intercept) 240.28750 0.2253282
+## 2          ag.df[, &quot;treatment&quot;]  15.76042 0.8763263
+## 3                      statenas 107.28268 0.3839096
+## 4 ag.df[, &quot;treatment&quot;]:statenas -84.80653 0.4419010</code></pre>
+</div>
+<div id="appendix-g-farmer-pastoralist-differences" class="section level2">
+<h2>Appendix G: Farmer-pastoralist differences</h2>
+<pre><code>## $attitude_cw
+##                                 term    estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;]  0.14549900 0.1782298
+## 2                      farm_pastpast -0.00949469 0.8454740
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast -0.09046408 0.2780316
+## 
+## $in_cw
+##                                 term    estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;]  0.14870533 0.2294206
+## 2                      farm_pastpast -0.11217626 0.4916309
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast  0.02077157 0.9045019
+## 
+## $contactOnly_cw
+##                                 term   estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;] 0.12245873 0.3727152
+## 2                      farm_pastpast 0.07482787 0.7649711
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast 0.03064061 0.9105597
+## 
+## $rMean
+##                                 term    estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;]  0.06916678 0.5540888
+## 2                      farm_pastpast -0.14181940 0.2513859
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast -0.01406759 0.9132141
+## 
+## $end_exp
+##                                 term   estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;]  0.2194837 0.3450349
+## 2                      farm_pastpast  0.5257106 0.1742928
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast -0.1939351 0.6258698
+## 
+## $pgp_donate_end
+##                                 term    estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;]  0.05421409 0.4190902
+## 2                      farm_pastpast  0.09507843 0.2377855
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast -0.06358824 0.3859465
+## 
+## $pgp_amount_end
+##                                 term   estimate   p.value
+## 1               ag.df[, &quot;treatment&quot;] -46.765628 0.5440105
+## 2                      farm_pastpast   9.819108 0.9082086
+## 3 ag.df[, &quot;treatment&quot;]:farm_pastpast  23.284255 0.7835737</code></pre>
+<hr />
+<!--
+## Old Appendix B: Results with Additive Indices
+
+These tables show results for self-report survey outcomes made with additive indices.  The tables include the coefficients and $p$-values with additive indices for community- and individual-level analyses.
+
+
+
+\begin{table}[H]
+\begin{center}
+
+\begin{tabular}{l|r|r|r|r}
+\hline
+  & ag\_coef & ag\_p & ind\_coef & ind\_p\\
+\hline
+Affect & 0.093 & 0.037 & 0.062 & 0.056\\
+\hline
+Insecurity & 0.015 & 0.174 & 0.030 & 0.011\\
+\hline
+Contact & 0.054 & 0.193 & 0.070 & 0.143\\
+\hline
+\end{tabular}
+
+
+\caption{\label{tab:add_ind_tab}\textbf{Effect of ECPN on main outcomes with additive indices.} The first and second columns are coefficients and $p$-values for aggregate community-level analyses.  The third and fourth columns are coefficients and $p$-values for individual-level analyses.}
+\end{center}
+\end{table}
+
+
+## OLD Appendix C: Mechanisms and Placebo Analysis
+
+These tables show results for mechanism and placebo outcomes using inverse-covariance weighted indices.  The tables include the coefficients and $p$-values for community- and individual-level analyses.
+
+
+
+
+## Old Appendix X: Individual-level analysis
+
+
+
+We approximately 300 baseline respondents, roughly evenly spread throughout all communities (between 8 and 15 respondents per community). Participants are clustered in certain communities where they could more easily be identified during our endline survey.
+-->
+</div>
+<div id="appendix-z-survey-questions" class="section level2">
+<h2>Appendix Z: Survey Questions</h2>
+<p><strong>Attitudes</strong></p>
 <ul>
 <li>With regards to someone from [X GROUP], would you feel comfortable:
 <ul>

@@ -223,7 +223,7 @@ save(farmList, file="farm_list.Rda")
 
 # Placebos
 
-```{r}
+```{r, eval=F}
 # loop over all placebo outcomes
 placebo_list <- c("vio", 
                   "violence_group.criminals",
@@ -233,10 +233,9 @@ placebo_list <- c("vio",
                   "violence_group.maintain_culture",
                   "violence_group.retaliate",
                   'outgroup_atts_group.trust_rel',
-                  "radio",
-                  "disp_index")
+                  "radio")
 #analysis.fun(var=placebo_list[1])
-#analysis.fun(var=placebo_list[10])
+#analysis.fun(var=placebo_list[9])
 
 placeboList <- vector(mode="list", length=length(placebo_list))
 for(i in 1:length(placebo_list))
@@ -244,9 +243,10 @@ for(i in 1:length(placebo_list))
   placeboList[[i]] <- analysis.fun(placebo_list[i])
 }
 save(placeboList, file="pl_list_of_coefs_and_ps.Rda")
-
 ```
-
+```{r}
+load("pl_list_of_coefs_and_ps.Rda")
+```
 
 
 **atts towards violence**: `r paste(vioVars, collapse=", ")`

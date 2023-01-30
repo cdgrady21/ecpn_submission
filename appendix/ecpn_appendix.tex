@@ -6,8 +6,8 @@
 ]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{iftex}
 \usepackage{float}
+\usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
@@ -70,61 +70,6 @@
 \begin{document}
 \maketitle
 
-\hypertarget{appendices}{%
-\section{Appendices}\label{appendices}}
-
-Desired appendices.
-
-\begin{itemize}
-\tightlist
-\item
-  Explaining randomization inference and bootstrapping
-\item
-  Robustness checks for analysis
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Additive indices instead of ICW indices
-  \item
-    Results with differencing method vs results with controlling-for
-    method
-  \item
-    raw vs ranked variables to create the index
-  \end{itemize}
-\item
-  Placebo analysis + components of placebo
-\item
-  Balance:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Communities/site: TR vs CO within state \& overall for all baseline
-    outcomes (Separate for svy and obs)
-  \item
-    Individuals: Direct/indirect/control == unneeded because exploratory
-    \& no assumption of balance.
-  \end{itemize}
-\item
-  Panel analysis: big table of results (lower priority)
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Additive indices instead of ICW indices
-  \item
-    Results with differencing method vs results with controlling-for
-    method
-  \item
-    raw vs ranked variables to create the index
-  \end{itemize}
-\item
-  \emph{State-level differences \& farmer-pastoralist differences}
-\item
-  Survey questions
-\end{itemize}
-
 \hypertarget{appendix-a-randomization-inference-and-bootstrapping}{%
 \subsection{Appendix A: Randomization Inference and
 Bootstrapping}\label{appendix-a-randomization-inference-and-bootstrapping}}
@@ -185,7 +130,7 @@ baseline and an endline and are measured with indices.
 \begin{table}[H]
 \begin{center}
 \label{tab:attitude_tab}
-\caption{\textbf{Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
@@ -209,7 +154,7 @@ Differencing \& Additive & 0.073 & 0.116 & 0\\
 \begin{table}[H]
 \begin{center}
 \label{tab:security_tab}
-\caption{\textbf{Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Perceptions of Security} Effect of ECPN on perceptions of security using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
@@ -233,7 +178,7 @@ Differencing \& Additive & 0.054 & 0.213 & 0\\
 \begin{table}[H]
 \begin{center}
 \label{tab:contact_tab}
-\caption{\textbf{Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Contact} Effect of ECPN on contact using alternative methods of estimation, index construction, and measuring count variables. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
@@ -265,7 +210,7 @@ Differencing \& ICW \& Raw & 0.071 & 0.207 & 0\\
 \begin{table}[H]
 \begin{center}
 \label{tab:percExp_tab}
-\caption{\textbf{Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Contact Willingness (Percent Experiment)} Effect of ECPN on willingness to have contact with the outgroup using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
@@ -282,10 +227,17 @@ Differencing & 0.062 & 0.239 & 1\\
 \end{center}
 \end{table}
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/randComm_plot.png}
+\caption{\label{fig:percExp_plot_comm} \textbf{Community Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the treatment communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
+\end{center}
+\end{figure}
+
 \begin{table}[H]
 \begin{center}
 \label{tab:endExp_tab}
-\caption{\textbf{Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Endorsement Experiment} Effect of ECPN on endorsement experiment using alternative methods of estimation. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
@@ -305,7 +257,7 @@ Differencing & 0.123 & 0.212 & 1\\
 \begin{table}[H]
 \begin{center}
 \label{tab:pgg_tab}
-\caption{\textbf{Publid Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
+\caption{\textbf{Community Public Goods Game} Effect of ECPN on probability of donating and on donation amount. The first column shows coefficients from OLS regression and the second column shows $p$-values from randomization inference.}
 \smallskip
 
 \begin{tabular}{l|r|r}
@@ -321,6 +273,13 @@ Donation amount & -35.124 & 0.852\\
 
 \end{center}
 \end{table}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/pggComm_plot.png}
+\caption{\label{fig:pgg_plot_comm} \textbf{Community Public Goods Game} This figure shows the proportion of each experimental group who donated and their average donation amount. Orange shows the treatment communities; blue shows control communities.}
+\end{center}
+\end{figure}
 
 \hypertarget{appendix-c-robustness-checks-for-individual-analysis}{%
 \subsection{Appendix C: Robustness checks for individual
@@ -345,7 +304,7 @@ baseline and an endline and are measured with indices.
 \begin{table}[H]
 \begin{center}
 \label{tab:attitude_tab_ind}
-\caption{\textbf{Indiviaul Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Individual Attitudes.} Effect of ECPN on attitudes using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 
 \begin{tabular}{l|r|r|r}
@@ -432,21 +391,21 @@ Non: Differencing \& Additive \& Ranks & -0.005 & 0.580 & 0\\
 \hline
 Part: Differencing \& Additive \& Ranks & 0.063 & 0.017 & 0\\
 \hline
-Non: Controlling-for \& ICW \& Categories & -0.045 & 0.820 & 0\\
+Non: Controlling-for \& ICW \& Categories & -0.045 & 0.764 & 0\\
 \hline
-Part: Controlling-for \& ICW \& Categories & 0.063 & 0.240 & 0\\
+Part: Controlling-for \& ICW \& Categories & 0.063 & 0.203 & 0\\
 \hline
-Non: Controlling-for \& ICW \& Raw & -0.023 & 0.780 & 0\\
+Non: Controlling-for \& ICW \& Raw & -0.023 & 0.737 & 0\\
 \hline
-Part: Controlling-for \& ICW \& Raw & 0.044 & 0.140 & 0\\
+Part: Controlling-for \& ICW \& Raw & 0.044 & 0.126 & 0\\
 \hline
-Non: Differencing \& ICW \& Categories & 0.017 & 0.430 & 0\\
+Non: Differencing \& ICW \& Categories & 0.017 & 0.407 & 0\\
 \hline
-Part: Differencing \& ICW \& Categories & 0.130 & 0.060 & 0\\
+Part: Differencing \& ICW \& Categories & 0.130 & 0.029 & 0\\
 \hline
-Non: Differencing \& ICW \& Raw & -0.002 & 0.600 & 0\\
+Non: Differencing \& ICW \& Raw & -0.002 & 0.531 & 0\\
 \hline
-Part: Differencing \& ICW \& Raw & 0.066 & 0.050 & 0\\
+Part: Differencing \& ICW \& Raw & 0.066 & 0.025 & 0\\
 \hline
 \end{tabular}
 
@@ -478,262 +437,493 @@ Part: Donation amount & -53.740 & 0.875\\
 \end{center}
 \end{table}
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/pggPan_plot.png}
+\caption{\label{fig:pgg_plot_ind} \textbf{Individual Public Goods Game} This figure shows the proportion of each experimental group who donated and their average donation amount. Orange shows the full participants; red shows the nonparticipants in intervention communities; blue shows people in control communities.}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/randPan_plot.png}
+\caption{\label{fig:percExp_plot_ind} \textbf{Individual Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the full participants; green shows participants in intervention communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
+\end{center}
+\end{figure}
+
 \hypertarget{appendix-d-balance-tests}{%
 \subsection{Appendix D: Balance Tests}\label{appendix-d-balance-tests}}
 
-\begin{verbatim}
-## $results
-## , , strata = strat
-## 
-##                                 stat
-## vars                              Control Treatment   adj.diff adj.diff.null.sd
-##   pastoralists_index_events      84.17723  50.96957 -33.207669         37.15460
-##   farmers_index_events           74.29650  66.71920  -7.577295         23.92461
-##   pastoralists_index_raw_markets 42.81793  21.07748 -21.740450         13.28139
-##   farmers_index_raw_markets      73.12578 119.42288  46.297101         69.66326
-##                                 stat
-## vars                               std.diff          z         p
-##   pastoralists_index_events      -0.6350832 -0.8937701 0.3714449
-##   farmers_index_events           -0.2074869 -0.3167155 0.7514595
-##   pastoralists_index_raw_markets -1.2565059 -1.6369106 0.1016492
-##   farmers_index_raw_markets       0.4507416  0.6645842 0.5063165
-## 
-## attr(,"originals")
-## [1] "pastoralists_index_events"      "farmers_index_events"          
-## [3] "pastoralists_index_raw_markets" "farmers_index_raw_markets"     
-## 
-## $overall
-##       chisquare df   p.value
-## strat  5.493953  4 0.2402615
-## 
-## attr(,"fmla")
-## treatment ~ pastoralists_index_events + farmers_index_events + 
-##     pastoralists_index_raw_markets + farmers_index_raw_markets
-## attr(,"class")
-## [1] "xbal" "list"
-## attr(,"report")
-## [1] "adj.means"              "adj.mean.diffs"         "adj.mean.diffs.null.sd"
-## [4] "chisquare.test"         "std.diffs"              "z.scores"              
-## [7] "p.values"
-\end{verbatim}
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_obs_tab1}
+\caption{\textbf{Balance: Observational Data All Outcomes}}
+\smallskip
 
-\begin{verbatim}
-## $results
-## , , strata = strat
-## 
-##                      stat
-## vars                       Control    Treatment      adj.diff adj.diff.null.sd
-##   attitude_cw_base     0.542222393  0.565609444  0.0233870504     0.0654220532
-##   in_cw_base          -0.458973498 -0.537499573 -0.0785260756     0.0705834856
-##   contactOnly_cw_base  0.495640082  0.336429250 -0.1592108323     0.1041997069
-##   rand_lm_base        -0.001855586 -0.002639292 -0.0007837057     0.0008508652
-##   rand_outcome_base    0.443022420  0.473606928  0.0305845084     0.0563078296
-##   end_exp_base        -0.212108532 -0.250012095 -0.0379035631     0.1686690404
-##                      stat
-## vars                     std.diff          z         p
-##   attitude_cw_base     0.09798240  0.3574796 0.7207328
-##   in_cw_base          -0.24640254 -1.1125276 0.2659114
-##   contactOnly_cw_base -0.58471858 -1.5279393 0.1265276
-##   rand_lm_base        -0.33434388 -0.9210691 0.3570143
-##   rand_outcome_base    0.20555272  0.5431662 0.5870154
-##   end_exp_base        -0.06657472 -0.2247215 0.8221959
-## 
-## attr(,"originals")
-## [1] "attitude_cw_base"    "in_cw_base"          "contactOnly_cw_base"
-## [4] "rand_lm_base"        "rand_outcome_base"   "end_exp_base"       
-## 
-## $overall
-##       chisquare df   p.value
-## strat   6.31019  6 0.3893542
-## 
-## attr(,"fmla")
-## treatment ~ attitude_cw_base + in_cw_base + contactOnly_cw_base + 
-##     rand_lm_base + rand_outcome_base + end_exp_base
-## attr(,"class")
-## [1] "xbal" "list"
-## attr(,"report")
-## [1] "adj.means"              "adj.mean.diffs"         "adj.mean.diffs.null.sd"
-## [4] "chisquare.test"         "std.diffs"              "z.scores"              
-## [7] "p.values"
-\end{verbatim}
+\begin{tabular}{l|r|r|r|r|r|r|r}
+\hline
+  & Control.strat & Treatment.strat & adj.diff.strat & adj.diff.null.sd.strat & std.diff.strat & z.strat & p.strat\\
+\hline
+Pastoralists\_index\_rank\_events & 35.415 & 25.141 & -10.275 & 12.377 & -0.585 & -0.830 & 0.406\\
+\hline
+Farmers\_index\_rank\_events & 32.978 & 36.182 & 3.204 & 7.104 & 0.303 & 0.451 & 0.652\\
+\hline
+Pastoralists\_index\_rank\_markets & 25.458 & 14.151 & -11.308 & 6.576 & -1.375 & -1.720 & 0.086\\
+\hline
+Farmers\_index\_rank\_markets & 24.417 & 25.250 & 0.834 & 5.699 & 0.101 & 0.146 & 0.884\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_obs_tab2}
+\caption{\textbf{Balance: Observational Data Omnibus P-value}}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & chisquare & df & p.value\\
+\hline
+strat & 6.494 & 4 & 0.165\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_svy_tab1}
+\caption{\textbf{Balance: Survey Data All Outcomes}}
+\smallskip
+
+\begin{tabular}{l|r|r|r|r|r|r|r}
+\hline
+  & Control.strat & Treatment.strat & adj.diff.strat & adj.diff.null.sd.strat & std.diff.strat & z.strat & p.strat\\
+\hline
+Baseline\_Attitudes & 0.542 & 0.566 & 0.023 & 0.065 & 0.098 & 0.357 & 0.721\\
+\hline
+Baseline\_Perceptions\_of\_Security & -0.459 & -0.537 & -0.079 & 0.071 & -0.246 & -1.113 & 0.266\\
+\hline
+Baseline\_Contact & 0.496 & 0.336 & -0.159 & 0.104 & -0.585 & -1.528 & 0.127\\
+\hline
+Baseline\_Percent\_Experiment & 0.443 & 0.474 & 0.031 & 0.056 & 0.206 & 0.543 & 0.587\\
+\hline
+Baseline\_Endorsement\_Experiment & -0.212 & -0.250 & -0.038 & 0.169 & -0.067 & -0.225 & 0.822\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_svy_tab2}
+\caption{\textbf{Balance: Survey Data Omnibus P-value}}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & chisquare & df & p.value\\
+\hline
+strat & 6.302 & 5 & 0.278\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
 
 \hypertarget{appendix-e-placebo-tests}{%
 \subsection{Appendix E: Placebo tests}\label{appendix-e-placebo-tests}}
 
-\begin{verbatim}
-## [[1]]
-##                              coef  truep  version base
-## vio_cw~treatment      0.009773392 0.4655  cw_cont    0
-## vio_index~treatment   0.003920160 0.4414 ind_cont    0
-## vio_cw~treatment1    -0.067354329 0.6866  cw_diff    1
-## vio_index~treatment1 -0.026803609 0.6788 ind_diff    0
-## 
-## [[2]]
-##                                            coef  truep  version base
-## violence_group.criminals~treatment   0.03363271 0.2520  cw_cont    0
-## 2                                            NA     NA ind_cont    0
-## violence_group.criminals~treatment1 -0.09150519 0.7917  cw_diff    1
-## 4                                            NA     NA ind_diff    0
-## 
-## [[3]]
-##                                               coef  truep  version base
-## violence_group.defend_group~treatment  -0.02614133 0.6587  cw_cont    1
-## 2                                               NA     NA ind_cont    0
-## violence_group.defend_group~treatment1 -0.02614133 0.6632  cw_diff    0
-## 4                                               NA     NA ind_diff    0
-## 
-## [[4]]
-##                                                  coef  truep  version base
-## violence_group.defend_religion~treatment  -0.03122685 0.6621  cw_cont    1
-## 2                                                  NA     NA ind_cont    0
-## violence_group.defend_religion~treatment1 -0.03122685 0.6715  cw_diff    0
-## 4                                                  NA     NA ind_diff    0
-## 
-## [[5]]
-##                                              coef  truep  version base
-## violence_group.government~treatment   0.004400951 0.4362  cw_cont    1
-## 2                                              NA     NA ind_cont    0
-## violence_group.government~treatment1 -0.012312079 0.6405  cw_diff    0
-## 4                                              NA     NA ind_diff    0
-## 
-## [[6]]
-##                                                    coef  truep  version base
-## violence_group.maintain_culture~treatment  -0.003939306 0.5576  cw_cont    1
-## 2                                                    NA     NA ind_cont    0
-## violence_group.maintain_culture~treatment1 -0.011053448 0.5846  cw_diff    0
-## 4                                                    NA     NA ind_diff    0
-## 
-## [[7]]
-##                                             coef  truep  version base
-## violence_group.retaliate~treatment  -0.006613703 0.6585  cw_cont    1
-## 2                                             NA     NA ind_cont    0
-## violence_group.retaliate~treatment1  0.011472645 0.3869  cw_diff    0
-## 4                                             NA     NA ind_diff    0
-## 
-## [[8]]
-##                                                  coef  truep  version base
-## outgroup_atts_group.trust_rel~treatment   0.016943300 0.3493  cw_cont    1
-## 2                                                  NA     NA ind_cont    0
-## outgroup_atts_group.trust_rel~treatment1 -0.002230286 0.5189  cw_diff    0
-## 4                                                  NA     NA ind_diff    0
-## 
-## [[9]]
-##                        coef  truep  version base
-## radio~treatment  0.02068120 0.4295  cw_cont    1
-## 2                        NA     NA ind_cont    0
-## radio~treatment1 0.02137291 0.4412  cw_diff    0
-## 4                        NA     NA ind_diff    0
-## 
-## [[10]]
-##                               coef  truep  version base
-## disp_index~treatment  0.0202398376 0.3731  cw_cont    1
-## 2                               NA     NA ind_cont    0
-## disp_index~treatment1 0.0007507051 0.4881  cw_diff    0
-## 4                               NA     NA ind_diff    0
-\end{verbatim}
+Several of our outcomes are survey self-reports, and self-reports could
+be affected by factors other than the intervntion. For example, our
+survey results are suspect if respondents in treatment communities
+learned the ``correct'\,' answers better than respondents in control
+communities (social desirability bias). If social desirability accounts
+for the effect in survey self-reports, we would also expect differences
+between treatment and control for other normatively desirable attitudes.
+
+To test social desirability effects, we conduct a placebo analysis using
+attitudes about violence as a placebo. Attitudes about violence are a
+good candidate for this placebo because intergroup contact should not
+affect general attitudes about violence, but respondents may feel social
+pressure to answer violence questions in a desirable way. We measure
+attitudes about violence with a six question index asking respondents if
+it is always, sometimes, rarely, or never justified to use violence in
+certain situations, such as retaliating against violence or bringing
+criminals to justice.
+
+Respondents in treatment communities might also express more positive
+attitudes towards the outgroup if attitudes were becoming more tolerant
+in treatment villages in a way that was unrelated to the intervention.
+If attitudes towards any outgroup were becoming more tolerant in
+treatment communities compared to control communities, we would expect
+attitudes towards religious outgroups to improve more in treatment
+communities than control communities. The contact intervention should
+not affect attitudes towards people from other religions because the
+farmers and pastoralists are often the same religion.
+
+Respondents in treatment communities also might have had better access
+to information, and that information changed their
+attitudes/perceptions. To measure access to information, we use
+frequency of radio listening. If the treatment communities increased
+their amount of radio listening significantly more than control
+communities, it is possible their attitudes/perceptions changed due to
+information and not the contact intervention.
+
+Coefficients come from OLS regression equation specified in the paper
+(using state-level blocked fixed effects). P-values come from the
+randomization inference described in the paper and in Appendix A; they
+are one-sided ``greater-than'' p-values. The base method used in the
+paper always constructs indices using inverse-covariance weighting; it
+uses the controlling-for method of difference-in-differences estimation
+when an outcome's baseline difference between treatment and control is
+less than 0.20 standard deviations; it uses the differencing method when
+the baseline difference is 0.20 standard deviations or larger.
+
+\hypertarget{community.}{%
+\subsubsection{Community.}\label{community.}}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_tab}
+\caption{\textbf{Community Placebo: Attitudes towards violence index.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for \& ICW & 0.010 & 0.466 & 0\\
+\hline
+Controlling-for \& Additive & 0.004 & 0.441 & 0\\
+\hline
+Differencing \& ICW & -0.067 & 0.687 & 1\\
+\hline
+Differencing \& Additive & -0.027 & 0.679 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_tab1}
+\caption{\textbf{Community Placebo: Components of violence index.} Effect of ECPN on components of placebo index (attitudes towards violence) using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Bring criminals to justice: Controlling-for & 0.034 & 0.252 & 0\\
+\hline
+Bring criminals to justice: Differencing & -0.092 & 0.792 & 1\\
+\hline
+Defend ones group: Controlling-for & -0.026 & 0.659 & 1\\
+\hline
+Defend ones group: Differencing & -0.026 & 0.663 & 0\\
+\hline
+Defend ones religion: Controlling-for & -0.031 & 0.662 & 1\\
+\hline
+Defend ones religion: Differencing & -0.031 & 0.671 & 0\\
+\hline
+Force the government to change their policies: Controlling-for & 0.004 & 0.436 & 1\\
+\hline
+Force the government to change their policies: Differencing & -0.012 & 0.640 & 0\\
+\hline
+Maintain culture and traditions: Controlling-for & -0.004 & 0.558 & 1\\
+\hline
+Maintain culture and traditions: Differencing & -0.011 & 0.585 & 0\\
+\hline
+Retaliate against violence: Controlling-for & -0.007 & 0.658 & 1\\
+\hline
+Retaliate against violence: Differencing & 0.011 & 0.387 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_out_tab}
+\caption{\textbf{Community Placebo: Trust towards religious outgroups.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for & 0.017 & 0.349 & 1\\
+\hline
+Differencing & -0.002 & 0.519 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_rad_tab}
+\caption{\textbf{Community Placebo: Radio listening frequency.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Controlling-for & 0.021 & 0.430 & 1\\
+\hline
+Differencing & 0.021 & 0.441 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\hypertarget{individual}{%
+\subsubsection{Individual}\label{individual}}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_ind}
+\caption{\textbf{Individual Placebo: Attitudes towards violence index.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Controlling-for \& ICW & -0.057 & 0.801 & 0\\
+\hline
+Part: Controlling-for \& ICW & 0.013 & 0.413 & 0\\
+\hline
+Non: Controlling-for \& Additive & -0.163 & 0.770 & 0\\
+\hline
+Part: Controlling-for \& Additive & 0.022 & 0.441 & 0\\
+\hline
+Non: Differencing \& ICW & -0.033 & 0.642 & 1\\
+\hline
+Part: Differencing \& ICW & -0.016 & 0.549 & 1\\
+\hline
+Non: Differencing \& Additive & -0.058 & 0.580 & 0\\
+\hline
+Part: Differencing \& Additive & -0.023 & 0.508 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_ind1}
+\caption{\textbf{Individual Placebo: Components of violence index.} Effect of ECPN on components of placebo index (attitudes towards violence) using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Bring criminals to justice: Controlling-for & -0.154 & 0.680 & 0\\
+\hline
+Part: Bring criminals to justice: Controlling-for & -0.031 & 0.535 & 0\\
+\hline
+Non: Bring criminals to justice: Differencing & -0.292 & 0.813 & 1\\
+\hline
+Part: Bring criminals to justice: Differencing & -0.494 & 0.933 & 1\\
+\hline
+Non: Defend ones group: Controlling-for & -0.078 & 0.616 & 1\\
+\hline
+Part: Defend ones group: Controlling-for & 0.039 & 0.440 & 1\\
+\hline
+Non: Defend ones group: Differencing & 0.034 & 0.447 & 0\\
+\hline
+Part: Defend ones group: Differencing & -0.021 & 0.525 & 0\\
+\hline
+Non: Defend ones religion: Controlling-for & -0.250 & 0.892 & 1\\
+\hline
+Part: Defend ones religion: Controlling-for & 0.141 & 0.276 & 1\\
+\hline
+Non: Defend ones religion: Differencing & -0.143 & 0.726 & 0\\
+\hline
+Part: Defend ones religion: Differencing & 0.067 & 0.378 & 0\\
+\hline
+Non: Force the government to change their policies: Controlling-for & -0.227 & 0.781 & 1\\
+\hline
+Part: Force the government to change their policies: Controlling-for & 0.031 & 0.457 & 1\\
+\hline
+Non: Force the government to change their policies: Differencing & -0.142 & 0.684 & 0\\
+\hline
+Part: Force the government to change their policies: Differencing & 0.013 & 0.496 & 0\\
+\hline
+Non: Maintain culture and traditions: Controlling-for & -0.190 & 0.797 & 1\\
+\hline
+Part: Maintain culture and traditions: Controlling-for & 0.024 & 0.443 & 1\\
+\hline
+Non: Maintain culture and traditions: Differencing & 0.022 & 0.453 & 0\\
+\hline
+Part: Maintain culture and traditions: Differencing & 0.161 & 0.261 & 0\\
+\hline
+Non: Retaliate against violence: Controlling-for & -0.091 & 0.639 & 1\\
+\hline
+Part: Retaliate against violence: Controlling-for & -0.080 & 0.601 & 1\\
+\hline
+Non: Retaliate against violence: Differencing & 0.176 & 0.254 & 0\\
+\hline
+Part: Retaliate against violence: Differencing & 0.156 & 0.286 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_out_ind}
+\caption{\textbf{Individual Placebo: Trust towards religious outgroups.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Controlling-for & 0.178 & 0.208 & 1\\
+\hline
+Part: Controlling-for & -0.060 & 0.586 & 1\\
+\hline
+Non: Differencing & 0.140 & 0.283 & 0\\
+\hline
+Part: Differencing & -0.079 & 0.616 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_rad_ind}
+\caption{\textbf{Individual Placebo: Radio listening frequency.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefficient & p-value & base\\
+\hline
+Non: Controlling-for & 0.178 & 0.208 & 1\\
+\hline
+Part: Controlling-for & -0.060 & 0.586 & 1\\
+\hline
+Non: Differencing & 0.140 & 0.283 & 0\\
+\hline
+Part: Differencing & -0.079 & 0.616 & 0\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
 
 \hypertarget{appendix-f-state-level-differences}{%
 \subsection{Appendix F: State-level
 differences}\label{appendix-f-state-level-differences}}
 
-\begin{verbatim}
-## $attitude_cw
-##                            term   estimate    p.value
-## 1                   (Intercept) -0.2498650 0.09501665
-## 2          ag.df[, "treatment"]  0.2057339 0.23320131
-## 3                      statenas  0.2725481 0.06919022
-## 4 ag.df[, "treatment"]:statenas -0.1757783 0.31539114
-## 
-## $in_cw
-##                            term    estimate   p.value
-## 1                   (Intercept)  0.12092800 0.2973856
-## 2          ag.df[, "treatment"]  0.07915428 0.5007593
-## 3                      statenas -0.10960567 0.4093834
-## 4 ag.df[, "treatment"]:statenas  0.13322806 0.3833034
-## 
-## $contactOnly_cw
-##                            term   estimate    p.value
-## 1                   (Intercept) -0.3344703 0.03594430
-## 2          ag.df[, "treatment"]  0.2004255 0.19018537
-## 3                      statenas  0.3780055 0.01138129
-## 4 ag.df[, "treatment"]:statenas -0.1044108 0.46866542
-## 
-## $rMean
-##                            term   estimate    p.value
-## 1                   (Intercept) -0.3264061 0.14061932
-## 2          ag.df[, "treatment"]  0.2127052 0.18992279
-## 3                      statenas  0.5495802 0.02713233
-## 4 ag.df[, "treatment"]:statenas -0.2509537 0.15763238
-## 
-## $end_exp
-##                            term     estimate   p.value
-## 1                   (Intercept) -0.025911144 0.8457171
-## 2          ag.df[, "treatment"]  0.008160342 0.9723655
-## 3                      statenas -0.321998592 0.1198422
-## 4 ag.df[, "treatment"]:statenas  0.190593087 0.4883455
-## 
-## $pgp_donate_end
-##                            term    estimate    p.value
-## 1                   (Intercept)  0.89125000 0.05078586
-## 2          ag.df[, "treatment"]  0.07833333 0.38398024
-## 3                      statenas  0.09548203 0.30127069
-## 4 ag.df[, "treatment"]:statenas -0.09318894 0.25682147
-## 
-## $pgp_amount_end
-##                            term  estimate   p.value
-## 1                   (Intercept) 240.28750 0.2253282
-## 2          ag.df[, "treatment"]  15.76042 0.8763263
-## 3                      statenas 107.28268 0.3839096
-## 4 ag.df[, "treatment"]:statenas -84.80653 0.4419010
-\end{verbatim}
+Coefficients and p-values estimating state-level heterogeneous effects
+were calculated with robust OLS regression using site-level clusters.
+The regression interacted the treatment indicator with the state
+indicator. This is a low-power analysis. There are no significant
+differences in treatment effect by state. Benue was the reference
+category so this table shows differences for Nasarawa.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:state_tab}
+\caption{\textbf{State-level differences in community-level analysis.} There are not significant differences between the effect of the contact intervention by state. The first column shows coefficients from OLS regression, the second column shows $p$-values from OLS regression.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+Attitudes & -0.176 & 0.315\\
+\hline
+Perceptions of security & 0.133 & 0.383\\
+\hline
+Contact & -0.104 & 0.469\\
+\hline
+Percent Experiment & -0.251 & 0.158\\
+\hline
+Endorsement Experiment & 0.191 & 0.488\\
+\hline
+PGG donation & -0.093 & 0.257\\
+\hline
+PGG amount & -84.807 & 0.442\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
 
 \hypertarget{appendix-g-farmer-pastoralist-differences}{%
 \subsection{Appendix G: Farmer-pastoralist
 differences}\label{appendix-g-farmer-pastoralist-differences}}
 
-\begin{verbatim}
-## $attitude_cw
-##                                 term    estimate   p.value
-## 1               ag.df[, "treatment"]  0.14549900 0.1782298
-## 2                      farm_pastpast -0.00949469 0.8454740
-## 3 ag.df[, "treatment"]:farm_pastpast -0.09046408 0.2780316
-## 
-## $in_cw
-##                                 term    estimate   p.value
-## 1               ag.df[, "treatment"]  0.14870533 0.2294206
-## 2                      farm_pastpast -0.11217626 0.4916309
-## 3 ag.df[, "treatment"]:farm_pastpast  0.02077157 0.9045019
-## 
-## $contactOnly_cw
-##                                 term   estimate   p.value
-## 1               ag.df[, "treatment"] 0.12245873 0.3727152
-## 2                      farm_pastpast 0.07482787 0.7649711
-## 3 ag.df[, "treatment"]:farm_pastpast 0.03064061 0.9105597
-## 
-## $rMean
-##                                 term    estimate   p.value
-## 1               ag.df[, "treatment"]  0.06916678 0.5540888
-## 2                      farm_pastpast -0.14181940 0.2513859
-## 3 ag.df[, "treatment"]:farm_pastpast -0.01406759 0.9132141
-## 
-## $end_exp
-##                                 term   estimate   p.value
-## 1               ag.df[, "treatment"]  0.2194837 0.3450349
-## 2                      farm_pastpast  0.5257106 0.1742928
-## 3 ag.df[, "treatment"]:farm_pastpast -0.1939351 0.6258698
-## 
-## $pgp_donate_end
-##                                 term    estimate   p.value
-## 1               ag.df[, "treatment"]  0.05421409 0.4190902
-## 2                      farm_pastpast  0.09507843 0.2377855
-## 3 ag.df[, "treatment"]:farm_pastpast -0.06358824 0.3859465
-## 
-## $pgp_amount_end
-##                                 term   estimate   p.value
-## 1               ag.df[, "treatment"] -46.765628 0.5440105
-## 2                      farm_pastpast   9.819108 0.9082086
-## 3 ag.df[, "treatment"]:farm_pastpast  23.284255 0.7835737
-\end{verbatim}
+Coefficients and p-values estimating farmer/pastoralist heterogeneous
+effects were calculated with robust OLS regression using site-level
+clusters and fixed effects for state. The regression interacted the
+treatment indicator with the state indicator. There are no significant
+differences in treatment effect by farmer/pastoralist. Farmers were the
+reference category so this table shows differences for pastoralists.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:farm_tab}
+\caption{\textbf{Farmer-pastoralist differences in community-level analysis.} There are not significant differences between the effect of the contact intervention by farmer/pastoralist. The first column shows coefficients from OLS regression, the second column shows $p$-values from OLS regression.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+Attitudes & -0.090 & 0.278\\
+\hline
+Perceptions of security & 0.021 & 0.905\\
+\hline
+Contact & 0.031 & 0.911\\
+\hline
+Percent Experiment & -0.014 & 0.913\\
+\hline
+Endorsement Experiment & -0.194 & 0.626\\
+\hline
+PGG donation & -0.064 & 0.386\\
+\hline
+PGG amount & 23.284 & 0.784\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 

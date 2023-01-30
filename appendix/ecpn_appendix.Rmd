@@ -7,28 +7,9 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-#load()
+rm(list=ls())
+# not included: Individual-levl balance between part/nonpart/control == unneeded because exploratory & no assumption of balance.
 ```
-
-# Appendices
-
-Desired appendices.
-
-- Explaining randomization inference and bootstrapping
-- Robustness checks for analysis
-    - Additive indices instead of ICW indices
-    - Results with differencing method vs results with controlling-for method
-    - raw vs ranked variables to create the index
-- Placebo analysis + components of placebo
-- Balance: 
-    - Communities/site: TR vs CO within state & overall for all baseline outcomes (Separate for svy and obs)
-    - Individuals: Direct/indirect/control == unneeded because exploratory & no assumption of balance.
-- Panel analysis: big table of results (lower priority)
-    - Additive indices instead of ICW indices
-    - Results with differencing method vs results with controlling-for method
-    - raw vs ranked variables to create the index
-- *State-level differences & farmer-pastoralist differences*
-- Survey questions
 
 ## Appendix A: Randomization Inference and Bootstrapping
 
@@ -135,6 +116,14 @@ percExp_tab <- knitr::kable(percExp_tab, format="latex")
 `r percExp_tab`
 \end{center}
 \end{table}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/randComm_plot.png}
+\caption{\label{fig:percExp_plot_comm} \textbf{Community Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the treatment communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
+\end{center}
+\end{figure}
+
 
 ```{r}
 endExp_tab <- newList[[5]][c(1,3),c(1:2,4)]
@@ -292,19 +281,75 @@ pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 \end{figure}
 
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\textwidth]{figs/randPan_plot.png}
+\caption{\label{fig:percExp_plot_ind} \textbf{Individual Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the full participants; green shows participants in intervention communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
+\end{center}
+\end{figure}
+
+
+
 ## Appendix D: Balance Tests
 
 ```{r}
 load("balTests.rda")
-bal_obs
-bal_svy
+#bal_obs
+bal_obs_tab1 <- knitr::kable(round(bal_obs$results, 3), format="latex")
+bal_obs_tab2 <- knitr::kable(round(bal_obs$overall, 3), format="latex")
+
+#bal_svy
+bal_svy_tab1 <- knitr::kable(round(bal_svy$results, 3), format="latex")
+bal_svy_tab2 <- knitr::kable(round(bal_svy$overall, 3), format="latex")
 ```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_obs_tab1}
+\caption{\textbf{Balance: Observational Data All Outcomes}}
+\smallskip
+`r bal_obs_tab1`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_obs_tab2}
+\caption{\textbf{Balance: Observational Data Omnibus P-value}}
+\smallskip
+`r bal_obs_tab2`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_svy_tab1}
+\caption{\textbf{Balance: Survey Data All Outcomes}}
+\smallskip
+`r bal_svy_tab1`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:bal_svy_tab2}
+\caption{\textbf{Balance: Survey Data Omnibus P-value}}
+\smallskip
+`r bal_svy_tab2`
+\end{center}
+\end{table}
 
 ## Appendix E: Placebo tests
 
-Several of our outcomes are survey self-reports, and all self-reports could be affected by social desirability bias. Our survey results are suspect if respondents in treatment communities learned the ``correct'' answers better than respondents in control communities. If social desirability accounts for the effect in survey self-reports, we would also expect differences between treatment and control for other normatively desirable attitudes. 
+Several of our outcomes are survey self-reports, and self-reports could be affected by factors other than the intervntion. For example, our survey results are suspect if respondents in treatment communities learned the ``correct'' answers better than respondents in control communities (social desirability bias). If social desirability accounts for the effect in survey self-reports, we would also expect differences between treatment and control for other normatively desirable attitudes. 
 
-To test social desirability effects, we conduct a placebo analysis using attitudes about violence as a placebo. Attitudes about violence are a good candidate for a placebo because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way. We measure attitudes about violence with a six question index asking respondents if it is always, sometimes, rarely, or never justified to use violence in certain situations, such as retaliating against violence or bringing criminals to justice.
+To test social desirability effects, we conduct a placebo analysis using attitudes about violence as a placebo. Attitudes about violence are a good candidate for this placebo because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way. We measure attitudes about violence with a six question index asking respondents if it is always, sometimes, rarely, or never justified to use violence in certain situations, such as retaliating against violence or bringing criminals to justice.
+
+Respondents in treatment communities might also express more positive attitudes towards the outgroup if attitudes were becoming more tolerant in treatment villages in a way that was unrelated to the intervention.  If attitudes towards any outgroup were becoming more tolerant in treatment communities compared to control communities, we would expect attitudes towards religious outgroups to improve more in treatment communities than control communities.  The contact intervention should not affect attitudes towards people from other religions because the farmers and pastoralists are often the same religion.
+
+Respondents in treatment communities also might have had better access to information, and that information changed their attitudes/perceptions.  To measure access to information, we use frequency of radio listening.  If the treatment communities increased their amount of radio listening significantly more than control communities, it is possible their attitudes/perceptions changed due to information and not the contact intervention.
+
+Coefficients come from OLS regression equation specified in the paper (using state-level blocked fixed effects).  P-values come from the randomization inference described in the paper and in Appendix A; they are one-sided "greater-than" p-values. The base method used in the paper always constructs indices using inverse-covariance weighting; it uses the controlling-for method of difference-in-differences estimation when an outcome's baseline difference between treatment and control is less than 0.20 standard deviations; it uses the differencing method when the baseline difference is 0.20 standard deviations or larger.
 
 ```{r}
 load("../data_and_code/survey_dat/d_analysis/pl_list_of_coefs_and_ps.Rda")
@@ -316,6 +361,7 @@ load("../data_and_code/survey_dat/d_analysis/pl_list_of_coefs_and_ps_ind.Rda")
 ### Community.
 
 ```{r}
+# vio
 pl_vio_tab <- placeboList[[1]][,c(1:2,4)]
 colnames(pl_vio_tab) <- c("coefficient", "p-value", "base")
 rownames(pl_vio_tab) <- c("Controlling-for & ICW", "Controlling-for & Additive",
@@ -328,15 +374,14 @@ pl_vio_tab <- knitr::kable(pl_vio_tab, format="latex")
 \begin{table}[H]
 \begin{center}
 \label{tab:pl_vio_tab}
-\caption{\textbf{Community Placebo: Attitudes towards violence.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\caption{\textbf{Community Placebo: Attitudes towards violence index.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
 \smallskip
 `r pl_vio_tab`
 \end{center}
 \end{table}
 
-Components of violence index.
-
 ```{r}
+# components of vio index
 pl_vio_tab1 <- rbind(placeboList[[2]][c(1,3),c(1:2,4)],
                      placeboList[[3]][c(1,3),c(1:2,4)],
                      placeboList[[4]][c(1,3),c(1:2,4)],
@@ -345,8 +390,8 @@ pl_vio_tab1 <- rbind(placeboList[[2]][c(1,3),c(1:2,4)],
                      placeboList[[7]][c(1,3),c(1:2,4)])
 colnames(pl_vio_tab1) <- c("coefficient", "p-value", "base")
 rownames(pl_vio_tab1) <- c("Bring criminals to justice: Controlling-for", "Bring criminals to justice: Differencing",
-                           "Defend one’s group: Controlling-for", "Defend one’s group: Differencing",
-                           "Defend one’s religion: Controlling-for", "Defend one’s religion: Differencing",
+                           "Defend ones group: Controlling-for", "Defend ones group: Differencing",
+                           "Defend ones religion: Controlling-for", "Defend ones religion: Differencing",
                            "Force the government to change their policies: Controlling-for", "Force the government to change their policies: Differencing",
                            "Maintain culture and traditions: Controlling-for", "Maintain culture and traditions: Differencing",
                            "Retaliate against violence: Controlling-for", "Retaliate against violence: Differencing")
@@ -355,34 +400,222 @@ pl_vio_tab1 <- knitr::kable(pl_vio_tab1, format="latex")
 
 ```
 
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_tab1}
+\caption{\textbf{Community Placebo: Components of violence index.} Effect of ECPN on components of placebo index (attitudes towards violence) using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_vio_tab1`
+\end{center}
+\end{table}
+
+
+```{r}
+# outgroup trust
+pl_out_tab <- placeboList[[8]][c(1,3),c(1:2,4)]
+colnames(pl_out_tab) <- c("coefficient", "p-value", "base")
+rownames(pl_out_tab) <- c("Controlling-for", "Differencing")
+pl_out_tab <- round(pl_out_tab,3)
+pl_out_tab <- knitr::kable(pl_out_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_out_tab}
+\caption{\textbf{Community Placebo: Trust towards religious outgroups.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_out_tab`
+\end{center}
+\end{table}
+
+```{r}
+# radio listening
+pl_rad_tab <- placeboList[[9]][c(1,3),c(1:2,4)]
+colnames(pl_rad_tab) <- c("coefficient", "p-value", "base")
+rownames(pl_rad_tab) <- c("Controlling-for", "Differencing")
+pl_rad_tab <- round(pl_rad_tab,3)
+pl_rad_tab <- knitr::kable(pl_rad_tab, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_rad_tab}
+\caption{\textbf{Community Placebo: Radio listening frequency.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_rad_tab`
+\end{center}
+\end{table}
 
 ### Individual
 
 ```{r}
-pl_tab_ind <- placeboList_ind[[1]][,c(1:2,4)]
-colnames(pl_tab_ind) <- c("coefficient", "p-value", "base")
-rownames(pl_tab_ind) <- c("Non: Controlling-for & ICW", "Part: Controlling-for & ICW", 
+# vio
+pl_vio_ind <- placeboList_ind[[1]][,c(1:2,4)]
+colnames(pl_vio_ind) <- c("coefficient", "p-value", "base")
+rownames(pl_vio_ind) <- c("Non: Controlling-for & ICW", "Part: Controlling-for & ICW", 
                                 "Non: Controlling-for & Additive", "Part: Controlling-for & Additive",
                                 "Non: Differencing & ICW", "Part: Differencing & ICW", 
                                 "Non: Differencing & Additive", "Part: Differencing & Additive")
-pl_tab_ind <- round(pl_tab_ind,3)
-pl_tab_ind <- knitr::kable(pl_tab_ind, format="latex")
+pl_vio_ind <- round(pl_vio_ind,3)
+pl_vio_ind <- knitr::kable(pl_vio_ind, format="latex")
 ```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_ind}
+\caption{\textbf{Individual Placebo: Attitudes towards violence index.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_vio_ind`
+\end{center}
+\end{table}
+
+
+```{r}
+# vio components
+pl_vio_ind1 <- rbind(placeboList_ind[[2]][c(1,2,5,6),c(1:2,4)],
+                     placeboList_ind[[3]][c(1,2,5,6),c(1:2,4)],
+                     placeboList_ind[[4]][c(1,2,5,6),c(1:2,4)],
+                     placeboList_ind[[5]][c(1,2,5,6),c(1:2,4)],
+                     placeboList_ind[[6]][c(1,2,5,6),c(1:2,4)],
+                     placeboList_ind[[7]][c(1,2,5,6),c(1:2,4)])
+colnames(pl_vio_ind1) <- c("coefficient", "p-value", "base")
+rownames(pl_vio_ind1) <- c("Non: Bring criminals to justice: Controlling-for", "Part: Bring criminals to justice: Controlling-for",
+                           "Non: Bring criminals to justice: Differencing", "Part: Bring criminals to justice: Differencing",
+                           "Non: Defend ones group: Controlling-for", "Part: Defend ones group: Controlling-for",
+                           "Non: Defend ones group: Differencing", "Part: Defend ones group: Differencing",
+                           "Non: Defend ones religion: Controlling-for", "Part: Defend ones religion: Controlling-for",
+                           "Non: Defend ones religion: Differencing", "Part: Defend ones religion: Differencing",
+                           "Non: Force the government to change their policies: Controlling-for", "Part: Force the government to change their policies: Controlling-for",
+                           "Non: Force the government to change their policies: Differencing", "Part: Force the government to change their policies: Differencing",
+                           "Non: Maintain culture and traditions: Controlling-for", "Part: Maintain culture and traditions: Controlling-for",
+                           "Non: Maintain culture and traditions: Differencing", "Part: Maintain culture and traditions: Differencing",
+                           "Non: Retaliate against violence: Controlling-for", "Part: Retaliate against violence: Controlling-for", 
+                           "Non: Retaliate against violence: Differencing", "Part: Retaliate against violence: Differencing")
+pl_vio_ind1 <- round(pl_vio_ind1,3)
+pl_vio_ind1 <- knitr::kable(pl_vio_ind1, format="latex")
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_vio_ind1}
+\caption{\textbf{Individual Placebo: Components of violence index.} Effect of ECPN on components of placebo index (attitudes towards violence) using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_vio_ind1`
+\end{center}
+\end{table}
+
+
+```{r}
+# outgroup trust
+pl_out_ind <- placeboList_ind[[8]][c(1,2,5,6),c(1:2,4)]
+colnames(pl_out_ind) <- c("coefficient", "p-value", "base")
+rownames(pl_out_ind) <- c("Non: Controlling-for", "Part: Controlling-for",
+                          "Non: Differencing", "Part: Differencing")
+pl_out_ind <- round(pl_out_ind,3)
+pl_out_ind <- knitr::kable(pl_out_ind, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_out_ind}
+\caption{\textbf{Individual Placebo: Trust towards religious outgroups.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_out_ind`
+\end{center}
+\end{table}
+
+```{r}
+# outgroup trust
+pl_rad_ind <- placeboList_ind[[8]][c(1,2,5,6),c(1:2,4)]
+colnames(pl_rad_ind) <- c("coefficient", "p-value", "base")
+rownames(pl_rad_ind) <- c("Non: Controlling-for", "Part: Controlling-for",
+                          "Non: Differencing", "Part: Differencing")
+pl_rad_ind <- round(pl_rad_ind,3)
+pl_rad_ind <- knitr::kable(pl_rad_ind, format="latex")
+
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:pl_rad_ind}
+\caption{\textbf{Individual Placebo: Radio listening frequency.} Effect of ECPN on placebo outcome using alternative methods of estimation and index construction. The first column shows coefficients from OLS regression, the second column shows $p$-values from randomization inference, and the third column shows which method was used in the paper.}
+\smallskip
+`r pl_rad_ind`
+\end{center}
+\end{table}
+
 
 ## Appendix F: State-level differences
 
+Coefficients and p-values estimating state-level heterogeneous effects were calculated with robust OLS regression using site-level clusters. The regression interacted the treatment indicator with the state indicator.  This is a low-power analysis.  There are no significant differences in treatment effect by state. Benue was the reference category so this table shows differences for Nasarawa.
+
 ```{r}
 load("../data_and_code/survey_dat/d_analysis/state_list.Rda")
-stateList
+#stateList
+
+state_tab <- rbind(stateList[[1]][4,c(2,3)],
+                       stateList[[2]][4,c(2,3)],
+                       stateList[[3]][4,c(2,3)],
+                       stateList[[4]][4,c(2,3)],
+                       stateList[[5]][4,c(2,3)],
+                       stateList[[6]][4,c(2,3)],
+                       stateList[[7]][4,c(2,3)])
+colnames(state_tab) <- c("coefficient", "p-value")
+rownames(state_tab) <- c("Attitudes", "Perceptions of security",
+                          "Contact", "Percent Experiment",
+                          "Endorsement Experiment",
+                          "PGG donation", "PGG amount")
+state_tab <- round(state_tab,3)
+state_tab <- knitr::kable(state_tab, format="latex")
 
 ```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:state_tab}
+\caption{\textbf{State-level differences in community-level analysis.} There are not significant differences between the effect of the contact intervention by state. The first column shows coefficients from OLS regression, the second column shows $p$-values from OLS regression.}
+\smallskip
+`r state_tab`
+\end{center}
+\end{table}
+
 
 ## Appendix G: Farmer-pastoralist differences
 
+Coefficients and p-values estimating farmer/pastoralist heterogeneous effects were calculated with robust OLS regression using site-level clusters and fixed effects for state. The regression interacted the treatment indicator with the state indicator. There are no significant differences in treatment effect by farmer/pastoralist. Farmers were the reference category so this table shows differences for pastoralists.
+
 ```{r}
 load("../data_and_code/survey_dat/d_analysis/farm_list.Rda")
-farmList
+#farmList
+
+farm_tab <- rbind(farmList[[1]][3,c(2,3)],
+                       farmList[[2]][3,c(2,3)],
+                       farmList[[3]][3,c(2,3)],
+                       farmList[[4]][3,c(2,3)],
+                       farmList[[5]][3,c(2,3)],
+                       farmList[[6]][3,c(2,3)],
+                       farmList[[7]][3,c(2,3)])
+colnames(farm_tab) <- c("coefficient", "p-value")
+rownames(farm_tab) <- c("Attitudes", "Perceptions of security",
+                          "Contact", "Percent Experiment",
+                          "Endorsement Experiment",
+                          "PGG donation", "PGG amount")
+farm_tab <- round(farm_tab,3)
+farm_tab <- knitr::kable(farm_tab, format="latex")
+
 ```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:farm_tab}
+\caption{\textbf{Farmer-pastoralist differences in community-level analysis.} There are not significant differences between the effect of the contact intervention by farmer/pastoralist. The first column shows coefficients from OLS regression, the second column shows $p$-values from OLS regression.}
+\smallskip
+`r farm_tab`
+\end{center}
+\end{table}
 
 
 **********

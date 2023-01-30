@@ -18,43 +18,53 @@ Survey dat balance tests: ag.df
 
 ```{r}
 outcome_list <- c("attitude_cw_base", "in_cw_base", 'contactOnly_cw_base',
-                  'rand_lm_base', "rand_outcome_base", "end_exp_base")
-demos_list <- c("age_base", "end_expTR_base", "rand_condition_base")
+                  "rand_outcome_base", "end_exp_base")
+# note: this is for baseline outcomes, so not looking at demographics or svy experiment balance (end_exp condition, 'rand_condition_base')
+names(ag.df)[grepl(paste0(outcome_list, collapse="|"), names(ag.df))] <- c("Baseline_Attitudes", "Baseline_Contact", 
+                                                                           "Baseline_Perceptions_of_Security",
+                                                                           "Baseline_Percent_Experiment",
+                                                                           "Baseline_Endorsement_Experiment")
 
-bal_fmla <- formula(treatment ~ attitude_cw_base + in_cw_base + contactOnly_cw_base + rand_lm_base + rand_outcome_base + end_exp_base)
-#bal_fmla1 <- formula(treatment ~ attitude_index_base + in_index_base + contactOnly_index_base + rand_lm_base + rand_outcome_base + end_exp_base)
+bal_fmla <- formula(treatment ~ Baseline_Attitudes + Baseline_Perceptions_of_Security + Baseline_Contact + Baseline_Percent_Experiment + Baseline_Endorsement_Experiment)
 
 bal_svy <- xBalance(bal_fmla, strata = factor(ag.df$state), data=ag.df,
          report=c("all"))
 
 ```
 
-Obs dat balance tests
+Obs dat balance tests.  Using rank because that is the outcome in the paper, but have raw also (raw is even more balanced than rank).
 
 ```{r}
-event_list <- c("treatment", "State", "pastoralists_index_rank", "farmers_index_rank")
-event_list1 <- c("treatment", "State", "pastoralists_index", "farmers_index")
+event_list <- c("treatment", "State", "pastoralists_index_rank", "farmers_index_rank",
+                "pastoralists_index", "farmers_index")
 events_df <- events[events$time %in% 0,] %>% group_by(site, State) %>%
-  select(event_list1) %>%
+  select(event_list) %>%
   summarise_all(mean, na.rm=T)
 names(events_df)[-c(1:3)] <- paste0(names(events_df)[-c(1:3)], "_events")
 
-markets_list <- c("treatment", "State", "pastoralists_index_rank", "farmers_index_rank")
-markets_list1 <- c("treatment", "State", "pastoralists_index_raw", "farmers_index_raw")
+markets_list <- c("treatment", "State", "pastoralists_index_rank", "farmers_index_rank", 
+                  "pastoralists_index_raw", "farmers_index_raw")
 markets_df <- markets[markets$time %in% 0,] %>% group_by(site, State) %>%
-  select(markets_list1) %>%
+  select(markets_list) %>%
   summarise_all(mean, na.rm=T)
 names(markets_df)[-c(1:3)] <- paste0(names(markets_df)[-c(1:3)], "_markets")
 
 obs_df <- merge(events_df, markets_df, by=c("site", "treatment", "State"))
 
-obs_fmla <- formula(treatment ~ pastoralists_index_rank_events + farmers_index_rank_events
-                    + pastoralists_index_rank_markets + farmers_index_rank_markets)
-obs_fmla1 <- formula(treatment ~ pastoralists_index_events + farmers_index_events
-                    + pastoralists_index_raw_markets + farmers_index_raw_markets)
+names(obs_df)[grepl("index", names(obs_df))] <- c("Pastoralists_index_rank_events", 
+                                                  "Farmers_index_rank_events",
+                                                  "Pastoralists_index_raw_events", 
+                                                  "Farmers_index_raw_events",
+                                                  "Pastoralists_index_rank_markets",
+                                                  "Farmers_index_rank_markets",
+                                                  "Pastoralists_index_raw_markets",
+                                                  "Farmers_index_raw_markets")
 
-bal_obs <- xBalance(obs_fmla1, strata = factor(obs_df$State), data=obs_df,
+obs_fmla <- formula(treatment ~ Pastoralists_index_rank_events + Farmers_index_rank_events
+                    + Pastoralists_index_rank_markets + Farmers_index_rank_markets)
+bal_obs <- xBalance(obs_fmla, strata = factor(obs_df$State), data=obs_df,
          report=c("all"))
+
 
 ```
 
