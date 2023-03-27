@@ -500,9 +500,6 @@ strat.fun("threat_cw_y0")
 #com.fun("threat_group.threat_dis_group.x_threat", 1000)
 threat1p <- com.fun('threat_index', 1000)
 
-(p_threat_trust <- true.fun('allTrust_cw', 'threat_cw'))
-(p_threat_contact <- true.fun('contactOnly_cw', 'threat_cw'))
-(p_threat_in <- true.fun('in_cw', 'threat_cw'))
 ```
 
 ECPN does not reduce feelings of threat.  But feelings of threat negatively correlated with intergroup attitudes, contact, and security.
@@ -514,21 +511,12 @@ strat.fun("emp_cw_y0")
 (p_threatp1 <- com.fun1('emp_cw', 1000))
 emp1p <- com.fun1('emp_index', 1000)
 
-(p_emp_trust <- true.fun1('allTrust_cw', 'emp_cw'))
-(p_emp_contact <- true.fun1('contactOnly_cw', 'emp_cw'))
-(p_emp_in <- true.fun1('in_cw', 'emp_cw'))
-
-
 
 # select
 strat.fun("persp_cw_y0")
 # true pvals persp
 (p_persp1 <- com.fun('persp_cw', 1000))
 persp1p <- com.fun('persp_index', 1000)
-
-(p_persp_trust <- true.fun1('allTrust_cw', 'persp_cw'))
-(p_persp_contact <- true.fun1('contactOnly_cw', 'persp_cw'))
-(p_persp_in <- true.fun1('in_cw', 'persp_cw'))
 
 ```
 
@@ -542,10 +530,6 @@ ECPN increases perspective-taking a bit, but not to a statistically significant 
 strat.fun("expand_cw_y0")
 (p_expandp1 <- com.fun('expand_cw', 1000))
 expan1p <- com.fun('expand_index', 1000)
-
-(p_expand_trust <- true.fun('allTrust_cw', 'expand_cw'))
-(p_expand_contact <- true.fun('contactOnly_cw', 'expand_cw'))
-(p_expand_in <- true.fun('in_cw', 'expand_cw'))
 
 ```
 
@@ -737,8 +721,9 @@ save(ps_df_p, file="ps_df_p.Rdata")
 For cross-level combined hypothesis test
 
 ```{r}
-p_combP <- theGlobP_un
-save(p_combP,panel.df, file="g2-panelAnal.Rdata")
+#p_combP <- theGlobP_un
+#save(p_combP,panel.df, file="g2-panelAnal.Rdata")
+save(panel.df, file="g2-panelAnal.Rdata")
 
 ```
 
