@@ -632,7 +632,7 @@ farm_tab <- knitr::kable(farm_tab, format="latex")
 
 **********
 
-## Appendix Z: Survey Questions
+## Appendix H: Survey Questions
 
 **Attitudes**
 

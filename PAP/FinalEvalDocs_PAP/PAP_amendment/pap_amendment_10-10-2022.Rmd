@@ -1,6 +1,6 @@
 ---
 title: "PAP Deviation"
-author: "Christopher Grady"
+author: "Christopher Grady, Rebecca Wolfe, Dawop Saidu, Lisa Inks"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
@@ -64,7 +64,7 @@ Hypothesis testing.
 
 ## Description and Justification
 
-We initially listed only radio listening as a placebo outcome.  Along with radio listening, we also use attitudes towards violence as a placebo outcome.  Attitudes about violence are a good candidate for a “placebo outcome” because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way.  Radio listening should also not be affected by ECPN but is less relevant for how self-reported attitudes change from baseline to endline. 
+We initially listed only radio listening as a placebo outcome.  Along with radio listening, we also use attitudes towards violence and attitudes towards people from othr religions as  placebo outcomes.  Attitudes about violence are a good candidate for a “placebo outcome” because intergroup contact should not affect general attitudes about violence, but respondents may feel social pressure to answer violence questions in a desirable way.  Attitudes towards people from other religions should not be affected by ECPN but would signal either social desirability bias or a general increase in tolerance towards outgroups. And radio listening should also not be affected by ECPN but is less relevant for how self-reported attitudes change from baseline to endline. 
 
 We did not initially list attitudes towards violence as a placebo outcome because the program team was interested to know if the program affected these attitudes.  However, we explicitly did not include attitudes towards violence in any hypothesis because we did not expect the program to affect such attitudes and wanted to use them as placebos in our analysis.[^PAP_quote]
 

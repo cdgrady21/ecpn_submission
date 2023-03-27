@@ -15,7 +15,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
-load("../clean/a_obsDat_clean.rda")
+load("../a_clean/a_obsDat_clean.rda")
 library(dplyr)
 library(estimatr)
 
