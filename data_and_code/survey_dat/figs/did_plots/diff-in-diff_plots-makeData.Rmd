@@ -31,7 +31,7 @@ load("../../../obs_dat/b_analysis/marketMedian.Rdata")
 # clean environment
 rm(list=ls(pattern="Var|var|.fun|Fun|Col|Index|Indice|Stand|fmla|outcomes"))
 
-#until I figure out insecurity, vio, list, reverse scale it.
+#reverse scaled in earlier code.
 #ag.df$in_cw_base <- abs(ag.df$in_cw_base+1)
 #ag.df$in_cw_end <- abs(ag.df$in_cw_end+1)
 #panel.df$in_cw_y0 <- abs(panel.df$in_cw_y0+1)

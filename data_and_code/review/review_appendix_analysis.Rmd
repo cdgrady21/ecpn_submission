@@ -1,0 +1,234 @@
+---
+title: "Review_appendix"
+output: html_document
+date: "2023-07-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+# Load data I anticipate needing
+load("../survey_dat/c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../survey_dat/c_creating_dataframes/rand_df.Rdata")
+load("../survey_dat/b_creating_outcomes/f2-panelData.Rdata")
+load("../obs_dat/b_analysis/eventsMedian.Rdata")
+load("../obs_dat/b_analysis/marketMedian.Rdata")
+
+# clean environment
+rm(list=ls(pattern="Var|var|.fun|Fun|Col|Index|Indice|Stand|fmla|outcomes"))
+
+# Functions
+## True p-value function. 
+load("../survey_dat/d_analysis/true_fun.rda")
+
+# make variables
+ag.df$farm_past <- ifelse(grepl(".farmers", ag.df$comm), "farm", "past")
+
+# Packages
+library(estimatr)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(DescTools)
+
+```
+
+# Review 1
+
+## Comment 1
+
+**Comment**
+Third, how can the authors differentiate the impact of intergroup contact from the impact of the development project around which the contact was organized? Treatment communities received large monetary contributions to be used for development projects that could potentially reduce the resource scarcity that is driving conflict (water access points and fencing to protect crops from grazing livestock). Maybe the reported findings have nothing to do with intergroup contact and are instead driven by a reduction in the triggers for conflict. The authors acknowledge this possibility on page 6, but only within the context of trying to understand diffusion mechanisms. While the experiment cannot be rerun, there may be analyses that could help address this (e.g., if the effects are larger in places with greater scarcity, this would suggest that the resource infusion is doing much of the work).
+
+**Response**
+Great question. We might be able to answer this that the boreholes were largely constructed at the end of the project, and likely had little impact on water scarcity at the time of the survey. Participants might have had expectations the scarcity would be lifted, and that’s hard to disentangle. Not sure what analysis we could do to disentangle. Maybe the fact that at endline, in Benue, pastoralists would not have benefited from the borehole as they were displaced?
+
+Few were aware of mediation
+Less likely to have direct short-term effects on attitudes
+Look at people who used the boreholes
+Maybe look at Benue pastoralists (issue: low power)
+
+```{r}
+## mediation awareness/participation
+table(rand.df$ecpn_group.negotiation)
+table(rand.df$heard_MC_group.heard_MC)
+table(rand.df$heard_MC_group.part_MC)
+```
+
+People aware/used QIP, peole aware/used borehole.
+
+```{r}
+# people who used boreholes
+table(rand.df$qip_group.borehole_aware)
+table(rand.df$qip_group.borehole_use)
+# obvious: control group is all NA for borehole use/aware.
+table(ag.df$treatment, ag.df$qip_group.borehole_use_end, exclude=c())
+# this lm doesnt make sense because TR and borehole use/aware almost perfectly correlated with TR
+lm1 <- lm_robust(attitude_cw_end~treatment*qip_group.borehole_use_end,
+                            clusters = psu, data=ag.df)
+tidy(lm1)[, c(1,2,5)]
+# must do effect of borehole use among subset of treated comms/ppl
+lm1 <- lm_robust(attitude_cw~qip_group.borehole_use_end,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+tidy(lm1)[, c(1,2,5)]
+
+
+# loop over outcome list (from g-aggAnalysis-mainOutcomes.Rmd)
+outcome_list <- c("attitude", "in", 'contactOnly',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
+outcome_list_qip <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(outcome_list)])
+qipList <- vector(mode="list", length=length(outcome_list_qip))
+for(i in 1:length(outcome_list_qip))
+{
+  thelm <- lm_robust(ag.df[,outcome_list_qip[i]]~ag.df[,"qip_group.borehole_use_end"],
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+  qipList[[i]] <- tidy(thelm)[, c(1,2,5)]
+}
+names(qipList) <- outcome_list_qip
+save(qipList, file="qip_list.Rda")
+
+
+# graph reveals semi-outliers
+ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = qip_group.borehole_use_end, y = attitude_cw, color = psu)) +
+  geom_point() +
+  geom_text(aes(label = comm), vjust = -0.5) +
+  theme_bw()
+
+# relationship b/ween borehole use and attitude change with semi-outliers removed
+ag.df$attitude_cw_test <- DescTools::Winsorize(ag.df$attitude_cw, probs = c(0.05, 0.95))
+lm1 <- lm_robust(attitude_cw_test~qip_group.borehole_use_end,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+tidy(lm1)[, c(1,2,5)]
+
+# farmer-pastoralists differences
+lm_robust(qip_group.borehole_use_end~farm_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+```
+
+```{r}
+# Benue pastoralists only (were displaced, not using boreholes)
+
+```
+
+
+## Comment 2
+
+Fourth, I am concerned about the robustness of the findings given the relatively small sample size. In general, the findings were more mixed and more marginal than the paper's abstract and introduction would suggest. The marginality and mixed nature of the results is not surprising given the small sample size (20 communities), which is to be expected for such an intense/expensive intervention implemented in a real conflict setting. I think we can still learn something from the study, but would encourage the authors to address the following:
+
+Were adjustments made for multiple comparisons? The PAP suggests that this would be done, but I do not believe that the manuscript mentions this.
+
+Within family FDR (appendix)
+Footnote with appendix
+
+```{r}
+
+```
+
+## Comment 3
+
+What are the substantive effect sizes and how do they compare to the minimum detectable effect sizes identified in the PAP's power analyses (0.3-0.4 SDs)?
+
+Significant results are as strong or stronger than what is the PAP
+Add to appendix
+Add .5 x-axis marker to community-level graph
+
+```{r}
+
+```
+
+## Comment 4
+
+Figure 2 suggests that the effects in Figure 1 are driven by worsening conditions in control communities rather than improved relations in treatment communities. Given the small number of control communities (5), I worry that the effects could be driven by a particularly bad period in a single control community. Do similar patterns hold for other outcomes?
+
+**Response**
+Great point. In general, we do see control communities getting worse across outcomes. But it wasn't driven by a particularly bad period in a single control community.
+Add to appendix: graphs with communities disaggregated
+
+```{r}
+
+```
+
+## Comment 5
+
+Lots of the findings are not statistically significant (e.g., Figure 3 seems to show that none of the effects on non-participants were statistically distinguishable from zero). Sometimes such estimates are treated as null effects and other times as impacts that are not statistically significant. It would be helpful to understand how the authors make such distinctions.
+
+**Response**
+Thank you, that is correct that the non-participants were not statistically different from the control group. We need to be consistent with wording.
+
+.1 marginal
+.2 a potential trend
+/>.2 null
+
+```{r}
+# For exact p-values: Appendix B for community-level analysis, Appendix C for individual-level.
+
+```
+
+Finally, a few smaller questions:
+• Why are conflict and violence not included as dependent variables? There is an assumption that violence is caused by poor intergroup attitudes, but it is possible that attitudes could be improved without reducing violence. This seems important both theoretically and practically.
+
+**Response**
+Good question. We have the footnote about it. It's a good idea but we weren't able to measure that.
+We have: violence_effect “In any clash that occurred in the last year, were you or anyone in your family negatively affected by an attack caused by [X group]”
+
+
+```{r}
+
+```
+
+
+• Were the enumerators who carried out the market observations aware of a community's treatment status? If such observations were not treatment-blind, should we be concerned about biased reporting of intergroup contact?
+
+**Response**
+Lisa’s email .
+
+Method appendix
+Unaware of hypotheses
+Enumerator differences: take out Israel and Hadiza?
+
+```{r}
+
+```
+
+# Review 2
+
+## Comment 1
+
+The baseline for our understanding of pastoralist-farmer relations here refers to conflict. As the authors note circa line 147, relations had involved positive interactions that arose endogenously (see 167-68). The intervention here, as well as some of the drivers of contemporary conflict (ie, climate change) are largely exogenous. This could interfere with certain aspects of the research design, discussed below. But I believe it could be sufficiently, appropriately addressed within the framing of the paper around intergroup theory. For example, Allport was exploring prejudice and misinformed views about outgroups. Farmers and pastoralists have different interests, meaning that the attitudes shaping their interactions are not simply about a lack of information (or experience with) the other. The authors explore this around line 163. The PGG generates a shared interest, and in his regard the failure, or limited evidence of cooperation there, is an important limitation of this study, as the authors concede. I would appreciate a stronger justification, perhaps within the background about Nigeria itself, for how the inorganic and engineered contact does not interfere with the theorized drivers of outcomes. This seems especially important since participants were provided with mediation training; this made me wonder if I am observing effects and positive spillover of mediation training or random social contact that generates "authentic" attitudes and behaviors. Is the contact or the efficacy of the mediation driving change here?
+
+**Response**
+Many good points being made here.  We will address each of them. 
+
+Emphasize conditions need to be met. Why intervention was explicitly designed to meet those conditions. Just encountering can have negative effects (Enos)
+We can’t disqualify that some of the spillover contact–for example in the markets–did not also contribute to outcomes. But that is part of the hope of contact interventions is that it leads to positive contact outside of the intervention. This is a rare study that we look at both in the intervention and outside (Mousa an exception). 
+
+Mediation being driving, see response above
+Lack of information–contact may apply  in both when people have negative attitudes–extensions of contact theory to situations where knowledge may not be an issues but still negative beliefs
+
+So in my rereading of the comment, it seems more about that in addition to lack of knowledge there are differing interests in this situation. So it’s not just about knowledge–there is real resource scarcity. While the resource scarcity is real, a) it’s a common interest to manage it well and b) there is a history of cooperation. 
+Maybe Kertzer on contact not improving attitudes if other side wants bad things for you
+Maybe other stuff
+
+Maybe concerned with:
+- artificiality of intervention?
+- real effect caused by random social contact that our intervention generated.  Voluntary contact outside of the program is an intended outcome of the intervention.
+- these groups have differing interests, intervention trying to build on common interests. vs most contact interventions: cause of prejudice/conflict lack of knowledge.  Here groups are competing with one another.  Response Empirical question we are answering. beyond minimal groups, unrealistic that groups have no information. contact can do more than knowledge -- can change perceptions about degree to which interests are aligned/misaligned. pettigrew & tropp meta-analysis about more than information.
+
+Possible response solution: note that the reviewer makes good points and this is a complex issue.  Then go over the several things we think reviewer is pointing out, responding to each point.
+
+```{r}
+
+```
+
+## Comment 2
+
+With regard to research design, I would appreciate a stronger justification of the site selection. As the authors note, Benue has embraced especially strong policies biased against pastoralists (it was one of the first states to ban "open grazing"). The intervention is therefore correcting for a manufactured imbalance between the groups, in a way: pastoralists likely feel insecure when the state sided with farmers and organized militias on their behalf. This is also a condition that is arguably different from Nasarawa. Perhaps this is adequately captured in the fixed effects models noted in the supplemental info. Secondly, the description of the group identities is standard, characterizing pastoralists as overwhelmingly Fulani and Muslim etc. There might be little reason to question this, but I noticed that individual characteristics are dropped from the survey analysis in the supplemental index...if I am understanding that reference properly.
+
+**Response**
+In appendix, add exploratory regression that also uses individual’s demographic characteristics
+Potentially add something about site selection or clarify the anti-grazing policies were implemented after site selection. 
+
+```{r}
+
+```

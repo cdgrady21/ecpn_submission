@@ -12,6 +12,12 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 rm(list=ls())
+
+# data
+load("../data_and_code/survey_dat/d_analysis/list_of_coefs_and_ps.Rda")
+load("../data_and_code/survey_dat/d_analysis/list_of_rank_bin_raw.Rda")
+
+
 # not included: Individual-levl balance between part/nonpart/control == unneeded because exploratory & no assumption of balance.
 ```
 
@@ -34,8 +40,9 @@ These tables shows results with different ways of making indices (additive vs in
 The base method is always inverse-covariance weighted indices; the estimation method is controlling-for unless the baseline difference between the treatment and control groups is 0.20 standard deviations or more; the base method of handling count variables is dense rank. Only contact outcomes use count variables, only survey outcomes have a baseline and an endline and are measured with indices.
 
 ```{r, echo=F}
-load("../data_and_code/survey_dat/d_analysis/list_of_coefs_and_ps.Rda")
-load("../data_and_code/survey_dat/d_analysis/list_of_rank_bin_raw.Rda")
+# data
+## newList is list of coefs and ps for outcomes
+## var_tab is coefs and ps for the various ways to calculate self-reported contact outside of the intervention
 
 #newList[[3]]
 #var_tab
@@ -188,6 +195,10 @@ The base method is always inverse-covariance weighted indices; the estimation me
 ```{r, echo=F}
 load("../data_and_code/survey_dat/d_analysis/list_of_coefs_and_ps_ind.Rda")
 load("../data_and_code/survey_dat/d_analysis/list_of_rank_bin_raw_ind.Rda")
+
+# Data
+# newList_ind is list of coefs and ps for individual-level observational analysis. rows are part or nonpart vs CO.
+# var_tab_ind is coefs and ps for the various ways to calculate self-reported contact outside the intervention, in the individual-level data. rows are participants or nonparticipants vs CO.
 
 #newList_ind[[3]]
 #var_tab_ind
