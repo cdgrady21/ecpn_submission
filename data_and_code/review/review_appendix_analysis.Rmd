@@ -58,22 +58,140 @@ table(rand.df$heard_MC_group.part_MC)
 People aware/used QIP, peole aware/used borehole.
 
 ```{r}
-# people who used boreholes
+# people who aware/used boreholes
 table(rand.df$qip_group.borehole_aware)
 table(rand.df$qip_group.borehole_use)
-# obvious: control group is all NA for borehole use/aware.
-table(ag.df$treatment, ag.df$qip_group.borehole_use_end, exclude=c())
-# this lm doesnt make sense because TR and borehole use/aware almost perfectly correlated with TR
-lm1 <- lm_robust(attitude_cw_end~treatment*qip_group.borehole_use_end,
-                            clusters = psu, data=ag.df)
-tidy(lm1)[, c(1,2,5)]
-# must do effect of borehole use among subset of treated comms/ppl
+# obvious: control group is all NA or 0 for borehole use/aware.
+table(ag.df$qip_group.borehole_use_end>0, ag.df$treatment, exclude=c())
+
+# robustness checks
+## make a version thats all NA and a version thats all 0
+ag.df$qip_group.borehole_use_end_NA <- ifelse(ag.df$qip_group.borehole_use_end %in% 0, NA, ag.df$qip_group.borehole_use_end)
+ag.df$qip_group.borehole_use_end_0 <- ifelse(is.na(ag.df$qip_group.borehole_use_end), 0, ag.df$qip_group.borehole_use_end)
+
+############
+# must do effect of borehole aware/use among subset of treated comms/ppl bcuz TR and borehole use/aware perfectly correlated
 lm1 <- lm_robust(attitude_cw~qip_group.borehole_use_end,
                             clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
 tidy(lm1)[, c(1,2,5)]
 
 
-# loop over outcome list (from g-aggAnalysis-mainOutcomes.Rmd)
+################################
+# make one loop
+##############################
+#graph fun
+qip_graph_fun <- function(ben_var, out_var, title, xlab, ylab, estimate1, intercept1)
+{
+  ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = ag.df[ag.df$treatment %in% 1,ben_var], 
+                                             y = ag.df[ag.df$treatment %in% 1,out_var], 
+                                             color = psu)) +
+    geom_point() +
+    geom_text(aes(label = comm), vjust = -0.5) +
+    geom_abline(slope=estimate1,
+                intercept=intercept1,
+                color="black",
+                size=1) +
+    theme_bw() +
+    ggtitle(title) +
+    xlab(xlab) +
+    ylab(ylab)
+}
+
+# loop over outcome list (from g-aggAnalysis-mainOutcomes.Rmd) and save
+outcome_list <- c("attitude", "in", 'contactOnly',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
+outcome_list_qip <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(outcome_list)])
+
+ben_vars <- c("qip_group.borehole_use_end", "qip_group.borehole_aware_end",
+              "qip_ben_end", "qip_aware_end")
+ben_out_df <- expand.grid(ben_vars = ben_vars,
+                    out_vars = outcome_list_qip)
+
+# loop lm and graph fun
+qipList <- vector(mode="list", length=nrow(ben_out_df))
+names(qipList) <- paste(ben_out_df[,1], "and", ben_out_df[,2])
+plot_list <- vector(mode="list", length=nrow(ben_out_df))
+names(plot_list) <- paste(ben_out_df[,1], "and", ben_out_df[,2])
+for(i in 1:nrow(ben_out_df))
+{
+  # thelm
+  thelm <- lm_robust(ag.df[ag.df$treatment %in% 1,paste(ben_out_df[i,2])]~
+                       ag.df[ag.df$treatment %in% 1,paste(ben_out_df[i,1])],
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+  
+  # tidy it, grab term, coef, pval
+  lm_res <- tidy(thelm)[, c(1,2,5)]
+  
+  # save to list
+  qipList[[i]] <- lm_res
+  
+  # make plot
+  theplot <- qip_graph_fun(ben_var = paste(ben_out_df[i,1]),
+                           out_var = paste(ben_out_df[i,2]),
+                           title=paste(ben_out_df[i,1], "and", ben_out_df[i,2]),
+                           xlab=ben_out_df[i,1],
+                           ylab=ben_out_df[i,2],
+                           estimate1=qipList[[i]][[2,2]],
+                           intercept1=qipList[[i]][[1,2]])
+  
+  # save to list
+  plot_list[[i]] <- theplot
+}
+
+save(qipList, file="qip_list.Rda")
+save(plot_list, file="plot_list.Rda")
+# save plot images
+for (i in 1:length(plot_list)) {
+    file_name = paste0(names(plot_list)[i],".tiff")
+    tiff(file_name)
+    print(plot_list[[i]])
+    dev.off()
+}
+
+# graph reveals semi-outliers for some outcomes
+# same relationship b/ween borehole use and attitude_change with semi-outliers removed
+ag.df$attitude_cw_test <- DescTools::Winsorize(ag.df$attitude_cw, probs = c(0.05, 0.95))
+lm1 <- lm_robust(attitude_cw_test~qip_group.borehole_use_end,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+tidy(lm1)[, c(1,2,5)]
+
+# summarize coefs & pvals for each outcome/benefit variable
+all_coefficients <- sapply(qipList, function(x) x$estimate)
+rownames(all_coefficients) <- c("intercept", "estimate")
+
+mean(all_coefficients["estimate",colnames(all_coefficients)[grepl("attitude", colnames(all_coefficients))]])
+
+all_pvalues <- sapply(qipList, function(x) x$p.value)
+rownames(all_pvalues) <- c("intercept", "variable")
+mean(all_pvalues["variable",])
+mean(all_pvalues["variable",colnames(all_pvalues)[grepl("borehole_use", colnames(all_pvalues))]])
+
+summary(all_pvalues["variable",])
+
+# farmer-pastoralists differences
+lm_robust(qip_group.borehole_use_end~farm_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+```
+
+```{r, eval=F}
+#test
+# non-function plot
+ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = qip_group.borehole_use_end, y = attitude_cw, color = psu)) +
+  geom_point() +
+  geom_text(aes(label = comm), vjust = -0.5) +
+  geom_abline(slope=tidy(lm1)[2, 2],
+              intercept=tidy(lm1)[1, 2],
+              color="black",
+              size=1) +
+  theme_bw()
+
+qipList$attitude_cw$term_use
+
+######################################
+# when it was two functions 
+######################################################
+# loop over outcome list (from g-aggAnalysis-mainOutcomes.Rmd) and save
 outcome_list <- c("attitude", "in", 'contactOnly',
                   'rMean', "end_exp",
                   "pgp_donate_end", "pgp_amount_end")
@@ -81,30 +199,78 @@ outcome_list_qip <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(ou
 qipList <- vector(mode="list", length=length(outcome_list_qip))
 for(i in 1:length(outcome_list_qip))
 {
-  thelm <- lm_robust(ag.df[,outcome_list_qip[i]]~ag.df[,"qip_group.borehole_use_end"],
+  # boreholes
+  thelm1 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
+                       ag.df[ag.df$treatment %in% 1,"qip_group.borehole_use_end"],
                             clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  qipList[[i]] <- tidy(thelm)[, c(1,2,5)]
+  thelm2 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
+                       ag.df[ag.df$treatment %in% 1,"qip_group.borehole_aware_end"],
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+  # qips
+  thelm3 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
+                       ag.df[ag.df$treatment %in% 1,"qip_ben_end"],
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+  thelm4 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
+                       ag.df[ag.df$treatment %in% 1,"qip_aware_end"],
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+  
+  lm1_res <- tidy(thelm1)[, c(1,2,5)]
+  lm2_res <- tidy(thelm2)[, c(1,2,5)]
+  names(lm1_res) <- paste0(names(lm1_res), "_bore_use")
+  names(lm2_res) <- paste0(names(lm2_res), "_bore_aware")
+  
+  lm3_res <- tidy(thelm3)[, c(1,2,5)]
+  lm4_res <- tidy(thelm4)[, c(1,2,5)]
+  names(lm3_res) <- paste0(names(lm3_res), "_qip_ben")
+  names(lm4_res) <- paste0(names(lm4_res), "_qip_aware")
+  
+  
+  qipList[[i]] <- cbind(lm1_res, lm2_res, lm3_res, lm4_res)
 }
 names(qipList) <- outcome_list_qip
 save(qipList, file="qip_list.Rda")
 
+# create graphs, save graphs
+## graph fun
+qip_graph_fun <- function(ben_var, out_var, title, xlab, ylab)
+{
+  ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = ag.df[ag.df$treatment %in% 1,ben_var], 
+                                             y = ag.df[ag.df$treatment %in% 1,out_var], 
+                                             color = psu)) +
+    geom_point() +
+    geom_text(aes(label = comm), vjust = -0.5) +
+    geom_abline(slope=tidy(lm1)[2, 2],
+                intercept=tidy(lm1)[1, 2],
+                color="black",
+                size=1) +
+    theme_bw() +
+    ggtitle(title) +
+    xlab(xlab) +
+    ylab(ylab)
+}
+#qip_graph_fun(ben_var="qip_group.borehole_use_end", out_var="attitude_cw", 
+#              title="Borehole use and attitudes", xlab="borehole use", ylab="attitude change")
+ben_vars <- c("qip_group.borehole_use_end", "qip_group.borehole_aware_end",
+              "qip_ben_end", "qip_aware_end")
+ben_out_df <- expand.grid(ben_vars = ben_vars,
+                    out_vars = outcome_list_qip)
+plot_list <- list()
+for(i in 1:nrow(ben_out_df))
+{
+  theplot <- qip_graph_fun(ben_var = paste(ben_out_df[i,1]),
+                           out_var = paste(ben_out_df[i,2]),
+                           title=paste(ben_out_df[i,1], "and", ben_out_df[i,2]),
+                           xlab=ben_out_df[i,1],
+                           ylab=ben_out_df[i,2])
+  
+  plot_list[[i]] <- theplot
+}
+######################################################
 
-# graph reveals semi-outliers
-ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = qip_group.borehole_use_end, y = attitude_cw, color = psu)) +
-  geom_point() +
-  geom_text(aes(label = comm), vjust = -0.5) +
-  theme_bw()
 
-# relationship b/ween borehole use and attitude change with semi-outliers removed
-ag.df$attitude_cw_test <- DescTools::Winsorize(ag.df$attitude_cw, probs = c(0.05, 0.95))
-lm1 <- lm_robust(attitude_cw_test~qip_group.borehole_use_end,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-tidy(lm1)[, c(1,2,5)]
-
-# farmer-pastoralists differences
-lm_robust(qip_group.borehole_use_end~farm_past,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
 ```
+
+
 
 ```{r}
 # Benue pastoralists only (were displaced, not using boreholes)
