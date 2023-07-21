@@ -55,19 +55,12 @@ table(rand.df$heard_MC_group.heard_MC)
 table(rand.df$heard_MC_group.part_MC)
 ```
 
-People aware/used QIP, peole aware/used borehole.
+People aware/used QIP, people aware/used borehole.
 
 ```{r}
 # people who aware/used boreholes
 table(rand.df$qip_group.borehole_aware)
 table(rand.df$qip_group.borehole_use)
-# obvious: control group is all NA or 0 for borehole use/aware.
-table(ag.df$qip_group.borehole_use_end>0, ag.df$treatment, exclude=c())
-
-# robustness checks
-## make a version thats all NA and a version thats all 0
-ag.df$qip_group.borehole_use_end_NA <- ifelse(ag.df$qip_group.borehole_use_end %in% 0, NA, ag.df$qip_group.borehole_use_end)
-ag.df$qip_group.borehole_use_end_0 <- ifelse(is.na(ag.df$qip_group.borehole_use_end), 0, ag.df$qip_group.borehole_use_end)
 
 ############
 # must do effect of borehole aware/use among subset of treated comms/ppl bcuz TR and borehole use/aware perfectly correlated
@@ -121,7 +114,7 @@ for(i in 1:nrow(ben_out_df))
                             clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
   
   # tidy it, grab term, coef, pval
-  lm_res <- tidy(thelm)[, c(1,2,5)]
+  lm_res <- tidy(thelm)[, c(1,2,5,4)]
   
   # save to list
   qipList[[i]] <- lm_res
@@ -158,20 +151,76 @@ tidy(lm1)[, c(1,2,5)]
 
 # summarize coefs & pvals for each outcome/benefit variable
 all_coefficients <- sapply(qipList, function(x) x$estimate)
-rownames(all_coefficients) <- c("intercept", "estimate")
-
-mean(all_coefficients["estimate",colnames(all_coefficients)[grepl("attitude", colnames(all_coefficients))]])
-
 all_pvalues <- sapply(qipList, function(x) x$p.value)
-rownames(all_pvalues) <- c("intercept", "variable")
-mean(all_pvalues["variable",])
-mean(all_pvalues["variable",colnames(all_pvalues)[grepl("borehole_use", colnames(all_pvalues))]])
+all_tstat <- sapply(qipList, function(x) x$statistic)
+rownames(all_coefficients) <- c("intercept_coef", "var_coef")
+rownames(all_pvalues) <- c("intercept_p", "var_p")
+rownames(all_tstat) <- c("intercept_t", "var_t")
 
-summary(all_pvalues["variable",])
+# all coefs, pvals, and ts for each outcome across benefit variables
+benefit_df <- data.frame(coefs = numeric(0), pvals = numeric(0), tstat = numeric(0))
+for(i in 1:length(outcome_list))
+{
+  benefit_df[i,1] <- mean(all_coefficients["var_coef",colnames(all_coefficients)[grepl(paste(outcome_list[i]), colnames(all_coefficients))]])
+  benefit_df[i,2] <- mean(all_pvalues["var_p",colnames(all_pvalues)[grepl(paste(outcome_list[i]), colnames(all_pvalues))]])
+  benefit_df[i,3] <- mean(all_tstat["var_t",colnames(all_tstat)[grepl(paste(outcome_list[i]), colnames(all_tstat))]])
+}
+rownames(benefit_df) <- outcome_list
+benefit_df["all",] <- c(NA, mean(all_pvalues["var_p",]), mean(all_tstat["var_t",]))
+save(benefit_df, file="benefit_df.Rda")
+
+
+# all coefs, pvals, and ts for each benefit variable across outcomes
+benefitVar_df <- data.frame(coefs = numeric(0), pvals = numeric(0), tstat = numeric(0))
+for(i in 1:length(ben_vars))
+{
+  # coefs don't even really make sense because they're not on same scales
+  benefitVar_df[i,1] <- mean(all_coefficients["var_coef",colnames(all_coefficients)[grepl(paste(ben_vars[i]), colnames(all_coefficients))]])
+  benefitVar_df[i,2] <- mean(all_pvalues["var_p",colnames(all_pvalues)[grepl(paste(ben_vars[i]), colnames(all_pvalues))]])
+   benefitVar_df[i,3] <- mean(all_tstat["var_t",colnames(all_tstat)[grepl(paste(ben_vars[i]), colnames(all_tstat))]])
+}
+rownames(benefitVar_df) <- ben_vars
+benefitVar_df["all",] <- c(NA, mean(all_pvalues["var_p",]), mean(all_tstat["var_t",]))
+save(benefitVar_df, file="benefitVar_df.Rda")
+
+```
+
+Robustness check
+
+```{r}
+# obvious: control group is all NA or 0 for borehole use/aware.
+table(ag.df$qip_group.borehole_use_end>0, ag.df$treatment, exclude=c())
+
+# robustness checks
+## make a version thats all thats all 0 if NA (NA really means they didnt benefit)
+ag.df$qip_group.borehole_use_end <- ifelse(is.na(ag.df$qip_group.borehole_use_end), 0, ag.df$qip_group.borehole_use_end)
+ag.df$qip_group.borehole_aware_end <- ifelse(is.na(ag.df$qip_group.borehole_aware_end), 0, ag.df$qip_group.borehole_aware_end)
+ag.df$qip_ben_end <- ifelse(is.na(ag.df$qip_ben_end), 0, ag.df$qip_ben_end)
+ag.df$qip_aware_end <- ifelse(is.na(ag.df$qip_aware_end), 0, ag.df$qip_aware_end)
+
+# run above code with robustness check var, save lists with "_0" at end.
+load(file="qip_list_0.Rda")
+load(file="plot_list_0.Rda")
+load(file="benefit_df.Rda")
+load(file="benefitVar_df.Rda")
+
+```
+
+
+Benue pastoralists less benefit because migration
+
+```{r}
 
 # farmer-pastoralists differences
 lm_robust(qip_group.borehole_use_end~farm_past,
                             clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+
+# benue pastoralist differences?e
+## chris: is this reg correct?  Or should it just be all benue pastoralists?  Or should it only be TR Ben pastoralists (rather than TR interaction)?
+ag.df$ben_past <- ifelse(ag.df$state %in% "ben" & ag.df$farm_past %in% "past", 1, 0)
+lm_robust(attitude_cw~ben_past*treatment,
+          clusters = psu, data=ag.df)
+
 ```
 
 ```{r, eval=F}
