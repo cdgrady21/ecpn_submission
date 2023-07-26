@@ -1,11 +1,14 @@
 ---
 title: "Review_appendix"
-output: html_document
 date: "2023-07-12"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 rm(list=ls())
 # Load data I anticipate needing
 load("../survey_dat/c_creating_dataframes/f-aggregateComms_ap.Rdata")
@@ -43,30 +46,41 @@ Third, how can the authors differentiate the impact of intergroup contact from t
 **Response**
 Great question. We might be able to answer this that the boreholes were largely constructed at the end of the project, and likely had little impact on water scarcity at the time of the survey. Participants might have had expectations the scarcity would be lifted, and that’s hard to disentangle. Not sure what analysis we could do to disentangle. Maybe the fact that at endline, in Benue, pastoralists would not have benefited from the borehole as they were displaced?
 
-Few were aware of mediation
-Less likely to have direct short-term effects on attitudes
-Look at people who used the boreholes
-Maybe look at Benue pastoralists (issue: low power)
+- Few were aware of mediation
+- Less likely to have direct short-term effects on attitudes
+- Look at people who used the boreholes
+- Maybe look at Benue pastoralists: is TR effect smaller there? (issue: low power)
+
+
+**Code**
+
+Few people participated in negotiations, relatively few were even aware of the ECPN development project or of Mercy Corps.
 
 ```{r}
 ## mediation awareness/participation
-table(rand.df$ecpn_group.negotiation)
-table(rand.df$heard_MC_group.heard_MC)
-table(rand.df$heard_MC_group.part_MC)
+table(rand.df$ecpn_group.negotiation, exclude=c())
+table(rand.df$heard_MC_group.heard_MC, exclude=c())
+table(rand.df$heard_MC_group.part_MC, exclude=c())
 ```
 
-People aware/used QIP, people aware/used borehole.
+Bigger effects among people aware/used QIP, people aware/used borehole?  Among TR group, does qip/borehole awareness and use predict improved outcomes?
 
-```{r}
+```{r, echo=F}
 # people who aware/used boreholes
-table(rand.df$qip_group.borehole_aware)
-table(rand.df$qip_group.borehole_use)
+table(rand.df$qip_group.borehole_aware, exclude=c())
+table(rand.df$qip_group.borehole_use, exclude=c())
 
 ############
-# must do effect of borehole aware/use among subset of treated comms/ppl bcuz TR and borehole use/aware perfectly correlated
-lm1 <- lm_robust(attitude_cw~qip_group.borehole_use_end,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-tidy(lm1)[, c(1,2,5)]
+# must do effect of borehole aware/use among subset of treated comms/ppl bcuz TR and borehole use/aware almost perfectly correlated
+#tidy(lm_robust(attitude_cw~qip_group.borehole_use_end,
+#                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,]))[, c(1,2,5)]
+
+# graph reveals semi-outliers for some outcomes
+# same relationship b/ween borehole use and attitude_change with semi-outliers removed
+#ag.df$attitude_cw_test <- DescTools::Winsorize(ag.df$attitude_cw, probs = c(0.05, 0.95))
+#lm1 <- lm_robust(attitude_cw_test~qip_group.borehole_use_end,
+#                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+#tidy(lm1)[, c(1,2,5)]
 
 
 ################################
@@ -142,14 +156,9 @@ for (i in 1:length(plot_list)) {
     dev.off()
 }
 
-# graph reveals semi-outliers for some outcomes
-# same relationship b/ween borehole use and attitude_change with semi-outliers removed
-ag.df$attitude_cw_test <- DescTools::Winsorize(ag.df$attitude_cw, probs = c(0.05, 0.95))
-lm1 <- lm_robust(attitude_cw_test~qip_group.borehole_use_end,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-tidy(lm1)[, c(1,2,5)]
-
+#############################
 # summarize coefs & pvals for each outcome/benefit variable
+#############################
 all_coefficients <- sapply(qipList, function(x) x$estimate)
 all_pvalues <- sapply(qipList, function(x) x$p.value)
 all_tstat <- sapply(qipList, function(x) x$statistic)
@@ -183,9 +192,45 @@ rownames(benefitVar_df) <- ben_vars
 benefitVar_df["all",] <- c(NA, mean(all_pvalues["var_p",]), mean(all_tstat["var_t",]))
 save(benefitVar_df, file="benefitVar_df.Rda")
 
+
+# all coefs, pvals, and ts for each benefit variable across outcomes, removing PGG
+all_coefficients_svy <- all_coefficients[,!grepl("pgp", colnames(all_coefficients))]
+all_pvalues_svy <- all_pvalues[,!grepl("pgp", colnames(all_pvalues))]
+all_tstat_svy <- all_tstat[,!grepl("pgp", colnames(all_tstat))]
+
+benefitVar_df_svy <- data.frame(coefs = numeric(0), pvals = numeric(0), tstat = numeric(0))
+for(i in 1:length(ben_vars))
+{
+  # coef, pval, tstat
+  benefitVar_df_svy[i,1] <- mean(all_coefficients_svy["var_coef",colnames(all_coefficients_svy)[grepl(paste(ben_vars[i]), colnames(all_coefficients_svy))]])
+  benefitVar_df_svy[i,2] <- mean(all_pvalues_svy["var_p",colnames(all_pvalues_svy)[grepl(paste(ben_vars[i]), colnames(all_pvalues_svy))]])
+   benefitVar_df_svy[i,3] <- mean(all_tstat_svy["var_t",colnames(all_tstat_svy)[grepl(paste(ben_vars[i]), colnames(all_tstat_svy))]])
+}
+rownames(benefitVar_df_svy) <- ben_vars
+benefitVar_df_svy["all",] <- c(NA, mean(all_pvalues_svy["var_p",]), mean(all_tstat_svy["var_t",]))
+save(benefitVar_df_svy, file="benefitVar_df_svy.Rda")
 ```
 
-Robustness check
+Show the analysis
+
+```{r}
+# all (hard to determine a trend across so many tests)
+print(qipList)
+
+# coefficients for each outcome across "benefit" variables
+## no meaningful trend, but most coefficients positive and pvals below 0.50, so somewhat suggestive that benefiting from the project added to improved attitudes though certainly doesn't explain them entirely.
+benefit_df
+
+# coefficients for each "benefit variables" across outcomes
+## no meaningful trend, but coef/tstat/pval could be affected by PGG being weird negative outcome
+benefitVar_df
+
+# coefficients for each "benefit variables" across outcomes, removing PGG
+## no clear trend, seems slightly suggestive that benefiting weakly improved outcomes.
+benefitVar_df_svy
+```
+
+Unecessary Robustness check
 
 ```{r}
 # obvious: control group is all NA or 0 for borehole use/aware.
@@ -206,21 +251,58 @@ load(file="benefitVar_df.Rda")
 
 ```
 
+**Benue pastoralists less likely to perceive benefit because migration. Are effects among Benue pastoralists different than other respondents?**
 
-Benue pastoralists less benefit because migration
+No patterns.
+
+chris: more here.
 
 ```{r}
+# make ben past variable
+ag.df$ben_past <- ifelse(ag.df$state %in% "ben" & ag.df$farm_past %in% "past", 1, 0)
 
-# farmer-pastoralists differences
-lm_robust(qip_group.borehole_use_end~farm_past,
+# Benue pastoralists: are they less aware and do they use/benefit from projects less?
+## yes, they are less aware and use the borehole less (mixed on other project, which was done earlier)
+lm_robust(qip_group.borehole_use_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+lm_robust(qip_group.borehole_aware_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+lm_robust(qip_aware_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+lm_robust(qip_ben_end~ben_past,
                             clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
 
-# benue pastoralist differences?e
-## chris: is this reg correct?  Or should it just be all benue pastoralists?  Or should it only be TR Ben pastoralists (rather than TR interaction)?
-ag.df$ben_past <- ifelse(ag.df$state %in% "ben" & ag.df$farm_past %in% "past", 1, 0)
-lm_robust(attitude_cw~ben_past*treatment,
-          clusters = psu, data=ag.df)
 
+# benue pastoralist differences?
+## is the TR effect weaker among Benue pastoralists?
+## chris: is this reg correct?  Or should it just be all benue pastoralists?  Or should it only be TR Ben pastoralists (rather than TR interaction, seeing if TR effect is weaker among Ben Pastoralists)?
+benPastList <- vector(mode="list", length=length(outcome_list_qip))
+names(benPastList) <- paste(outcome_list_qip)
+for(i in 1:length(outcome_list_qip))
+{
+  # thelm
+  thelm <- lm_robust(ag.df[,outcome_list_qip[i]]~ben_past*treatment,
+                     clusters = psu, data=ag.df)
+  
+  # tidy it, grab term, coef, pval
+  lm_res <- tidy(thelm)[, c(1,2,5,4)]
+  
+  # save to list
+  benPastList[[i]] <- lm_res
+}
+
+save(benPastList, file="benPast_list.Rda")
+```
+```{r}
+print(benPastList)
+
+benPast_pvalues <- sapply(benPastList, function(x) x$p.value)
+benPast_tstat <- sapply(benPastList, function(x) x$statistic)
+rownames(benPast_pvalues) <- c("intercept_p", "ben_past_p", "tr_p", "benpast:tr_p")
+rownames(benPast_tstat) <- c("intercept_t", "ben_past_t", "tr_t", "benpast:tr_t")
+
+mean(benPast_pvalues['benpast:tr_p',])
+mean(benPast_tstat['benpast:tr_t',])
 ```
 
 ```{r, eval=F}
