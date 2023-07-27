@@ -343,7 +343,7 @@ load("../survey_dat/d_analysis/list_of_coefs_and_ps_ind.rda")
 
 
 # FDR
-p.adjust(p=commListPs, method = "fdr")
+p.adjust(p=commListPs[1:2], method = "fdr")
 
 ```
 
