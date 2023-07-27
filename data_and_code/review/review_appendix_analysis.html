@@ -354,6 +354,23 @@ display: none;
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#review-1" id="toc-review-1">Review 1</a>
+<ul>
+<li><a href="#comment-1" id="toc-comment-1">Comment 1</a></li>
+<li><a href="#comment-2" id="toc-comment-2">Comment 2</a></li>
+<li><a href="#comment-3" id="toc-comment-3">Comment 3</a></li>
+<li><a href="#comment-4" id="toc-comment-4">Comment 4</a></li>
+<li><a href="#comment-5" id="toc-comment-5">Comment 5</a></li>
+</ul></li>
+<li><a href="#review-2" id="toc-review-2">Review 2</a>
+<ul>
+<li><a href="#comment-1-1" id="toc-comment-1-1">Comment 1</a></li>
+<li><a href="#comment-2-1" id="toc-comment-2-1">Comment 2</a></li>
+</ul></li>
+</ul>
+</div>
 
 <div id="review-1" class="section level1">
 <h1>Review 1</h1>
@@ -381,9 +398,13 @@ be lifted, and that’s hard to disentangle. Not sure what analysis we
 could do to disentangle. Maybe the fact that at endline, in Benue,
 pastoralists would not have benefited from the borehole as they were
 displaced?</p>
-<p>Few were aware of mediation Less likely to have direct short-term
-effects on attitudes Look at people who used the boreholes Maybe look at
-Benue pastoralists (issue: low power)</p>
+<ul>
+<li>Few were aware of mediation</li>
+<li>Less likely to have direct short-term effects on attitudes</li>
+<li>Look at people who used the boreholes</li>
+<li>Maybe look at Benue pastoralists: is TR effect smaller there?
+(issue: low power)</li>
+</ul>
 <p><strong>Code</strong></p>
 <p>Few people participated in negotiations, relatively few were even
 aware of the ECPN development project or of Mercy Corps.</p>
@@ -635,62 +656,6 @@ print(qipList)</code></pre>
 ##   statistic
 ## 1 10.345767
 ## 2 -1.053596</code></pre>
-<pre class="r"><code>qipList[grepl(&quot;qip_ben_end&quot;, names(qipList))]</code></pre>
-<pre><code>## $`qip_ben_end and attitude_cw`
-##                                                     term   estimate   p.value
-## 1                                            (Intercept)  0.1228893 0.2441145
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])] -0.2321103 0.1593870
-##   statistic
-## 1  1.383928
-## 2 -1.730619
-## 
-## $`qip_ben_end and in_cw`
-##                                                     term  estimate   p.value
-## 1                                            (Intercept) 0.0667589 0.6761734
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])] 0.2412950 0.3300336
-##   statistic
-## 1 0.4525381
-## 2 1.1096260
-## 
-## $`qip_ben_end and contactOnly_cw`
-##                                                     term    estimate   p.value
-## 1                                            (Intercept) -0.05203494 0.6813960
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])]  0.12239958 0.4061062
-##    statistic
-## 1 -0.4446118
-## 2  0.9288455
-## 
-## $`qip_ben_end and rMean`
-##                                                     term   estimate   p.value
-## 1                                            (Intercept)  0.1809871 0.2864994
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])] -0.2321093 0.2209224
-##   statistic
-## 1  1.244310
-## 2 -1.452014
-## 
-## $`qip_ben_end and end_exp`
-##                                                     term   estimate   p.value
-## 1                                            (Intercept) -0.2724795 0.2545324
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])]  0.4291659 0.3871612
-##    statistic
-## 1 -1.3474947
-## 2  0.9709019
-## 
-## $`qip_ben_end and pgp_donate_end`
-##                                                     term    estimate
-## 1                                            (Intercept)  0.98264149
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])] -0.02439341
-##        p.value  statistic
-## 1 6.270997e-07 71.0561110
-## 2 3.852131e-01 -0.9753259
-## 
-## $`qip_ben_end and pgp_amount_end`
-##                                                     term   estimate     p.value
-## 1                                            (Intercept) 272.444849 0.000296108
-## 2 ag.df[ag.df$treatment %in% 1, paste(ben_out_df[i, 1])]  -3.518875 0.928148517
-##     statistic
-## 1 13.30701211
-## 2 -0.09605319</code></pre>
 <pre class="r"><code># coefficients for each outcome across &quot;benefit&quot; variables
 ## no meaningful trend, but most coefficients positive and pvals below 0.50, so somewhat suggestive that benefiting from the project added to improved attitudes though certainly doesn&#39;t explain them entirely.
 benefit_df</code></pre>
@@ -741,123 +706,125 @@ load(file=&quot;qip_list_0.Rda&quot;)
 load(file=&quot;plot_list_0.Rda&quot;)
 load(file=&quot;benefit_df.Rda&quot;)
 load(file=&quot;benefitVar_df.Rda&quot;)</code></pre>
-<p>Benue pastoralists less benefit because migration</p>
-<pre class="r"><code># farmer-pastoralists differences
-lm_robust(qip_group.borehole_use_end~farm_past,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])</code></pre>
-<pre><code>##                 Estimate Std. Error   t value     Pr(&gt;|t|)   CI Lower  CI Upper
-## (Intercept)    0.4560596 0.07026745  6.490339 0.0001127107  0.2971036 0.6150156
-## farm_pastpast -0.1219094 0.10519974 -1.158837 0.2763452006 -0.3598877 0.1160690
-##               DF
-## (Intercept)    9
-## farm_pastpast  9</code></pre>
-<pre class="r"><code># benue pastoralist differences?e
-## chris: is this reg correct?  Or should it just be all benue pastoralists?  Or should it only be TR Ben pastoralists (rather than TR interaction)?
+<p><strong>Benue pastoralists less likely to perceive benefit because
+(were displaced, not using boreholes). Are effects among Benue
+pastoralists different than other respondents?</strong></p>
+<p>No patterns.</p>
+<p>chris: more here. (did more but could do even more)</p>
+<pre class="r"><code># make ben past variable
 ag.df$ben_past &lt;- ifelse(ag.df$state %in% &quot;ben&quot; &amp; ag.df$farm_past %in% &quot;past&quot;, 1, 0)
-lm_robust(attitude_cw~ben_past*treatment,
-          clusters = psu, data=ag.df)</code></pre>
-<pre><code>##                       Estimate Std. Error    t value  Pr(&gt;|t|)   CI Lower
-## (Intercept)        -0.04413259 0.07492197 -0.5890474 0.5909207 -0.2619890
-## ben_past           -0.21101793 0.07971313 -2.6472167 0.1646222 -0.7222710
-## treatment           0.10661302 0.09227390  1.1553974 0.2844967 -0.1099617
-## ben_past:treatment -0.03173032 0.13230238 -0.2398319 0.8260431 -0.4549321
-##                     CI Upper       DF
-## (Intercept)        0.1737238 3.585366
-## ben_past           0.3002352 1.434986
-## treatment          0.3231878 7.267633
-## ben_past:treatment 0.3914714 2.973183</code></pre>
-<pre class="r"><code>#test
-# non-function plot
-ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = qip_group.borehole_use_end, y = attitude_cw, color = psu)) +
-  geom_point() +
-  geom_text(aes(label = comm), vjust = -0.5) +
-  geom_abline(slope=tidy(lm1)[2, 2],
-              intercept=tidy(lm1)[1, 2],
-              color=&quot;black&quot;,
-              size=1) +
-  theme_bw()
 
-qipList$attitude_cw$term_use
-
-######################################
-# when it was two functions 
-######################################################
-# loop over outcome list (from g-aggAnalysis-mainOutcomes.Rmd) and save
-outcome_list &lt;- c(&quot;attitude&quot;, &quot;in&quot;, &#39;contactOnly&#39;,
-                  &#39;rMean&#39;, &quot;end_exp&quot;,
-                  &quot;pgp_donate_end&quot;, &quot;pgp_amount_end&quot;)
-outcome_list_qip &lt;- c(paste0(outcome_list[1:3], &quot;_cw&quot;), outcome_list[4:length(outcome_list)])
-qipList &lt;- vector(mode=&quot;list&quot;, length=length(outcome_list_qip))
+# Benue pastoralists: are they less aware and do they use/benefit from projects less?
+## yes, they are less aware and use the borehole less (mixed on other project, which was done earlier)
+lm_robust(qip_group.borehole_use_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])</code></pre>
+<pre><code>##               Estimate Std. Error   t value     Pr(&gt;|t|)   CI Lower   CI Upper
+## (Intercept)  0.4632439 0.06076430  7.623618 5.587948e-05  0.3235646  0.6029232
+## ben_past    -0.3406948 0.06563456 -5.190784 5.832725e-03 -0.5199676 -0.1614221
+##                   DF
+## (Intercept) 8.148559
+## ben_past    4.174049</code></pre>
+<pre class="r"><code>lm_robust(qip_group.borehole_aware_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])</code></pre>
+<pre><code>##               Estimate Std. Error   t value     Pr(&gt;|t|)   CI Lower   CI Upper
+## (Intercept)  0.7152896 0.08396237  8.519169 2.476459e-05  0.5222848  0.9082945
+## ben_past    -0.4309759 0.09939244 -4.336103 1.118970e-02 -0.7024542 -0.1594976
+##                   DF
+## (Intercept) 8.148559
+## ben_past    4.174049</code></pre>
+<pre class="r"><code>lm_robust(qip_aware_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])</code></pre>
+<pre><code>##               Estimate Std. Error   t value     Pr(&gt;|t|)   CI Lower   CI Upper
+## (Intercept)  0.5762138 0.09732716  5.920380 0.0003292883  0.3524872 0.79994036
+## ben_past    -0.2907236 0.11767188 -2.470629 0.0662888960 -0.6121299 0.03068276
+##                   DF
+## (Intercept) 8.148559
+## ben_past    4.174049</code></pre>
+<pre class="r"><code>lm_robust(qip_ben_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])</code></pre>
+<pre><code>##                Estimate Std. Error    t value    Pr(&gt;|t|)   CI Lower  CI Upper
+## (Intercept)  0.52276923 0.08578581  6.0938892 0.000270639  0.3255728 0.7199656
+## ben_past    -0.06443589 0.10115950 -0.6369732 0.557407490 -0.3407407 0.2118689
+##                   DF
+## (Intercept) 8.148559
+## ben_past    4.174049</code></pre>
+<pre class="r"><code># benue pastoralist differences?
+## is the TR effect weaker among Benue pastoralists?
+## chris: is this reg correct?  Or should it just be all benue pastoralists?  Or should it only be TR Ben pastoralists (rather than TR interaction, seeing if TR effect is weaker among Ben Pastoralists)?
+benPastList &lt;- vector(mode=&quot;list&quot;, length=length(outcome_list_qip))
+names(benPastList) &lt;- paste(outcome_list_qip)
 for(i in 1:length(outcome_list_qip))
 {
-  # boreholes
-  thelm1 &lt;- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,&quot;qip_group.borehole_use_end&quot;],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  thelm2 &lt;- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,&quot;qip_group.borehole_aware_end&quot;],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  # qips
-  thelm3 &lt;- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,&quot;qip_ben_end&quot;],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  thelm4 &lt;- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,&quot;qip_aware_end&quot;],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+  # thelm
+  thelm &lt;- lm_robust(ag.df[,outcome_list_qip[i]]~ben_past*treatment,
+                     clusters = psu, data=ag.df)
   
-  lm1_res &lt;- tidy(thelm1)[, c(1,2,5)]
-  lm2_res &lt;- tidy(thelm2)[, c(1,2,5)]
-  names(lm1_res) &lt;- paste0(names(lm1_res), &quot;_bore_use&quot;)
-  names(lm2_res) &lt;- paste0(names(lm2_res), &quot;_bore_aware&quot;)
+  # tidy it, grab term, coef, pval
+  lm_res &lt;- tidy(thelm)[, c(1,2,5,4)]
   
-  lm3_res &lt;- tidy(thelm3)[, c(1,2,5)]
-  lm4_res &lt;- tidy(thelm4)[, c(1,2,5)]
-  names(lm3_res) &lt;- paste0(names(lm3_res), &quot;_qip_ben&quot;)
-  names(lm4_res) &lt;- paste0(names(lm4_res), &quot;_qip_aware&quot;)
-  
-  
-  qipList[[i]] &lt;- cbind(lm1_res, lm2_res, lm3_res, lm4_res)
+  # save to list
+  benPastList[[i]] &lt;- lm_res
 }
-names(qipList) &lt;- outcome_list_qip
-save(qipList, file=&quot;qip_list.Rda&quot;)
 
-# create graphs, save graphs
-## graph fun
-qip_graph_fun &lt;- function(ben_var, out_var, title, xlab, ylab)
-{
-  ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = ag.df[ag.df$treatment %in% 1,ben_var], 
-                                             y = ag.df[ag.df$treatment %in% 1,out_var], 
-                                             color = psu)) +
-    geom_point() +
-    geom_text(aes(label = comm), vjust = -0.5) +
-    geom_abline(slope=tidy(lm1)[2, 2],
-                intercept=tidy(lm1)[1, 2],
-                color=&quot;black&quot;,
-                size=1) +
-    theme_bw() +
-    ggtitle(title) +
-    xlab(xlab) +
-    ylab(ylab)
-}
-#qip_graph_fun(ben_var=&quot;qip_group.borehole_use_end&quot;, out_var=&quot;attitude_cw&quot;, 
-#              title=&quot;Borehole use and attitudes&quot;, xlab=&quot;borehole use&quot;, ylab=&quot;attitude change&quot;)
-ben_vars &lt;- c(&quot;qip_group.borehole_use_end&quot;, &quot;qip_group.borehole_aware_end&quot;,
-              &quot;qip_ben_end&quot;, &quot;qip_aware_end&quot;)
-ben_out_df &lt;- expand.grid(ben_vars = ben_vars,
-                    out_vars = outcome_list_qip)
-plot_list &lt;- list()
-for(i in 1:nrow(ben_out_df))
-{
-  theplot &lt;- qip_graph_fun(ben_var = paste(ben_out_df[i,1]),
-                           out_var = paste(ben_out_df[i,2]),
-                           title=paste(ben_out_df[i,1], &quot;and&quot;, ben_out_df[i,2]),
-                           xlab=ben_out_df[i,1],
-                           ylab=ben_out_df[i,2])
-  
-  plot_list[[i]] &lt;- theplot
-}
-######################################################</code></pre>
-<pre class="r"><code># Benue pastoralists only (were displaced, not using boreholes)</code></pre>
+save(benPastList, file=&quot;benPast_list.Rda&quot;)</code></pre>
+<pre class="r"><code>print(benPastList)</code></pre>
+<pre><code>## $attitude_cw
+##                 term    estimate   p.value  statistic
+## 1        (Intercept) -0.04413259 0.5909207 -0.5890474
+## 2           ben_past -0.21101793 0.1646222 -2.6472167
+## 3          treatment  0.10661302 0.2844967  1.1553974
+## 4 ben_past:treatment -0.03173032 0.8260431 -0.2398319
+## 
+## $in_cw
+##                 term    estimate    p.value  statistic
+## 1        (Intercept)  0.04896055 0.54884848  0.6606510
+## 2           ben_past  0.03102023 0.92663677  0.1087160
+## 3          treatment  0.19246330 0.05314168  2.3063954
+## 4 ben_past:treatment -0.16686096 0.64004837 -0.5187857
+## 
+## $contactOnly_cw
+##                 term     estimate    p.value   statistic
+## 1        (Intercept)  0.004148459 0.93281436  0.09036735
+## 2           ben_past -0.559077279 0.08826057 -4.25210716
+## 3          treatment  0.090914094 0.25088566  1.24756973
+## 4 ben_past:treatment  0.234324708 0.31880309  1.19451968
+## 
+## $rMean
+##                 term    estimate   p.value  statistic
+## 1        (Intercept)  0.09490267 0.4657685  0.8149186
+## 2           ben_past -0.45780357 0.1136704 -3.5228563
+## 3          treatment  0.05610774 0.6756433  0.4357864
+## 4 ben_past:treatment  0.03012622 0.8672572  0.1820363
+## 
+## $end_exp
+##                 term   estimate     p.value statistic
+## 1        (Intercept) -0.3802838 0.005114448 -6.123002
+## 2           ben_past  0.8058674 0.130915463  3.164668
+## 3          treatment  0.2239975 0.139017323  1.661355
+## 4 ben_past:treatment -0.5074066 0.196886090 -1.657151
+## 
+## $pgp_donate_end
+##                 term    estimate      p.value  statistic
+## 1        (Intercept)  0.93567402 8.732914e-05 19.7087029
+## 2           ben_past  0.06432598 3.499128e-01  1.3549394
+## 3          treatment  0.02927496 5.596401e-01  0.6112826
+## 4 ben_past:treatment -0.03427496 5.305509e-01 -0.7077525
+## 
+## $pgp_amount_end
+##                 term  estimate     p.value  statistic
+## 1        (Intercept) 308.59638 0.003833935  6.6735971
+## 2           ben_past -19.69638 0.863392624 -0.2041236
+## 3          treatment -45.10438 0.369729061 -0.9561169
+## 4 ben_past:treatment  49.90438 0.654904093  0.4949424</code></pre>
+<pre class="r"><code>benPast_pvalues &lt;- sapply(benPastList, function(x) x$p.value)
+benPast_tstat &lt;- sapply(benPastList, function(x) x$statistic)
+rownames(benPast_pvalues) &lt;- c(&quot;intercept_p&quot;, &quot;ben_past_p&quot;, &quot;tr_p&quot;, &quot;benpast:tr_p&quot;)
+rownames(benPast_tstat) &lt;- c(&quot;intercept_t&quot;, &quot;ben_past_t&quot;, &quot;tr_t&quot;, &quot;benpast:tr_t&quot;)
+
+mean(benPast_pvalues[&#39;benpast:tr_p&#39;,])</code></pre>
+<pre><code>## [1] 0.5763561</code></pre>
+<pre class="r"><code>mean(benPast_tstat[&#39;benpast:tr_t&#39;,])</code></pre>
+<pre><code>## [1] -0.1788604</code></pre>
 </div>
 <div id="comment-2" class="section level2">
 <h2>Comment 2</h2>
@@ -872,7 +839,40 @@ study, but would encourage the authors to address the following:</p>
 <p>Were adjustments made for multiple comparisons? The PAP suggests that
 this would be done, but I do not believe that the manuscript mentions
 this.</p>
-<p>Within family FDR (appendix) Footnote with appendix</p>
+<p><strong>Response</strong> Within family FDR (appendix). Footnote with
+appendix.</p>
+<pre class="r"><code># from g-aggAnalysis-mainOutcomes.rmd
+# comm
+load(&quot;../survey_dat/d_analysis/list_of_coefs_and_ps.rda&quot;)
+load(&quot;../obs_dat/figs/obsDat_fig_dat.rda&quot;)
+
+## add &quot;base&quot; var to PGG outcomes
+newList[[6]]$base &lt;- c(1,rep(0,3))
+newList[[7]]$base &lt;- c(1,rep(0,3))
+
+## make list of ps
+commListPs &lt;- sapply(newList, function(x) x$truep[x$base %in% 1])
+names(commListPs) &lt;- outcome_list
+
+## separate into our hypothesis families
+### contact
+
+### security
+
+### attitudes
+
+### cooperation
+
+## ind
+load(&quot;../survey_dat/d_analysis/list_of_coefs_and_ps_ind.rda&quot;)
+
+
+# FDR
+p.adjust(p=commListPs, method = &quot;fdr&quot;)</code></pre>
+<pre><code>##       attitude             in    contactOnly          rMean        end_exp 
+##      0.1388333      0.1388333      0.1388333      0.3344600      0.3344600 
+## pgp_donate_end pgp_amount_end 
+##      0.3427667      0.8522000</code></pre>
 </div>
 <div id="comment-3" class="section level2">
 <h2>Comment 3</h2>

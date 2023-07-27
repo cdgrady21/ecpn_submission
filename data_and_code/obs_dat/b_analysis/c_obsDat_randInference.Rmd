@@ -30,7 +30,7 @@ library(estimatr)
 
 ```{r}
 ##analysis with no rand inference.
-## using rank because not skewed.
+## using rank because not skewed like raw.
 lm_robust(pastoralists_index_rank ~ treatment*time + site, data=markets, clusters = site)
 #thelm <- lm(pastoralists_index_rank~treatment*time+State+site, data=markets)
 ##note: lm_robust is same as this but with clustered SEs.
@@ -157,7 +157,8 @@ Outgroup Variables. Index.
 ```{r}
 #(out_ind <- true.fun(var='outgroup_index', dat=events))
 (out_ind <- true.fun(var='outgroup_index_rank', dat=events))
-(out_ind <- true.fun(var='outgroupPerc_index', dat=events))
+# robustness check other way to calc index
+#(out_ind <- true.fun(var='outgroupPerc_index', dat=events))
 
 ```
 

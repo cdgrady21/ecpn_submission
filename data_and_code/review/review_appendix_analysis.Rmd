@@ -251,11 +251,11 @@ load(file="benefitVar_df.Rda")
 
 ```
 
-**Benue pastoralists less likely to perceive benefit because migration. Are effects among Benue pastoralists different than other respondents?**
+**Benue pastoralists less likely to perceive benefit because (were displaced, not using boreholes). Are effects among Benue pastoralists different than other respondents?**
 
 No patterns.
 
-chris: more here.
+chris: more here. (did more but could do even more)
 
 ```{r}
 # make ben past variable
@@ -305,109 +305,6 @@ mean(benPast_pvalues['benpast:tr_p',])
 mean(benPast_tstat['benpast:tr_t',])
 ```
 
-```{r, eval=F}
-#test
-# non-function plot
-ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = qip_group.borehole_use_end, y = attitude_cw, color = psu)) +
-  geom_point() +
-  geom_text(aes(label = comm), vjust = -0.5) +
-  geom_abline(slope=tidy(lm1)[2, 2],
-              intercept=tidy(lm1)[1, 2],
-              color="black",
-              size=1) +
-  theme_bw()
-
-qipList$attitude_cw$term_use
-
-######################################
-# when it was two functions 
-######################################################
-# loop over outcome list (from g-aggAnalysis-mainOutcomes.Rmd) and save
-outcome_list <- c("attitude", "in", 'contactOnly',
-                  'rMean', "end_exp",
-                  "pgp_donate_end", "pgp_amount_end")
-outcome_list_qip <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(outcome_list)])
-qipList <- vector(mode="list", length=length(outcome_list_qip))
-for(i in 1:length(outcome_list_qip))
-{
-  # boreholes
-  thelm1 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,"qip_group.borehole_use_end"],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  thelm2 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,"qip_group.borehole_aware_end"],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  # qips
-  thelm3 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,"qip_ben_end"],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  thelm4 <- lm_robust(ag.df[ag.df$treatment %in% 1,outcome_list_qip[i]]~
-                       ag.df[ag.df$treatment %in% 1,"qip_aware_end"],
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-  
-  lm1_res <- tidy(thelm1)[, c(1,2,5)]
-  lm2_res <- tidy(thelm2)[, c(1,2,5)]
-  names(lm1_res) <- paste0(names(lm1_res), "_bore_use")
-  names(lm2_res) <- paste0(names(lm2_res), "_bore_aware")
-  
-  lm3_res <- tidy(thelm3)[, c(1,2,5)]
-  lm4_res <- tidy(thelm4)[, c(1,2,5)]
-  names(lm3_res) <- paste0(names(lm3_res), "_qip_ben")
-  names(lm4_res) <- paste0(names(lm4_res), "_qip_aware")
-  
-  
-  qipList[[i]] <- cbind(lm1_res, lm2_res, lm3_res, lm4_res)
-}
-names(qipList) <- outcome_list_qip
-save(qipList, file="qip_list.Rda")
-
-# create graphs, save graphs
-## graph fun
-qip_graph_fun <- function(ben_var, out_var, title, xlab, ylab)
-{
-  ggplot(ag.df[ag.df$treatment %in% 1,], aes(x = ag.df[ag.df$treatment %in% 1,ben_var], 
-                                             y = ag.df[ag.df$treatment %in% 1,out_var], 
-                                             color = psu)) +
-    geom_point() +
-    geom_text(aes(label = comm), vjust = -0.5) +
-    geom_abline(slope=tidy(lm1)[2, 2],
-                intercept=tidy(lm1)[1, 2],
-                color="black",
-                size=1) +
-    theme_bw() +
-    ggtitle(title) +
-    xlab(xlab) +
-    ylab(ylab)
-}
-#qip_graph_fun(ben_var="qip_group.borehole_use_end", out_var="attitude_cw", 
-#              title="Borehole use and attitudes", xlab="borehole use", ylab="attitude change")
-ben_vars <- c("qip_group.borehole_use_end", "qip_group.borehole_aware_end",
-              "qip_ben_end", "qip_aware_end")
-ben_out_df <- expand.grid(ben_vars = ben_vars,
-                    out_vars = outcome_list_qip)
-plot_list <- list()
-for(i in 1:nrow(ben_out_df))
-{
-  theplot <- qip_graph_fun(ben_var = paste(ben_out_df[i,1]),
-                           out_var = paste(ben_out_df[i,2]),
-                           title=paste(ben_out_df[i,1], "and", ben_out_df[i,2]),
-                           xlab=ben_out_df[i,1],
-                           ylab=ben_out_df[i,2])
-  
-  plot_list[[i]] <- theplot
-}
-######################################################
-
-
-```
-
-
-
-```{r}
-# Benue pastoralists only (were displaced, not using boreholes)
-
-```
-
 
 ## Comment 2
 
@@ -415,10 +312,38 @@ Fourth, I am concerned about the robustness of the findings given the relatively
 
 Were adjustments made for multiple comparisons? The PAP suggests that this would be done, but I do not believe that the manuscript mentions this.
 
-Within family FDR (appendix)
-Footnote with appendix
+**Response**
+Within family FDR (appendix). Footnote with appendix.
 
 ```{r}
+# from g-aggAnalysis-mainOutcomes.rmd
+# comm
+load("../survey_dat/d_analysis/list_of_coefs_and_ps.rda")
+load("../obs_dat/figs/obsDat_fig_dat.rda")
+
+## add "base" var to PGG outcomes
+newList[[6]]$base <- c(1,rep(0,3))
+newList[[7]]$base <- c(1,rep(0,3))
+
+## make list of ps
+commListPs <- sapply(newList, function(x) x$truep[x$base %in% 1])
+names(commListPs) <- outcome_list
+
+## separate into our hypothesis families
+### contact
+
+### security
+
+### attitudes
+
+### cooperation
+
+## ind
+load("../survey_dat/d_analysis/list_of_coefs_and_ps_ind.rda")
+
+
+# FDR
+p.adjust(p=commListPs, method = "fdr")
 
 ```
 

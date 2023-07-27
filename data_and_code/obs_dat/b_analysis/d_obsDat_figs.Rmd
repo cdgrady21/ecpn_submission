@@ -5,10 +5,12 @@ date: "September 7, 2020"
 output: html_document
 ---
 
+chris 7-27-2023: this file is irrelevant.  We are not using any of these plots.  They show observational data in TR/CO communities over time.  The plot functions are defunct and no longer work.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
-load("../clean/a_obsDat_clean.rda")
+load("../a_clean/a_obsDat_clean.rda")
 library(dplyr)
 library(ggplot2)
 library(estimatr)

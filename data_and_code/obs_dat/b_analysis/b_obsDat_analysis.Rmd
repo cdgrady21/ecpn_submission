@@ -21,6 +21,8 @@ library(estimatr)
 
 ```
 
+chris 7-27-2023: this file is also irrelevant.  We bootstrap CIs in figs/obsDat_coefplot_coefs.Rmd. We do randomization inference for true pvalues in c_obsDat_randInference.
+
 chris: does not run after splitting from a_obsDat_clean; some object names have changed.
 
 # Overview
