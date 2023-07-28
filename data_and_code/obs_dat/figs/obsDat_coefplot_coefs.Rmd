@@ -6,7 +6,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
-load("../clean/a_obsDat_clean.rda")
+load("../a_clean/a_obsDat_clean.rda")
 
 library(tidyr)
 library(dplyr)
@@ -162,14 +162,15 @@ for(i in 1:length(outcomes))
 Save.
 
 ```{r, eval=F}
-#save(markCoefs, file="marketCoefs.rda") #with site and state FEs (biased)
+#save(markCoefs, file="marketCoefs.rda") #with site and state FEs (should be more precise but biased)
 save(markCoefs, file="marketCoefs1.rda") # without FEs
 ```
 
 Don't run that time-consuming code repeatedly, just load the output.
 
 ```{r}
-load("marketCoefs.rda")
+#load("marketCoefs.rda")
+load("marketCoefs1.rda")
 ```
 
 Looking to see why the bootstrap distirbution is bimodal: change over time in some places really different than others -- hugely negative in some CO sites.  When those control sites get bootstrapped in, the estimated treatment effect is pretty large.  When those control sites are not selected, the estimated effect is pretty small.
@@ -320,6 +321,11 @@ Save.
 save(eventCoefs, file="eventCoefs1.rda") # without site/state FEs
 ```
 
+Load it in.
+
+```{r}
+load("eventCoefs1.rda")
+```
 ********
 #############################################
 #############################################

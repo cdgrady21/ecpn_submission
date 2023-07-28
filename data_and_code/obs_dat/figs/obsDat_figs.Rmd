@@ -15,7 +15,7 @@ library(ggplot2)
 ```
 ```{r, eval=F}
 #load original data if desired
-load("../clean/a_obsDat_clean.rda")
+load("../a_clean/a_obsDat_clean.rda")
 
 # check outcomes that are the same
 test <- markets[complete.cases(markets),9:16]
@@ -62,10 +62,10 @@ Chris: getting to pretty.
 ```{r}
 outcome1 <- eventCoefs
 outcome1 <- outcome1[grepl("outgroup", outcome1$var) & grepl("rank", outcome1$var),]
-outcome1 <- outcome1[4:6,]
+outcome1 <- outcome1[4:6,] # only want those that account for total size of event (outgroup percentage)
 outcome1[c("coef_sd", "ll_sd", "ul_sd")] <- outcome1[,c("coef", "ll", "ul")]/outcome1$sd
 outcome1 <- outcome1[,c("var", "coef_sd", "ll_sd", "ul_sd")]
-outcome1$var <- c("attend_outgroup_rank", "eat_ougroup_rank", 
+outcome1$var <- c("attend_outgroup_rank", "eat_outgroup_rank", 
                  "outgroup_index_rank")
 outcome1$outcome_type <- ifelse(grepl("index", outcome1$var), "index", "comp")
 

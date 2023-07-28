@@ -89,6 +89,7 @@ true.fun <- function(var, nsims=5000, dat)
 Pastoralists Index Rank
 
 ```{r}
+set.seed(0528)
 (mark_pasts <- true.fun(var='pastoralists_index_rank', dat=markets))
 #(mark_pasts <- true.fun(var='pastoralists_index_raw', dat=markets))
 ```
@@ -96,11 +97,13 @@ Pastoralists Index Rank
 
 ### Components of pastoralists index -- ranked and raw
 
+Note: don't need this, didn't finish it.
+
 Outcomes: `r rankOutcomes[grepl("past", rankOutcomes)]`
 
 Pastoralist buyers
 
-```{r}
+```{r, eval=F}
 (mark_pasts_buyers_raw <- true.fun(var='pastoralist_buyers', dat=markets))
 (mark_pasts_buyers <- true.fun(var='pastoralist_buyers_rank', dat=markets))
 
@@ -108,7 +111,7 @@ Pastoralist buyers
 
 Pastoralist sellers
 
-```{r}
+```{r, eval=F}
 (mark_pasts_sellers_raw <- true.fun(var='pastoralist_sellers', dat=markets))
 (mark_pasts_sellers <- true.fun(var='pastoralist_sellers_rank', dat=markets))
 ```
@@ -129,6 +132,7 @@ pastoralist_nono_buyers_rank. chris: this one shouldn't be much affected.
 ## Farmers
 
 ```{r}
+set.seed(0528)
 (mark_farms <- true.fun(var='farmers_index_rank', dat=markets))
 #(mark_farms <- true.fun(var='farmers_index_raw', dat=markets))
 ```
@@ -140,13 +144,13 @@ pastoralist_nono_buyers_rank. chris: this one shouldn't be much affected.
 no rand inf
 
 ```{r, eval=F}
-lm_robust(outgroup_index_rank~treatment*time+site, data=events, clusters=site)
+lm_robust(outgroupPerc_index_rank~treatment*time+site, data=events, clusters=site)
 
-# TR group drops by 5, CO group drops by 10.
-mosaic::mean(events[events$time %in% 0 & events$treatment %in% 0, "outgroup_index_rank"], na.rm=T)
-mosaic::mean(events[events$time %in% 1 & events$treatment %in% 0, "outgroup_index_rank"])
-mosaic::mean(events[events$time %in% 0 & events$treatment %in% 1, "outgroup_index_rank"])
-mosaic::mean(events[events$time %in% 1 & events$treatment %in% 1, "outgroup_index_rank"])
+# TR group drops by 9, CO group drops by 18.
+mosaic::mean(events[events$time %in% 0 & events$treatment %in% 0, "outgroupPerc_index_rank"], na.rm=T)
+mosaic::mean(events[events$time %in% 1 & events$treatment %in% 0, "outgroupPerc_index_rank"])
+mosaic::mean(events[events$time %in% 0 & events$treatment %in% 1, "outgroupPerc_index_rank"])
+mosaic::mean(events[events$time %in% 1 & events$treatment %in% 1, "outgroupPerc_index_rank"])
 
 ```
 
@@ -155,12 +159,28 @@ mosaic::mean(events[events$time %in% 1 & events$treatment %in% 1, "outgroup_inde
 Outgroup Variables. Index.
 
 ```{r}
-#(out_ind <- true.fun(var='outgroup_index', dat=events))
-(out_ind <- true.fun(var='outgroup_index_rank', dat=events))
-# robustness check other way to calc index
+set.seed(0528)
+# need to account for total size of event, what % outgroup was
+(out_ind <- true.fun(var='outgroupPerc_index_rank', dat=events))
+
+#robustness check: alt outcome measure -- don't use rank
 #(out_ind <- true.fun(var='outgroupPerc_index', dat=events))
 
 ```
+
+# Save
+
+```{r}
+obsDat_truePs <- rbind(mark_pasts, mark_farms, out_ind)
+# fix rownames to match coefplot names (obsDat_figs.Rmd)
+rownames(obsDat_truePs) <- c("pastoralists_index_rank", 
+                             "farmers_index_rank",
+                             "outgroup_index_rank")
+save(obsDat_truePs, file="obsDat_truePs.rda")
+```
+
+# Other
+
 
 Outgroup variables.  Attend and eat.
 

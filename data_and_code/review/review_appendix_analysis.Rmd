@@ -319,7 +319,7 @@ Within family FDR (appendix). Footnote with appendix.
 # from g-aggAnalysis-mainOutcomes.rmd
 # comm
 load("../survey_dat/d_analysis/list_of_coefs_and_ps.rda")
-load("../obs_dat/figs/obsDat_fig_dat.rda")
+load("../obs_dat/b_analysis/obsDat_truePs.rda")
 
 ## add "base" var to PGG outcomes
 newList[[6]]$base <- c(1,rep(0,3))
@@ -327,25 +327,68 @@ newList[[7]]$base <- c(1,rep(0,3))
 
 ## make list of ps
 commListPs <- sapply(newList, function(x) x$truep[x$base %in% 1])
-names(commListPs) <- outcome_list
+commListPs <- c(commListPs, obsDat_truePs$truep)
+names(commListPs) <- c(outcome_list, rownames(obsDat_truePs))
 
 ## separate into our hypothesis families
 ### contact
+p.adjust(commListPs[c(3,4,8:10)], method="none")
+p.adjust(commListPs[c(3,4,8:10)], method="fdr")
+p.adjust(commListPs[c(3,4,8:10)], method="holm")
 
-### security
+### insecurity (its own family, could consider it an attitude)
+p.adjust(commListPs[c(1,2,5)], method="none")
+p.adjust(commListPs[c(1,2,5)], method="fdr")
+p.adjust(commListPs[c(1,2,5)], method="holm")
 
 ### attitudes
+p.adjust(commListPs[c(1,5)], method="none")
+p.adjust(commListPs[c(1,5)], method="fdr")
+p.adjust(commListPs[c(1,5)], method="holm")
 
 ### cooperation
+p.adjust(commListPs[c(6,7)], method="none")
+p.adjust(commListPs[c(6,7)], method="fdr")
+p.adjust(commListPs[c(6,7)], method="holm")
 
+### all
+p.adjust(p=commListPs, method = "none")
+p.adjust(p=commListPs, method = "fdr")
+p.adjust(p=commListPs, method = "holm")
+```
+
+Individual-level (only interested in participant-control differences)
+
+```{r}
 ## ind
 load("../survey_dat/d_analysis/list_of_coefs_and_ps_ind.rda")
 
+## add "base" var to PGG outcomes
+newList_ind[[4]]$base <- c(rep(1,2),rep(0,6))
+newList_ind[[5]]$base <- c(rep(1,2),rep(0,6))
 
-# FDR
-p.adjust(p=commListPs[1:2], method = "fdr")
+# only interested in participant-control differences
+indListPs <- sapply(newList_ind, function(x) x$truep[x$base %in% 1 & grepl("-part", rownames(x))])
+names(indListPs) <- c(outcome_list[c(1:3,6:7)])
+
+# not enough outcomes to really have families, but pgg vs not
+# atts, insecurity, contact
+p.adjust(p=indListPs[1:3], method = "none")
+p.adjust(p=indListPs[1:3], method = "fdr")
+p.adjust(p=indListPs[1:3], method = "holm")
+
+# pgg
+p.adjust(p=indListPs[4:5], method = "none")
+p.adjust(p=indListPs[4:5], method = "fdr")
+p.adjust(p=indListPs[4:5], method = "holm")
+
+### all
+p.adjust(p=indListPs, method = "none")
+p.adjust(p=indListPs, method = "fdr")
+p.adjust(p=indListPs, method = "holm")
 
 ```
+
 
 ## Comment 3
 
