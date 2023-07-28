@@ -330,6 +330,7 @@ commListPs <- sapply(newList, function(x) x$truep[x$base %in% 1])
 commListPs <- c(commListPs, obsDat_truePs$truep)
 names(commListPs) <- c(outcome_list, rownames(obsDat_truePs))
 
+# rebecca
 ## separate into our hypothesis families
 ### contact
 p.adjust(commListPs[c(3,4,8:10)], method="none")

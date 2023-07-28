@@ -844,7 +844,7 @@ appendix.</p>
 <pre class="r"><code># from g-aggAnalysis-mainOutcomes.rmd
 # comm
 load(&quot;../survey_dat/d_analysis/list_of_coefs_and_ps.rda&quot;)
-load(&quot;../obs_dat/figs/obsDat_fig_dat.rda&quot;)
+load(&quot;../obs_dat/b_analysis/obsDat_truePs.rda&quot;)
 
 ## add &quot;base&quot; var to PGG outcomes
 newList[[6]]$base &lt;- c(1,rep(0,3))
@@ -852,27 +852,128 @@ newList[[7]]$base &lt;- c(1,rep(0,3))
 
 ## make list of ps
 commListPs &lt;- sapply(newList, function(x) x$truep[x$base %in% 1])
-names(commListPs) &lt;- outcome_list
+commListPs &lt;- c(commListPs, obsDat_truePs$truep)
+names(commListPs) &lt;- c(outcome_list, rownames(obsDat_truePs))
 
 ## separate into our hypothesis families
 ### contact
-
-### security
-
-### attitudes
-
-### cooperation
-
-## ind
+p.adjust(commListPs[c(3,4,8:10)], method=&quot;none&quot;)</code></pre>
+<pre><code>##             contactOnly                   rMean pastoralists_index_rank 
+##               0.0595000               0.2389000               0.0014000 
+##      farmers_index_rank     outgroup_index_rank 
+##               0.2416000               0.2534757</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(3,4,8:10)], method=&quot;fdr&quot;)</code></pre>
+<pre><code>##             contactOnly                   rMean pastoralists_index_rank 
+##               0.1487500               0.2534757               0.0070000 
+##      farmers_index_rank     outgroup_index_rank 
+##               0.2534757               0.2534757</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(3,4,8:10)], method=&quot;holm&quot;)</code></pre>
+<pre><code>##             contactOnly                   rMean pastoralists_index_rank 
+##                  0.2380                  0.7167                  0.0070 
+##      farmers_index_rank     outgroup_index_rank 
+##                  0.7167                  0.7167</code></pre>
+<pre class="r"><code>### insecurity (its own family, could consider it an attitude)
+p.adjust(commListPs[c(1,2,5)], method=&quot;none&quot;)</code></pre>
+<pre><code>## attitude       in  end_exp 
+##   0.0448   0.0205   0.2117</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(1,2,5)], method=&quot;fdr&quot;)</code></pre>
+<pre><code>## attitude       in  end_exp 
+##   0.0672   0.0615   0.2117</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(1,2,5)], method=&quot;holm&quot;)</code></pre>
+<pre><code>## attitude       in  end_exp 
+##   0.0896   0.0615   0.2117</code></pre>
+<pre class="r"><code>### attitudes
+p.adjust(commListPs[c(1,5)], method=&quot;none&quot;)</code></pre>
+<pre><code>## attitude  end_exp 
+##   0.0448   0.2117</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(1,5)], method=&quot;fdr&quot;)</code></pre>
+<pre><code>## attitude  end_exp 
+##   0.0896   0.2117</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(1,5)], method=&quot;holm&quot;)</code></pre>
+<pre><code>## attitude  end_exp 
+##   0.0896   0.2117</code></pre>
+<pre class="r"><code>### cooperation
+p.adjust(commListPs[c(6,7)], method=&quot;none&quot;)</code></pre>
+<pre><code>## pgp_donate_end pgp_amount_end 
+##         0.2938         0.8522</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(6,7)], method=&quot;fdr&quot;)</code></pre>
+<pre><code>## pgp_donate_end pgp_amount_end 
+##         0.5876         0.8522</code></pre>
+<pre class="r"><code>p.adjust(commListPs[c(6,7)], method=&quot;holm&quot;)</code></pre>
+<pre><code>## pgp_donate_end pgp_amount_end 
+##         0.5876         0.8522</code></pre>
+<pre class="r"><code>### all
+p.adjust(p=commListPs, method = &quot;none&quot;)</code></pre>
+<pre><code>##                attitude                      in             contactOnly 
+##               0.0448000               0.0205000               0.0595000 
+##                   rMean                 end_exp          pgp_donate_end 
+##               0.2389000               0.2117000               0.2938000 
+##          pgp_amount_end pastoralists_index_rank      farmers_index_rank 
+##               0.8522000               0.0014000               0.2416000 
+##     outgroup_index_rank 
+##               0.2534757</code></pre>
+<pre class="r"><code>p.adjust(p=commListPs, method = &quot;fdr&quot;)</code></pre>
+<pre><code>##                attitude                      in             contactOnly 
+##               0.1487500               0.1025000               0.1487500 
+##                   rMean                 end_exp          pgp_donate_end 
+##               0.3168447               0.3168447               0.3264444 
+##          pgp_amount_end pastoralists_index_rank      farmers_index_rank 
+##               0.8522000               0.0140000               0.3168447 
+##     outgroup_index_rank 
+##               0.3168447</code></pre>
+<pre class="r"><code>p.adjust(p=commListPs, method = &quot;holm&quot;)</code></pre>
+<pre><code>##                attitude                      in             contactOnly 
+##                  0.3584                  0.1845                  0.4165 
+##                   rMean                 end_exp          pgp_donate_end 
+##                  1.0000                  1.0000                  1.0000 
+##          pgp_amount_end pastoralists_index_rank      farmers_index_rank 
+##                  1.0000                  0.0140                  1.0000 
+##     outgroup_index_rank 
+##                  1.0000</code></pre>
+<p>Individual-level (only interested in participant-control
+differences)</p>
+<pre class="r"><code>## ind
 load(&quot;../survey_dat/d_analysis/list_of_coefs_and_ps_ind.rda&quot;)
 
+## add &quot;base&quot; var to PGG outcomes
+newList_ind[[4]]$base &lt;- c(rep(1,2),rep(0,6))
+newList_ind[[5]]$base &lt;- c(rep(1,2),rep(0,6))
 
-# FDR
-p.adjust(p=commListPs, method = &quot;fdr&quot;)</code></pre>
-<pre><code>##       attitude             in    contactOnly          rMean        end_exp 
-##      0.1388333      0.1388333      0.1388333      0.3344600      0.3344600 
-## pgp_donate_end pgp_amount_end 
-##      0.3427667      0.8522000</code></pre>
+# only interested in participant-control differences
+indListPs &lt;- sapply(newList_ind, function(x) x$truep[x$base %in% 1 &amp; grepl(&quot;-part&quot;, rownames(x))])
+names(indListPs) &lt;- c(outcome_list[c(1:3,6:7)])
+
+# not enough outcomes to really have families, but pgg vs not
+# atts, insecurity, contact
+p.adjust(p=indListPs[1:3], method = &quot;none&quot;)</code></pre>
+<pre><code>##    attitude          in contactOnly 
+##  0.13000000  0.18633333  0.01766667</code></pre>
+<pre class="r"><code>p.adjust(p=indListPs[1:3], method = &quot;fdr&quot;)</code></pre>
+<pre><code>##    attitude          in contactOnly 
+##   0.1863333   0.1863333   0.0530000</code></pre>
+<pre class="r"><code>p.adjust(p=indListPs[1:3], method = &quot;holm&quot;)</code></pre>
+<pre><code>##    attitude          in contactOnly 
+##       0.260       0.260       0.053</code></pre>
+<pre class="r"><code># pgg
+p.adjust(p=indListPs[4:5], method = &quot;none&quot;)</code></pre>
+<pre><code>## pgp_donate_end pgp_amount_end 
+##      0.2950000      0.8753333</code></pre>
+<pre class="r"><code>p.adjust(p=indListPs[4:5], method = &quot;fdr&quot;)</code></pre>
+<pre><code>## pgp_donate_end pgp_amount_end 
+##      0.5900000      0.8753333</code></pre>
+<pre class="r"><code>p.adjust(p=indListPs[4:5], method = &quot;holm&quot;)</code></pre>
+<pre><code>## pgp_donate_end pgp_amount_end 
+##      0.5900000      0.8753333</code></pre>
+<pre class="r"><code>### all
+p.adjust(p=indListPs, method = &quot;none&quot;)</code></pre>
+<pre><code>##       attitude             in    contactOnly pgp_donate_end pgp_amount_end 
+##     0.13000000     0.18633333     0.01766667     0.29500000     0.87533333</code></pre>
+<pre class="r"><code>p.adjust(p=indListPs, method = &quot;fdr&quot;)</code></pre>
+<pre><code>##       attitude             in    contactOnly pgp_donate_end pgp_amount_end 
+##     0.31055556     0.31055556     0.08833333     0.36875000     0.87533333</code></pre>
+<pre class="r"><code>p.adjust(p=indListPs, method = &quot;holm&quot;)</code></pre>
+<pre><code>##       attitude             in    contactOnly pgp_donate_end pgp_amount_end 
+##     0.52000000     0.55900000     0.08833333     0.59000000     0.87533333</code></pre>
 </div>
 <div id="comment-3" class="section level2">
 <h2>Comment 3</h2>
