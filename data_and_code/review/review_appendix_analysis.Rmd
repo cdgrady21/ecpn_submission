@@ -396,11 +396,72 @@ p.adjust(p=indListPs, method = "holm")
 What are the substantive effect sizes and how do they compare to the minimum detectable effect sizes identified in the PAP's power analyses (0.3-0.4 SDs)?
 
 Significant results are as strong or stronger than what is the PAP
-Add to appendix
+Add power analysis to appendix
 Add .5 x-axis marker to community-level graph
 
-```{r}
+**Response**
+*Power analysis showed we had ~0.80 power for*:
+(1) combined p-value of 0.3 SD for community and 0.20 SD for individual.
+(2) separate p-values of 0.60-0.70 SD for community-level analysis
+(3) separate p-values of 0.30-0.40 SD for individual-level analysis (this one done through egap power calc)
 
+We would expect better power for our real analysis because the power analysis doesn't use randomization inference, but similar.
+
+*The effects we find are*:
+_Comm-level_
+- close to 0.50 SD for survey outcomes attitudes, insecurity, contact
+- ~0.20 SD for survey experiments (endorsement, percent exp)
+- 1.0 SD for market pastoralists index
+- ~0.20 SDs for events outgroup index
+_Ind-level_
+- Between 0.15 and 0.35 SD for survey outcomes atts, insec, contact. Atts weakest, contact strongest.
+
+```{r}
+# my original power analysis was bad. so inefficient and slow, so overcomplicated
+
+#var=outcome_list_qip[1]; tau=0.2
+bigPow.fn <-function(nsims, var=outcome_list_qip[1], tau)
+{
+  newPow.fn <- function(var, tau)
+{
+  df <- ag.df %>% dplyr::group_by(state) %>%
+    mutate(newtr = sample(treatment, replace=F)) %>%
+    as.data.frame(.)
+  
+  # make endline outcome with TR effect tau
+  df[, paste0(var,"_end")] <- (df[,paste0(var,"_end")]-mean(df[,paste0(var,"_end")]))/sd(df[,paste0(var,"_end")])
+  #scale(df[,paste0(var,"_end")])
+  df[df$newtr %in% 1, paste0(var,"_end")] <- df[df$newtr %in% 1, paste0(var,"_end")]+tau
+  
+  lm1 <- lm_robust(df[,paste0(var,"_end")]~df[,'newtr']+df[,paste0(var,"_base")]+state, 
+                   clusters = psu, data=df)
+  
+  want <- tidy(lm1)[2,5]
+  return(want)
+  }
+  
+  check <- do(nsims)*newPow.fn(var=var, tau=tau)
+  pval <- mean(check<0.05)
+  return(pval)
+}
+#bigPow.fn(nsims=100, tau=0.7)
+
+```
+
+Run it over taus from 0-1.
+
+```{r}
+possibleTaus <- seq(0,1,0.1)
+possibleTaus <- as.data.frame(possibleTaus)
+system.time(
+for(i in 1:nrow(possibleTaus))
+{
+  possibleTaus[i, "pow"] <- bigPow.fn(nsims=1000, tau=possibleTaus[i,1])
+}
+)
+possibleTaus
+
+save(possibleTaus, file="new_power.Rdata")
 ```
 
 ## Comment 4
