@@ -2,8 +2,11 @@
 title: "Review_appendix"
 date: "2023-07-12"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
   html_document:
-    toc: true
+    toc: yes
     toc_depth: 2
 ---
 
@@ -395,15 +398,15 @@ p.adjust(p=indListPs, method = "holm")
 
 What are the substantive effect sizes and how do they compare to the minimum detectable effect sizes identified in the PAP's power analyses (0.3-0.4 SDs)?
 
-Significant results are as strong or stronger than what is the PAP
+Significant results are as strong or stronger than what is in the PAP
 Add power analysis to appendix
 Add .5 x-axis marker to community-level graph
 
 **Response**
 *Power analysis showed we had ~0.80 power for*:
 (1) combined p-value of 0.3 SD for community and 0.20 SD for individual.
-(2) separate p-values of 0.60-0.70 SD for community-level analysis
-(3) separate p-values of 0.30-0.40 SD for individual-level analysis (this one done through egap power calc)
+(2) separate p-values of ~0.60 SD for community-level analysis
+(3) separate p-values of ~0.30-0.40 SD for individual-level analysis (this one done through egap power calc)
 
 We would expect better power for our real analysis because the power analysis doesn't use randomization inference, but similar.
 
@@ -419,20 +422,28 @@ _Ind-level_
 ```{r}
 # my original power analysis was bad. so inefficient and slow, so overcomplicated
 
-#var=outcome_list_qip[1]; tau=0.2
-bigPow.fn <-function(nsims, var=outcome_list_qip[1], tau)
+# use our strongest outcome, insecurity.
+#var=outcome_list_qip[2]; tau=0.2
+bigPow.fn <-function(nsims, var=outcome_list_qip[2], tau)
 {
   newPow.fn <- function(var, tau)
 {
-  df <- ag.df %>% dplyr::group_by(state) %>%
-    mutate(newtr = sample(treatment, replace=F)) %>%
-    as.data.frame(.)
+    # 6 TR sites from Nas, 4 from Ben
+    newtr_nas <- sample(unique(ag.df$psu[ag.df$state %in% "nas"]), size=6)
+    newtr_ben <- sample(unique(ag.df$psu[ag.df$state %in% "ben"]), size=4)
+    newtr <- c(as.character(newtr_nas), as.character(newtr_ben))
+    df <- ag.df
+    df[,"newtr"] <- ifelse(df$psu %in% newtr, 1, 0)
   
   # make endline outcome with TR effect tau
   df[, paste0(var,"_end")] <- (df[,paste0(var,"_end")]-mean(df[,paste0(var,"_end")]))/sd(df[,paste0(var,"_end")])
   #scale(df[,paste0(var,"_end")])
   df[df$newtr %in% 1, paste0(var,"_end")] <- df[df$newtr %in% 1, paste0(var,"_end")]+tau
   
+  # for baseline control, also scale
+  df[, paste0(var,"_base")] <- (df[,paste0(var,"_base")]-mean(df[,paste0(var,"_base")]))/sd(df[,paste0(var,"_base")])
+  
+  # lm
   lm1 <- lm_robust(df[,paste0(var,"_end")]~df[,'newtr']+df[,paste0(var,"_base")]+state, 
                    clusters = psu, data=df)
   
@@ -448,21 +459,26 @@ bigPow.fn <-function(nsims, var=outcome_list_qip[1], tau)
 
 ```
 
-Run it over taus from 0-1.
+Run it over taus from 0-1 for one survey outcome.
 
-```{r}
+```{r, eval=F}
 possibleTaus <- seq(0,1,0.1)
 possibleTaus <- as.data.frame(possibleTaus)
 system.time(
 for(i in 1:nrow(possibleTaus))
 {
-  possibleTaus[i, "pow"] <- bigPow.fn(nsims=1000, tau=possibleTaus[i,1])
+  possibleTaus[i, "pow"] <- bigPow.fn(nsims=3000, tau=possibleTaus[i,1])
 }
 )
 possibleTaus
 
+#save
 save(possibleTaus, file="new_power.Rdata")
 ```
+```{r}
+load("new_power.Rdata")
+```
+
 
 ## Comment 4
 
@@ -473,8 +489,41 @@ Great point. In general, we do see control communities getting worse across outc
 Add to appendix: graphs with communities disaggregated
 
 ```{r}
-
+# not the case that there is one big drop in control communities
+## attitudes
+summary(ag.df$attitude_cw[ag.df$treatment %in% 1])
+summary(ag.df$attitude_cw[ag.df$treatment %in% 0])
 ```
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../survey_dat/figs/did_plots/attitudeComm.plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:att_comm_dis}
+\end{figure}
+
+```{r}
+## contact
+summary(ag.df$contactOnly_cw[ag.df$treatment %in% 1])
+summary(ag.df$contactOnly_cw[ag.df$treatment %in% 0])
+```
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../survey_dat/figs/did_plots/conComm_plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:con_comm_dis}
+\end{figure}
+
+```{r}
+## insecurity
+summary(ag.df$in_cw[ag.df$treatment %in% 1])
+summary(ag.df$in_cw[ag.df$treatment %in% 0])
+```
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../survey_dat/figs/did_plots/inComm_plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:in_comm_dis}
+\end{figure}
 
 ## Comment 5
 
@@ -558,4 +607,115 @@ Potentially add something about site selection or clarify the anti-grazing polic
 
 ```{r}
 
+```
+
+
+
+
+
+
+
+
+
+
+# Misc
+
+## Power analysis
+
+Chris: I tried to run a randomization inference power analysis.  It takes too long to run.
+
+But that will probably be conservative because it does not use randomization inference, so here it is with the rand inference function we used for p-values, but with tau added to endline outcomes.
+- simulate an effect: 
+    - make new treatment variable by shuffling site-level TR within states.
+    - SD scale real baseline outcome
+    - make new endline outcome by shuffling baseline outcome (within state) & adding tau
+- get true p-value
+    - get sim_coef from lm(endline_outcome~newtr+baseline_outcome+state)
+    - get null distribution
+        - make null_tr by shuffling newtr at site-level, within states.
+        - do nsims (e.g. 3000) regressions to make null distribution
+    - compare sim_coef to null distribution: what % of coefs are bigger?
+        - save true p-value: % of larger coefs
+- get power: how many true p-vals are below 0.05?
+- run true p-val function over several taus
+
+```{r, eval=F}
+
+var=outcome_list_qip[2]; tr="treatment"
+big_truePow.fn <-function(nsims, var=outcome_list_qip[2], tau){
+
+truePow.fn <- function(var,tr,nsims=1000, dat=ag.df, tau=0)
+{
+  #(1) simulate an effect
+  
+  #make new treatment variable by shuffling site-level TR within states.
+  ## real exp had 6 TR sites from Nas, 4 from Ben
+  newtr_nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+  newtr_ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+  newtr <- c(as.character(newtr_nas), as.character(newtr_ben))
+  dat[,"newtr"] <- ifelse(dat$psu %in% newtr, 1, 0)
+  
+  #SD scale real baseline outcome
+  dat[, paste0(var,"_base")] <- (dat[,paste0(var,"_base")]-mean(dat[,paste0(var,"_base")]))/sd(dat[,paste0(var,"_base")])
+  
+  #make new endline outcome by shuffling baseline outcome (within state) & adding tau
+  dat <- dat %>% dplyr::group_by(state) %>%
+    mutate(newout = sample(dat[, paste0(var,"_base")], replace=F)) %>%
+    as.data.frame(.)
+  dat$newout <- dat$newout + tau
+  
+  #(2) get true p-value
+  
+  #get sim_coef from lm(endline_outcome~newtr+baseline_outcome+state)
+  thelm <- lm(newout~newtr+dat[, paste0(var,"_base")]+state, data=dat)
+  thecoef <-coef(thelm)[2]
+  
+  #(2a) get null distribution
+  null_dist = rep(NA,nsims)
+  
+  #make null_tr by shuffling newtr at site-level, within states.
+  for(i in 1:nsims){
+    nulltr_nas <- sample(unique(dat$psu[dat$state %in% "nas"]), size=6)
+    nulltr_ben <- sample(unique(dat$psu[dat$state %in% "ben"]), size=4)
+    nulltr <- c(as.character(nulltr_nas), as.character(nulltr_ben))
+    dat[,"nulltr"] <- ifelse(dat$psu %in% nulltr, 1, 0)
+    
+    #do nsims (e.g. 3000) regressions to make null distribution
+    null_lm <- lm(newout~nulltr+dat[, paste0(var,"_base")]+state, data=dat)
+    null_dist[i] <- coef(null_lm)[2]
+  }
+  
+  #compare sim_coef to null distribution: what % of coefs are bigger?
+  thep <- mean(null_dist<thecoef)
+  #true p-value == % of larger coefs
+  return(thep)
+}
+
+  # get power: how many true p-vals are below 0.05?
+  check <- do(nsims)*truePow.fn(var=var, tau=tau)
+  pval <- mean(check<0.05)
+  return(pval)
+
+}
+
+```
+
+Run over taus. chris: nevermind, this didn't run in 3 hours. Based on how long it takes to run 10 times, if time scales linearly it will run for 166 hours. Non randomization inference power analysis is fine.
+
+```{r, eval=F}
+possibleTaus <- seq(0,1,0.1)
+possibleTaus <- as.data.frame(possibleTaus)
+system.time(
+for(i in 1:nrow(possibleTaus))
+{
+  possibleTaus[i, "pow"] <- big_truePow.fn(nsims=1000, tau=possibleTaus[i,1])
+}
+)
+possibleTaus
+
+#save
+save(possibleTaus, file="new_power_truep.Rdata")
+```
+```{r, eval=F}
+load("new_power_truep.Rdata")
 ```

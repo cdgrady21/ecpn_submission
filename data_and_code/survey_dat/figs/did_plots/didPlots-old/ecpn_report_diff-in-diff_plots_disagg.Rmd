@@ -13,19 +13,19 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
-load("../c_creating_dataframes/rand_df.Rdata")
-load("../b_creating_outcomes/f2-panelData.Rdata")
+load("../../../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../../../c_creating_dataframes/rand_df.Rdata")
+load("../../../b_creating_outcomes/f2-panelData.Rdata")
 
 
 #until I figure out insecurity, reverse it.
-ag.df$in_cw_base <- ag.df$in_cw_base*-1
-ag.df$in_cw_end <- ag.df$in_cw_end*-1
-panel.df$in_cw_y0 <- panel.df$in_cw_y0*-1
-panel.df$in_cw_y1 <- panel.df$in_cw_y1*-1
+#ag.df$in_cw_base <- ag.df$in_cw_base*-1
+#ag.df$in_cw_end <- ag.df$in_cw_end*-1
+#panel.df$in_cw_y0 <- panel.df$in_cw_y0*-1
+#panel.df$in_cw_y1 <- panel.df$in_cw_y1*-1
 
-ag.df$list_exp_base <- ag.df$list_exp_base*-1
-ag.df$list_exp_end <- ag.df$list_exp_end*-1
+#ag.df$list_exp_base <- ag.df$list_exp_base*-1
+#ag.df$list_exp_end <- ag.df$list_exp_end*-1
 
 ##########
 # Plot functions - ggplot showing each community before and after, coloring by site.

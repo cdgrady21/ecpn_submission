@@ -369,6 +369,11 @@ display: none;
 <li><a href="#comment-1-1" id="toc-comment-1-1">Comment 1</a></li>
 <li><a href="#comment-2-1" id="toc-comment-2-1">Comment 2</a></li>
 </ul></li>
+<li><a href="#misc" id="toc-misc">Misc</a>
+<ul>
+<li><a href="#power-analysis" id="toc-power-analysis">Power
+analysis</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -855,6 +860,7 @@ commListPs &lt;- sapply(newList, function(x) x$truep[x$base %in% 1])
 commListPs &lt;- c(commListPs, obsDat_truePs$truep)
 names(commListPs) &lt;- c(outcome_list, rownames(obsDat_truePs))
 
+# rebecca
 ## separate into our hypothesis families
 ### contact
 p.adjust(commListPs[c(3,4,8:10)], method=&quot;none&quot;)</code></pre>
@@ -980,8 +986,72 @@ p.adjust(p=indListPs, method = &quot;none&quot;)</code></pre>
 <p>What are the substantive effect sizes and how do they compare to the
 minimum detectable effect sizes identified in the PAP’s power analyses
 (0.3-0.4 SDs)?</p>
-<p>Significant results are as strong or stronger than what is the PAP
-Add to appendix Add .5 x-axis marker to community-level graph</p>
+<p>Significant results are as strong or stronger than what is in the PAP
+Add power analysis to appendix Add .5 x-axis marker to community-level
+graph</p>
+<p><strong>Response</strong> <em>Power analysis showed we had ~0.80
+power for</em>: (1) combined p-value of 0.3 SD for community and 0.20 SD
+for individual. (2) separate p-values of ~0.60 SD for community-level
+analysis (3) separate p-values of ~0.30-0.40 SD for individual-level
+analysis (this one done through egap power calc)</p>
+<p>We would expect better power for our real analysis because the power
+analysis doesn’t use randomization inference, but similar.</p>
+<p><em>The effects we find are</em>: <em>Comm-level</em> - close to 0.50
+SD for survey outcomes attitudes, insecurity, contact - ~0.20 SD for
+survey experiments (endorsement, percent exp) - 1.0 SD for market
+pastoralists index - ~0.20 SDs for events outgroup index
+<em>Ind-level</em> - Between 0.15 and 0.35 SD for survey outcomes atts,
+insec, contact. Atts weakest, contact strongest.</p>
+<pre class="r"><code># my original power analysis was bad. so inefficient and slow, so overcomplicated
+
+# use our strongest outcome, insecurity.
+#var=outcome_list_qip[2]; tau=0.2
+bigPow.fn &lt;-function(nsims, var=outcome_list_qip[2], tau)
+{
+  newPow.fn &lt;- function(var, tau)
+{
+    # 6 TR sites from Nas, 4 from Ben
+    newtr_nas &lt;- sample(unique(ag.df$psu[ag.df$state %in% &quot;nas&quot;]), size=6)
+    newtr_ben &lt;- sample(unique(ag.df$psu[ag.df$state %in% &quot;ben&quot;]), size=4)
+    newtr &lt;- c(as.character(newtr_nas), as.character(newtr_ben))
+    df &lt;- ag.df
+    df[,&quot;newtr&quot;] &lt;- ifelse(df$psu %in% newtr, 1, 0)
+  
+  # make endline outcome with TR effect tau
+  df[, paste0(var,&quot;_end&quot;)] &lt;- (df[,paste0(var,&quot;_end&quot;)]-mean(df[,paste0(var,&quot;_end&quot;)]))/sd(df[,paste0(var,&quot;_end&quot;)])
+  #scale(df[,paste0(var,&quot;_end&quot;)])
+  df[df$newtr %in% 1, paste0(var,&quot;_end&quot;)] &lt;- df[df$newtr %in% 1, paste0(var,&quot;_end&quot;)]+tau
+  
+  # for baseline control, also scale
+  df[, paste0(var,&quot;_base&quot;)] &lt;- (df[,paste0(var,&quot;_base&quot;)]-mean(df[,paste0(var,&quot;_base&quot;)]))/sd(df[,paste0(var,&quot;_base&quot;)])
+  
+  # lm
+  lm1 &lt;- lm_robust(df[,paste0(var,&quot;_end&quot;)]~df[,&#39;newtr&#39;]+df[,paste0(var,&quot;_base&quot;)]+state, 
+                   clusters = psu, data=df)
+  
+  want &lt;- tidy(lm1)[2,5]
+  return(want)
+  }
+  
+  check &lt;- do(nsims)*newPow.fn(var=var, tau=tau)
+  pval &lt;- mean(check&lt;0.05)
+  return(pval)
+}
+#bigPow.fn(nsims=100, tau=0.7)</code></pre>
+<p>Run it over taus from 0-1 for one survey outcome.</p>
+<pre class="r"><code>possibleTaus &lt;- seq(0,1,0.1)
+possibleTaus &lt;- as.data.frame(possibleTaus)
+system.time(
+for(i in 1:nrow(possibleTaus))
+{
+  possibleTaus[i, &quot;pow&quot;] &lt;- bigPow.fn(nsims=3000, tau=possibleTaus[i,1])
+}
+)
+possibleTaus
+
+#save
+save(possibleTaus, file=&quot;new_power.Rdata&quot;)</code></pre>
+<pre class="r"><code>load(&quot;new_power.Rdata&quot;)</code></pre>
 </div>
 <div id="comment-4" class="section level2">
 <h2>Comment 4</h2>
@@ -995,6 +1065,28 @@ patterns hold for other outcomes?</p>
 communities getting worse across outcomes. But it wasn’t driven by a
 particularly bad period in a single control community. Add to appendix:
 graphs with communities disaggregated</p>
+<pre class="r"><code># not the case that there is one big drop in control communities
+## attitudes
+summary(ag.df$attitude_cw[ag.df$treatment %in% 1])</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.52240 -0.10307  0.01343  0.01393  0.16472  0.40404</code></pre>
+<pre class="r"><code>summary(ag.df$attitude_cw[ag.df$treatment %in% 0])</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.33479 -0.21865 -0.12571 -0.08634  0.05927  0.14522</code></pre>
+<pre class="r"><code>## contact
+summary(ag.df$contactOnly_cw[ag.df$treatment %in% 1])</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.62941 -0.11906  0.03868  0.03011  0.14413  0.57192</code></pre>
+<pre class="r"><code>summary(ag.df$contactOnly_cw[ag.df$treatment %in% 0])</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.66520 -0.24964 -0.11401 -0.10767  0.08487  0.45330</code></pre>
+<pre class="r"><code>## insecurity
+summary(ag.df$in_cw[ag.df$treatment %in% 1])</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -0.2871  0.1813  0.2407  0.2143  0.3228  0.4934</code></pre>
+<pre class="r"><code>summary(ag.df$in_cw[ag.df$treatment %in% 0])</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.17207 -0.08185 -0.04118  0.05516  0.22691  0.41297</code></pre>
 </div>
 <div id="comment-5" class="section level2">
 <h2>Comment 5</h2>
@@ -1111,6 +1203,99 @@ supplemental index…if I am understanding that reference properly.</p>
 that also uses individual’s demographic characteristics Potentially add
 something about site selection or clarify the anti-grazing policies were
 implemented after site selection.</p>
+</div>
+</div>
+<div id="misc" class="section level1">
+<h1>Misc</h1>
+<div id="power-analysis" class="section level2">
+<h2>Power analysis</h2>
+<p>Chris: I tried to run a randomization inference power analysis. It
+takes too long to run.</p>
+<p>But that will probably be conservative because it does not use
+randomization inference, so here it is with the rand inference function
+we used for p-values, but with tau added to endline outcomes. - simulate
+an effect: - make new treatment variable by shuffling site-level TR
+within states. - SD scale real baseline outcome - make new endline
+outcome by shuffling baseline outcome (within state) &amp; adding tau -
+get true p-value - get sim_coef from
+lm(endline_outcome~newtr+baseline_outcome+state) - get null distribution
+- make null_tr by shuffling newtr at site-level, within states. - do
+nsims (e.g. 3000) regressions to make null distribution - compare
+sim_coef to null distribution: what % of coefs are bigger? - save true
+p-value: % of larger coefs - get power: how many true p-vals are below
+0.05? - run true p-val function over several taus</p>
+<pre class="r"><code>var=outcome_list_qip[2]; tr=&quot;treatment&quot;
+big_truePow.fn &lt;-function(nsims, var=outcome_list_qip[2], tau){
+
+truePow.fn &lt;- function(var,tr,nsims=1000, dat=ag.df, tau=0)
+{
+  #(1) simulate an effect
+  
+  #make new treatment variable by shuffling site-level TR within states.
+  ## real exp had 6 TR sites from Nas, 4 from Ben
+  newtr_nas &lt;- sample(unique(dat$psu[dat$state %in% &quot;nas&quot;]), size=6)
+  newtr_ben &lt;- sample(unique(dat$psu[dat$state %in% &quot;ben&quot;]), size=4)
+  newtr &lt;- c(as.character(newtr_nas), as.character(newtr_ben))
+  dat[,&quot;newtr&quot;] &lt;- ifelse(dat$psu %in% newtr, 1, 0)
+  
+  #SD scale real baseline outcome
+  dat[, paste0(var,&quot;_base&quot;)] &lt;- (dat[,paste0(var,&quot;_base&quot;)]-mean(dat[,paste0(var,&quot;_base&quot;)]))/sd(dat[,paste0(var,&quot;_base&quot;)])
+  
+  #make new endline outcome by shuffling baseline outcome (within state) &amp; adding tau
+  dat &lt;- dat %&gt;% dplyr::group_by(state) %&gt;%
+    mutate(newout = sample(dat[, paste0(var,&quot;_base&quot;)], replace=F)) %&gt;%
+    as.data.frame(.)
+  dat$newout &lt;- dat$newout + tau
+  
+  #(2) get true p-value
+  
+  #get sim_coef from lm(endline_outcome~newtr+baseline_outcome+state)
+  thelm &lt;- lm(newout~newtr+dat[, paste0(var,&quot;_base&quot;)]+state, data=dat)
+  thecoef &lt;-coef(thelm)[2]
+  
+  #(2a) get null distribution
+  null_dist = rep(NA,nsims)
+  
+  #make null_tr by shuffling newtr at site-level, within states.
+  for(i in 1:nsims){
+    nulltr_nas &lt;- sample(unique(dat$psu[dat$state %in% &quot;nas&quot;]), size=6)
+    nulltr_ben &lt;- sample(unique(dat$psu[dat$state %in% &quot;ben&quot;]), size=4)
+    nulltr &lt;- c(as.character(nulltr_nas), as.character(nulltr_ben))
+    dat[,&quot;nulltr&quot;] &lt;- ifelse(dat$psu %in% nulltr, 1, 0)
+    
+    #do nsims (e.g. 3000) regressions to make null distribution
+    null_lm &lt;- lm(newout~nulltr+dat[, paste0(var,&quot;_base&quot;)]+state, data=dat)
+    null_dist[i] &lt;- coef(null_lm)[2]
+  }
+  
+  #compare sim_coef to null distribution: what % of coefs are bigger?
+  thep &lt;- mean(null_dist&lt;thecoef)
+  #true p-value == % of larger coefs
+  return(thep)
+}
+
+  # get power: how many true p-vals are below 0.05?
+  check &lt;- do(nsims)*truePow.fn(var=var, tau=tau)
+  pval &lt;- mean(check&lt;0.05)
+  return(pval)
+
+}</code></pre>
+<p>Run over taus. chris: nevermind, this didn’t run in 3 hours. Based on
+how long it takes to run 10 times, if time scales linearly it will run
+for 166 hours. Non randomization inference power analysis is fine.</p>
+<pre class="r"><code>possibleTaus &lt;- seq(0,1,0.1)
+possibleTaus &lt;- as.data.frame(possibleTaus)
+system.time(
+for(i in 1:nrow(possibleTaus))
+{
+  possibleTaus[i, &quot;pow&quot;] &lt;- big_truePow.fn(nsims=1000, tau=possibleTaus[i,1])
+}
+)
+possibleTaus
+
+#save
+save(possibleTaus, file=&quot;new_power_truep.Rdata&quot;)</code></pre>
+<pre class="r"><code>load(&quot;new_power_truep.Rdata&quot;)</code></pre>
 </div>
 </div>
 

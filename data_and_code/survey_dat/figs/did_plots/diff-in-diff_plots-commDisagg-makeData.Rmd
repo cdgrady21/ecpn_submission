@@ -1,0 +1,253 @@
+---
+title: "ecpn_diff-in-diff plots: data and function"
+output:
+  word_document: default
+  html_document: default
+---
+
+note: if want to convert to pdf:
+
+dev.copy(pdf,file="endComm_plot_nas.pdf")
+dev.off()
+
+pdf(file="endComm_plot_nas.pdf", bg="transparent", width=5, height=5)
+endComm_plot_nas
+dev.off()
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load("../../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../../c_creating_dataframes/rand_df.Rdata")
+load("../../b_creating_outcomes/f2-panelData.Rdata")
+load("../../../obs_dat/b_analysis/eventsMedian.Rdata")
+load("../../../obs_dat/b_analysis/marketMedian.Rdata")
+
+# clean environment
+rm(list=ls(pattern="Var|var|.fun|Fun|Col|Index|Indice|Stand|fmla|outcomes"))
+
+#reverse scaled in earlier code.
+#ag.df$in_cw_base <- abs(ag.df$in_cw_base+1)
+#ag.df$in_cw_end <- abs(ag.df$in_cw_end+1)
+#panel.df$in_cw_y0 <- abs(panel.df$in_cw_y0+1)
+#panel.df$in_cw_y1 <- abs(panel.df$in_cw_y1+1)
+
+#ag.df$vio_cw_base <- abs(ag.df$vio_cw_base-1)
+#ag.df$vio_cw_end <- abs(ag.df$vio_cw_end-1)
+#panel.df$vio_cw_y0 <- abs(panel.df$vio_cw_y0-1)
+#panel.df$vio_cw_y1 <- abs(panel.df$vio_cw_y1-1)
+
+
+#ag.df$list_exp_base <- ag.df$list_exp_base*-1
+#ag.df$list_exp_end <- ag.df$list_exp_end*-1
+```
+
+
+# Make plot data
+
+Isolate vars.
+
+```{r}
+# comm
+ag.vars <- c("attitude_cw", "in_cw", 'contactOnly_cw',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
+# individual
+ind.vars <- c('attitude_cw', "in_cw", 'contactOnly_cw',
+              'pgp_amount_y1', 'pgp_donate_y1')
+# both (placebo)
+pl.vars <- "vio_cw"
+
+# add additive index
+ag.vars <- c(ag.vars, setdiff(gsub("_cw", "_index", ag.vars), ag.vars))
+ind.vars <- c(ind.vars, setdiff(gsub("_cw", "_index", ind.vars), ind.vars))
+stopifnot(setdiff(ag.vars,names(ag.df))==0)
+stopifnot(setdiff(ind.vars,names(panel.df))==0)
+```
+
+Make df and plot function.
+
+```{r}
+#Aggregate Plot df - comm level
+base <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_base"), "treatment", "state", "psu", "comm")]
+names(base) <- sub("_base", "", names(base))
+base$survey <- "Baseline"
+end <- ag.df[,c(paste0(ag.vars[!grepl("pgp", ag.vars)], "_end"), "treatment", "state", "psu", "comm")]
+names(end) <- sub("_end", "", names(end))
+end$survey <- "Endline"
+plot.df <- rbind(base,end)
+plot.df$comm <- gsub("\\.", "", plot.df$comm)
+
+# get mean and sd at site-level with dplyr
+plot.df$state <- as.character(plot.df$state) # save me trouble with dplyr later
+plot.df$psu <- as.numeric(as.character(plot.df$psu))
+plot1.df<-plot.df %>% 
+  dplyr::group_by(psu,survey) %>%  # chris: could add state here to differentiate nas from ben
+  dplyr::summarise_all(list(~mean(.), ~sd(.))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+
+plot.df$Treatment<-ifelse(plot.df$treatment %in% 1, "ECPN", "Non-ECPN")
+plot1.df$Treatment<-ifelse(plot1.df$treatment_mean %in% 1, "ECPN", "Non-ECPN")
+names(plot1.df) <- gsub("_mean", "", names(plot1.df))
+
+
+# Individual Plot df
+base1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "community", "id_num")]
+names(base1) <- sub("_y0", "", names(base1))
+base1$survey <- "Baseline"
+end1 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "community", "id_num")]
+names(end1) <- sub("_y1", "", names(end1))
+end1$survey <- "Endline"
+plot.df1 <- rbind(base1,end1)
+plot.df1$state <- as.character(plot.df1$state) # save me trouble with dplyr later
+plot.df1$community <- as.character(plot.df1$community)
+
+
+# Panel Plot df
+base2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y0"), "treatment", "state", "committee", "community", "id_num")]
+names(base2) <- sub("_y0", "", names(base2))
+base2$survey <- "Baseline"
+end2 <- panel.df[,c(paste0(ind.vars[!grepl("pgp", ind.vars)], "_y1"), "treatment", "state", "committee", "community", "id_num")]
+names(end2) <- sub("_y1", "", names(end2))
+end2$survey <- "Endline"
+plot.df2 <- rbind(base2,end2)
+plot.df2$Treatment <- interaction(plot.df2$treatment, plot.df2$committee)
+levels(plot.df2$Treatment) <- c("Control", "Non-Part", NA, "Part")
+plot.df2$Treatment <- ordered(plot.df2$Treatment, levels=c("Part", "Non-Part", "Control"))
+plot.df2$state <- as.character(plot.df2$state) # save me trouble with dplyr later
+plot.df2$community <- as.character(plot.df2$community)
+
+plot2.df<-plot.df2 %>% 
+  dplyr::group_by(community,survey,Treatment) %>%
+  dplyr::summarise_all(list(~mean(.))) %>% # warnings because cannot sumarise non-numeric
+  as.data.frame()
+plot2.df$thegroup <- interaction(plot2.df$community, plot2.df$Treatment)
+
+# Fixing colors
+grps <-c("ECPN","Non-ECPN","Part", "Non-Part", "Control")
+color.codes<-as.character(c("#FC8D59", "#00BFC4", "#FC8D59", "dark red", "#00BFC4"))
+#ECPN = "#FC8D59", Non-ECPN = "#00BFC4", Part="FC8D59", Non-Part="green", Control="#00BFC4")
+#plot.df$colors <- c("#00BFC4","#00BFC4","#FC8D59","#FC8D59")
+#plot.df1$colors <- c("#FC8D59","#FC8D59","#00BFC4","#00BFC4")
+#plot.df2$colors <- c("#FC8D59","#FC8D59", "green", "green", "#FFFFBF","#FFFFBF")
+
+# The main Plot function chris: still need to make SE errorbars same color as lines...
+# gg line plot
+plot.fun<-function(var, group, thedf, time, title, xlab, ylab, ymin, ymax){
+  ggplot(data=thedf, aes(x=thedf[[time]], y=thedf[[var]], group=thedf[[group]])) +
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
+  scale_colour_manual(values=setNames(color.codes, grps)) +
+  coord_cartesian(ylim = c(ymin, ymax)) +
+  #geom_errorbar(aes(ymin = thedf[[paste0(var, "_mean")]] - thedf[[paste0(var, "_se")]], 
+   #                ymax= thedf[[paste0(var, "_mean")]] + thedf[[paste0(var, "_se")]],
+  #                 color=Treatment), 
+  #      width=.2, position=position_dodge(0.03)) + 
+  ggtitle(title) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(plot.title = element_text(size=18)) +
+  xlab(xlab) +
+  ylab(ylab)
+}
+```
+```{r, eval=F}
+#test
+plot.fun(var='attitude_cw', group='comm', thedf=plot.df, time='survey', title="Trust - Community", 
+         xlab="Survey", ylab="Average Attitudinal Index Score",
+         ymin=-0.1, ymax=1.1)
+```
+
+Plot.df is ag.df at community-level.
+
+Plot1.df is ag.df at site-level.
+
+Plot.df1 is panel.df at individual-level, collapsing TR and CO
+
+Plot.df2 is panel.df at individual-level, separating Part, Nonpart, Co.
+
+<!--Neither of these below are done. Don't need them. -->
+Plot.df3 is panel.df at community-level.
+
+Plot.df4 is panel.df at site-level.
+
+
+## Trust Index
+
+ECPN sites improed more on Outgroup Index than control sites.
+
+```{r, eval=F}
+(attitudeComm.plot_disag <- plot.fun(var='attitude_cw', group='psu', thedf=plot1.df, time='survey', title="Trust - Community", 
+         xlab="Survey", ylab="Average Attitudinal Index Score",
+         ymin=-0.1, ymax=1.1))
+```
+
+```{r}
+(attitudeComm.plot <- plot.fun(var='attitude_cw', group='comm', thedf=plot.df, time='survey', title="Community-level attitude change", 
+         xlab="Survey", ylab="Average Attitudinal Index Score",
+         ymin=-0.1, ymax=1.1))
+
+
+png(file="attitudeComm.plot_disag.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+attitudeComm.plot
+dev.off()
+```
+
+Part vs Non vs Con.  Part is blue and improves.  Non-part is green and gets a bit worse.  Control is red and gets much worse.
+
+```{r}
+(attitudePan.plot <- plot.fun(var='attitude_cw', group='thegroup', thedf=plot2.df, time='survey', title="Individual-level attitude change",
+         xlab="Survey", ylab="Average Attitudinal Index Score",
+         ymin=-0.1, ymax=1.1))
+
+png(file="attitudePan_plot_disag.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+attitudePan.plot
+dev.off()
+```
+
+## Intergroup Contact Index
+
+ECPN sites decreased less on contact index than control sites.
+
+```{r}
+(conComm.plot <- plot.fun(var='contactOnly_cw', group='comm',
+                          thedf=plot.df, time='survey',
+                          title="Community-level contact change",
+                          xlab="Survey", 
+                          ylab="Average Intergroup Contact Index Score",
+                          ymin=-0.1, ymax=1.1))
+
+png(file="conComm_plot_disag.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+conComm.plot
+dev.off()
+```
+
+
+## Perceptions of Security Index
+
+ECPN sites improved more on the security index than control sites.
+
+```{r}
+(inComm.plot <- plot.fun(var='in_cw', group='comm',
+                         thedf=plot.df, time='survey', title="Community-level insecurity perceptions change", 
+         xlab="Survey", ylab="Average Perceptions of Insecurity Index Score",
+         ymin=-1.1, ymax=0.1))
+
+png(file="inComm_plot_disag.png", bg="transparent", units="in",
+   width=8, height=6, res=300)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+inComm.plot
+dev.off()
+```
+
