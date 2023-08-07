@@ -488,6 +488,8 @@ Figure 2 suggests that the effects in Figure 1 are driven by worsening condition
 Great point. In general, we do see control communities getting worse across outcomes. But it wasn't driven by a particularly bad period in a single control community.
 Add to appendix: graphs with communities disaggregated
 
+**Survey outcomes*
+
 ```{r}
 # not the case that there is one big drop in control communities
 ## attitudes
@@ -525,6 +527,48 @@ summary(ag.df$in_cw[ag.df$treatment %in% 0])
 \caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:in_comm_dis}
 \end{figure}
 
+### Behavioral outcomes
+
+Skipped summary stats for most of these.
+
+#### Markets: pastoralist index
+
+```{r}
+# Events: pastoralists index
+summary(events$pastoralists_index_rank[events$treatment %in% 1 &
+                                       events$time %in% 0])
+summary(events$pastoralists_index_rank[events$treatment %in% 1 &
+                                       events$time %in% 1])
+
+summary(events$pastoralists_index_rank[events$treatment %in% 0 &
+                                       events$time %in% 0])
+summary(events$pastoralists_index_rank[events$treatment %in% 0 &
+                                       events$time %in% 1])
+```
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../obs_dat/b_analysis/market_pasts_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:market_past_siteTime}
+\end{figure}
+
+#### Markets: farmers index
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../obs_dat/b_analysis/market_farms_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:market_farm_siteTime}
+\end{figure}
+
+#### Events: Outgroup index
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../obs_dat/b_analysis/events_outgroup_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:events_outgroup_siteTime}
+\end{figure}
+
+
 ## Comment 5
 
 Lots of the findings are not statistically significant (e.g., Figure 3 seems to show that none of the effects on non-participants were statistically distinguishable from zero). Sometimes such estimates are treated as null effects and other times as impacts that are not statistically significant. It would be helpful to understand how the authors make such distinctions.
@@ -541,6 +585,8 @@ Thank you, that is correct that the non-participants were not statistically diff
 
 ```
 
+## Comment 6 (smaller questions)
+
 Finally, a few smaller questions:
 • Why are conflict and violence not included as dependent variables? There is an assumption that violence is caused by poor intergroup attitudes, but it is possible that attitudes could be improved without reducing violence. This seems important both theoretically and practically.
 
@@ -550,7 +596,15 @@ We have: violence_effect “In any clash that occurred in the last year, were yo
 
 
 ```{r}
+#violence_effect
+with(rand.df[rand.df$survey %in% 0,], prop.table(table(violence_effect_num, treatment),2))
 
+with(rand.df[rand.df$survey %in% 1,], prop.table(table(violence_effect_num, treatment),2))
+
+# violence work effect
+with(rand.df[rand.df$survey %in% 0,], prop.table(table(violence_work_effect, treatment),2))
+
+with(rand.df[rand.df$survey %in% 1,], prop.table(table(violence_work_effect, treatment),2))
 ```
 
 
@@ -564,8 +618,46 @@ Unaware of hypotheses
 Enumerator differences: take out Israel and Hadiza?
 
 ```{r}
+### robustness checks without hadiza/israel
+load("../obs_dat/b_analysis/obsDat_truePs_rb.rda")
+### robustness checks with only hadiza/israel
+load("../obs_dat/b_analysis/obsDat_truePs_had.rda")
 
+# without
+behObs_enumsCheck <- rbind(mark_pasts, mark_pasts_rb,
+                           mark_farms, mark_farms_rb,
+                           out_ind, out_ind_rb)
+colnames(behObs_enumsCheck) <- c("coefficient", "p-value")
+rownames(behObs_enumsCheck) <- c("market-pastoralists_all",
+                                 "market-pastoralists_without",
+                                 "market-farmers_all",
+                                 "market-farmers_without",
+                                 "events-outgroup_all",
+                                 "events-outgroup_without")
+behObs_enumsCheck <- round(behObs_enumsCheck,3)
+behObs_enumsCheck_tab <- knitr::kable(behObs_enumsCheck, format="latex")
+
+# only them
+behObs_enumsOnly <- rbind(mark_pasts_had, mark_farms_had, out_ind_had)
+colnames(behObs_enumsOnly) <- c("coefficient", "p-value")
+rownames(behObs_enumsOnly) <- c("market-pastoralists_enum",
+                                 "market-farmers_enum",
+                                 "events-outgroup_enum")
 ```
+
+**Chris written description for appendix**: Enumerators (for surveys and for behavioral observation) were not informed of a community's treatment status, but two of the enumerators for behavioral observations were involved in administering the intervention. They also only made observations at treatment sites. If their knowledge of program aims affected their observations (or if their observations became more positive over time for other reasons), our estimates of the treatment effect could be inflated.
+
+We removed observations from these two enumerators as a robustness check.  We also checked their change over time. Coefficients with their data removed are very similar to coefficients with their data included, and $p$-values are higher mainly as a result of fewer observations (and therefore degrees of freedom). Descriptively, the two enumerators involved in administering the intervention observed _less_ interaction in treatment sites over time relative to other enumerators. 
+
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsCheck_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows robustness checks for behavioral observations outcomes. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show  outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
+\smallskip
+`r behObs_enumsCheck_tab`
+\end{center}
+\end{table}
+
 
 # Review 2
 
