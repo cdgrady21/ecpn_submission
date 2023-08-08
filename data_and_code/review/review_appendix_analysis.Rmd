@@ -691,8 +691,9 @@ Possible response solution: note that the reviewer makes good points and this is
 With regard to research design, I would appreciate a stronger justification of the site selection. As the authors note, Benue has embraced especially strong policies biased against pastoralists (it was one of the first states to ban "open grazing"). The intervention is therefore correcting for a manufactured imbalance between the groups, in a way: pastoralists likely feel insecure when the state sided with farmers and organized militias on their behalf. This is also a condition that is arguably different from Nasarawa. Perhaps this is adequately captured in the fixed effects models noted in the supplemental info. Secondly, the description of the group identities is standard, characterizing pastoralists as overwhelmingly Fulani and Muslim etc. There might be little reason to question this, but I noticed that individual characteristics are dropped from the survey analysis in the supplemental index...if I am understanding that reference properly.
 
 **Response**
-In appendix, add exploratory regression that also uses individual’s demographic characteristics?
-table showing demographic characteristics of fulani vs farmers: (1) overall, (2) benue, (3) nasarawa
+In appendix:
+- table showing demographic characteristics of fulani vs farmers: (1) overall, (2) benue, (3) nasarawa
+- add exploratory regression that also uses individual’s demographic characteristics?
 Potentially add something about site selection or clarify the anti-grazing policies were implemented after site selection. 
 
 ```{r}
@@ -753,10 +754,107 @@ demo_tab_state1 <- knitr::kable(demo_tab_state, format="latex")
 \end{table}
 
 
+**add exploratory regression that also uses individual’s demographic characteristics for ag.df**
+
+```{r}
+#compare to newList coefs
+compCoefs <- sapply(newList, function(x) x$coef[x$base %in% 1])
+names(compCoefs) <- outcome_list
+
+# make vars for ag.df that aren't in ag.df
+needVars <- c("christian", "farming", "pastoralism", "trading",
+              "community", "survey")
+demo_df <- rand.df %>% filter(survey=="baseline")%>%
+  dplyr::select(all_of(needVars)) %>%
+  group_by(community) %>%
+  summarise(across(everything(), mean, na.rm=T))
+
+# merge into ag.df
+new_ag.df <- ag.df %>% left_join(demo_df, by=c("comm"="community")) %>%
+  as.data.frame()
+
+# make vars to control for in regression
+summary_vars_reg <- c("age_base", "female_base", "income_month_base", 
+                     "ethnic2fulani_base", paste(needVars[1:4]))
+
+# looping
+contr_reg_coefs <- data.frame(contr_coef = numeric(0))
+for(i in 1:length(outcome_list_qip))
+{
+  #reg formula
+  fmla <- paste(outcome_list_qip[i], "~ treatment +state +", 
+              paste(summary_vars_reg, collapse="+"))
+  
+  contr_reg_coefs[i,] <- summary(lm(fmla, data=new_ag.df))$coefficients[2,1]
+}
+comp_df <- cbind(compCoefs, contr_reg_coefs)
+comp_df['total (excludes pgp_amount)',] <- colSums(comp_df[!rownames(comp_df) %in% "pgp_amount_end",])
+comp_df$difference <- comp_df$compCoefs-comp_df$contr_coef
+names(comp_df) <- c("paper", "check", "difference")
+
+# kable
+comp_df1 <- knitr::kable(comp_df, format="latex")
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:comp_df1}
+\caption{\textbf{Regressions with community-average demographic variables} This table shows coefficients from each survey regression either (1) the version in the paper that does not control for demographic characteristics, or (2) a regression that aggregated demographic characteristics to the community-level and included them as control variables. The coefficients are similar -- the sum of the coefficients when controlling for demographic characteristics is slightly larger.}
+\smallskip
+`r comp_df1`
+\end{center}
+\end{table}
 
 
+**add exploratory regression that also uses individual’s demographic characteristics for individual-level stuff**
 
+```{r}
+#compare to newList coefs
+compCoefs_ind <- sapply(newList_ind, function(x) x$thecoef[x$base %in% 1 & grepl("-part", rownames(x))])
+names(compCoefs_ind) <- c(outcome_list[c(1:3,6:7)])
 
+# make vars that aren't in panel.df
+panel.df$christian_y0 <- ifelse(panel.df$religion_y0 %in% "christian", 1, 0)
+panel.df$farming_y0 <- ifelse(panel.df$occupation_y0 %in% c("farm","both"), 1, 0)
+panel.df$pastoralism_y0 <- ifelse(panel.df$occupation_y0 %in% c("pastor","both"), 1, 0)
+panel.df$trading_y0 <- ifelse(panel.df$occupation_y0 %in% "trade", 1, 0)
+panel.df$female_y0 <- ifelse(panel.df$gender_y0 %in% "female", 1, 0)
+panel.df$fulani_y0 <- ifelse(panel.df$ethnic2_y0 %in% "fulani", 1, 0)
+
+# make vars to control for in regression
+summary_vars_reg_ind <- c("age_y0", "female_y0", "income_month_y0", 
+                     "fulani_y0", "christian_y0",
+                     "farming_y0", "pastoralism_y0", "trading_y0")
+
+# looping
+outcome_list_ind <- outcome_list_qip[c(1:3,6:7)]
+outcome_list_ind <- gsub("_end", "_y1", outcome_list_ind)
+contr_reg_coefs <- data.frame(contr_coef = numeric(0))
+for(i in 1:length(outcome_list_ind))
+{
+  #reg formula
+  fmla <- paste(outcome_list_ind[i], "~ treatment +state +", 
+              paste(summary_vars_reg_ind, collapse="+"))
+  
+  contr_reg_coefs[i,] <- summary(lm(fmla, data=panel.df))$coefficients[2,1]
+}
+comp_df_ind <- cbind(compCoefs_ind, contr_reg_coefs)
+comp_df_ind['total (excludes pgp_amount)',] <- colSums(comp_df_ind[!rownames(comp_df_ind) %in% "pgp_amount_end",])
+comp_df_ind$difference <- comp_df_ind$compCoefs-comp_df_ind$contr_coef
+names(comp_df_ind) <- c("paper", "check", "difference")
+
+# kable
+comp_df_ind1 <- knitr::kable(comp_df_ind, format="latex")
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:comp_df_ind1}
+\caption{\textbf{Regressions with individual demographic variables} This table shows coefficients from each survey regression either (1) the version in the paper that does not control for demographic characteristics, or (2) a regression that includes individual-level demographic characteristics as control variables. The coefficients are similar -- the sum of the coefficients when controlling for demographic characteristics is slightly smaller.}
+\smallskip
+`r comp_df_ind1`
+\end{center}
+\end{table}
 
 # Misc
 
