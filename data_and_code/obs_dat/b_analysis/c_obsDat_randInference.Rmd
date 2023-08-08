@@ -47,6 +47,8 @@ summary(lm(pastoralists_index_rank~treatment*time+State+site, data=markets_rb))
 # only israel/hadiza
 ## note: only went to treatment sites
 mark_pasts_had <- summary(lm(pastoralists_index_rank~time, data=markets_had))$coefficients['time',c(1,4)]
+## comparison
+summary(lm(pastoralists_index_rank~time, data=markets_rb))$coefficients['time',c(1,4)]
 ```
 
 ```{r}
@@ -160,6 +162,8 @@ set.seed(0528)
 
 #cannot do truep with only israel/hadiza -- they only went to TR sites
 mark_farms_had <- summary(lm(farmers_index_rank~time, data=markets_had))$coefficients['time',c(1,4)]
+## comparison
+summary(lm(farmers_index_rank~time, data=markets_rb))$coefficients['time',c(1,4)]
 ```
 
 
@@ -200,6 +204,8 @@ set.seed(0528)
 
 #only israel/hadiza
 out_ind_had <- summary(lm(outgroupPerc_index_rank~time, data=events_had))$coefficients['time',c(1,4)]
+## comparison
+summary(lm(outgroupPerc_index_rank~time, data=events_rb))$coefficients['time',c(1,4)]
 ```
 
 # Save
@@ -210,7 +216,7 @@ obsDat_truePs <- rbind(mark_pasts, mark_farms, out_ind)
 rownames(obsDat_truePs) <- c("pastoralists_index_rank", 
                              "farmers_index_rank",
                              "outgroup_index_rank")
-save(obsDat_truePs, file="obsDat_truePs.rda")
+save(mark_pasts,mark_farms,out_ind,obsDat_truePs, file="obsDat_truePs.rda")
 
 # Save robustness check that excludes hadiza/israel
 obsDat_truePs_rb <- rbind(mark_pasts_rb, mark_farms_rb, out_ind_rb)
@@ -218,7 +224,7 @@ obsDat_truePs_rb <- rbind(mark_pasts_rb, mark_farms_rb, out_ind_rb)
 rownames(obsDat_truePs_rb) <- c("pastoralists_index_rank_rb", 
                              "farmers_index_rank_rb",
                              "outgroup_index_rank_rb")
-save(obsDat_truePs_rb, file="obsDat_truePs_rb.rda")
+save(mark_pasts_rb, mark_farms_rb, out_ind_rb,obsDat_truePs_rb, file="obsDat_truePs_rb.rda")
 
 # Save robustness check that is only hadiza/israel
 obsDat_truePs_had <- rbind(mark_pasts_had, mark_farms_had, out_ind_had)
@@ -226,7 +232,7 @@ obsDat_truePs_had <- rbind(mark_pasts_had, mark_farms_had, out_ind_had)
 rownames(obsDat_truePs_had) <- c("pastoralists_index_rank_had", 
                              "farmers_index_rank_had",
                              "outgroup_index_rank_had")
-save(obsDat_truePs_had, file="obsDat_truePs_had.rda")
+save(mark_pasts_had, mark_farms_had, out_ind_had,obsDat_truePs_had, file="obsDat_truePs_had.rda")
 ```
 
 # Other

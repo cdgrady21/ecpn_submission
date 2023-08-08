@@ -685,24 +685,72 @@ Maybe concerned with:
 
 Possible response solution: note that the reviewer makes good points and this is a complex issue.  Then go over the several things we think reviewer is pointing out, responding to each point.
 
-```{r}
-
-```
 
 ## Comment 2
 
 With regard to research design, I would appreciate a stronger justification of the site selection. As the authors note, Benue has embraced especially strong policies biased against pastoralists (it was one of the first states to ban "open grazing"). The intervention is therefore correcting for a manufactured imbalance between the groups, in a way: pastoralists likely feel insecure when the state sided with farmers and organized militias on their behalf. This is also a condition that is arguably different from Nasarawa. Perhaps this is adequately captured in the fixed effects models noted in the supplemental info. Secondly, the description of the group identities is standard, characterizing pastoralists as overwhelmingly Fulani and Muslim etc. There might be little reason to question this, but I noticed that individual characteristics are dropped from the survey analysis in the supplemental index...if I am understanding that reference properly.
 
 **Response**
-In appendix, add exploratory regression that also uses individual’s demographic characteristics
+In appendix, add exploratory regression that also uses individual’s demographic characteristics?
+table showing demographic characteristics of fulani vs farmers: (1) overall, (2) benue, (3) nasarawa
 Potentially add something about site selection or clarify the anti-grazing policies were implemented after site selection. 
 
 ```{r}
+# table showing demographic characteristics of fulani vs farmers: (1) overall, (2) benue, (3) nasarawa
+## make variables
+rand.df$survey <- ifelse(rand.df$survey %in% 0, "baseline", "endline")
+rand.df$christian <- ifelse(rand.df$religion %in% "christian", 1, 0)
+rand.df$muslim <- ifelse(rand.df$religion %in% "muslim", 1, 0)
+rand.df$farming <- ifelse(rand.df$occupation %in% c("farm","both"), 1, 0)
+rand.df$pastoralism <- ifelse(rand.df$occupation %in% c("pastor","both"), 1, 0)
+rand.df$trading <- ifelse(rand.df$occupation %in% "trade", 1, 0)
+rand.df$fulani <- rand.df$ethnic2fulani
 
+## List of group variables and summary variables
+group_vars <- c("farm_pastor", "state", "survey")
+summary_vars <- c("age", "female", "income_month", 
+                  "fulani", "christian", "muslim",
+                  "farming", "pastoralism", "trading",
+                  "radio")
+
+#show: age, gender, income, house_size, ethnic, religion, occupation, radio
+# overall
+demo_tab_overall <- rand.df %>% dplyr::select(farm_pastor,summary_vars) %>%
+  group_by(farm_pastor) %>%
+  summarise(across(everything(), mean, na.rm=T))
+
+# by state
+demo_tab_state <- rand.df %>% dplyr::select(farm_pastor, state,summary_vars) %>%
+  group_by(farm_pastor, state) %>%
+  summarise(across(everything(), mean, na.rm=T))
+
+# farm_pastor,state, survey -- too complex
+#rand.df %>% dplyr::select(group_vars,summary_vars) %>%
+#  group_by(farm_pastor, survey, state) %>%
+#  summarise(across(everything(), mean, na.rm=T))
+
+# tables
+demo_tab_overall1 <- knitr::kable(demo_tab_overall, format="latex")
+demo_tab_state1 <- knitr::kable(demo_tab_state, format="latex")
 ```
 
+\begin{table}[H]
+\begin{center}
+\label{tab:demo_tab_overall1}
+\caption{\textbf{Farmer and Pastoralist Demographics} This table shows demographic characteristics for farming groups and pastoralist groups}
+\smallskip
+`r demo_tab_overall1`
+\end{center}
+\end{table}
 
-
+\begin{table}[H]
+\begin{center}
+\label{tab:demo_tab_state1}
+\caption{\textbf{Farmer and Pastoralist Demographics by State} This table shows demographic characteristics for farming groups and pastoralist groups, separating respondents from Nasarawa and Benue}
+\smallskip
+`r demo_tab_state1`
+\end{center}
+\end{table}
 
 
 
