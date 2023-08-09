@@ -363,6 +363,8 @@ display: none;
 <li><a href="#comment-3" id="toc-comment-3">Comment 3</a></li>
 <li><a href="#comment-4" id="toc-comment-4">Comment 4</a></li>
 <li><a href="#comment-5" id="toc-comment-5">Comment 5</a></li>
+<li><a href="#comment-6-smaller-questions" id="toc-comment-6-smaller-questions">Comment 6 (smaller
+questions)</a></li>
 </ul></li>
 <li><a href="#review-2" id="toc-review-2">Review 2</a>
 <ul>
@@ -865,19 +867,19 @@ names(commListPs) &lt;- c(outcome_list, rownames(obsDat_truePs))
 ### contact
 p.adjust(commListPs[c(3,4,8:10)], method=&quot;none&quot;)</code></pre>
 <pre><code>##             contactOnly                   rMean pastoralists_index_rank 
-##               0.0595000               0.2389000               0.0014000 
+##                  0.0595                  0.2389                  0.0014 
 ##      farmers_index_rank     outgroup_index_rank 
-##               0.2416000               0.2534757</code></pre>
+##                  0.2416                  0.1856</code></pre>
 <pre class="r"><code>p.adjust(commListPs[c(3,4,8:10)], method=&quot;fdr&quot;)</code></pre>
 <pre><code>##             contactOnly                   rMean pastoralists_index_rank 
-##               0.1487500               0.2534757               0.0070000 
+##                 0.14875                 0.24160                 0.00700 
 ##      farmers_index_rank     outgroup_index_rank 
-##               0.2534757               0.2534757</code></pre>
+##                 0.24160                 0.24160</code></pre>
 <pre class="r"><code>p.adjust(commListPs[c(3,4,8:10)], method=&quot;holm&quot;)</code></pre>
 <pre><code>##             contactOnly                   rMean pastoralists_index_rank 
-##                  0.2380                  0.7167                  0.0070 
+##                  0.2380                  0.5568                  0.0070 
 ##      farmers_index_rank     outgroup_index_rank 
-##                  0.7167                  0.7167</code></pre>
+##                  0.5568                  0.5568</code></pre>
 <pre class="r"><code>### insecurity (its own family, could consider it an attitude)
 p.adjust(commListPs[c(1,2,5)], method=&quot;none&quot;)</code></pre>
 <pre><code>## attitude       in  end_exp 
@@ -911,22 +913,22 @@ p.adjust(commListPs[c(6,7)], method=&quot;none&quot;)</code></pre>
 <pre class="r"><code>### all
 p.adjust(p=commListPs, method = &quot;none&quot;)</code></pre>
 <pre><code>##                attitude                      in             contactOnly 
-##               0.0448000               0.0205000               0.0595000 
+##                  0.0448                  0.0205                  0.0595 
 ##                   rMean                 end_exp          pgp_donate_end 
-##               0.2389000               0.2117000               0.2938000 
+##                  0.2389                  0.2117                  0.2938 
 ##          pgp_amount_end pastoralists_index_rank      farmers_index_rank 
-##               0.8522000               0.0014000               0.2416000 
+##                  0.8522                  0.0014                  0.2416 
 ##     outgroup_index_rank 
-##               0.2534757</code></pre>
+##                  0.1856</code></pre>
 <pre class="r"><code>p.adjust(p=commListPs, method = &quot;fdr&quot;)</code></pre>
 <pre><code>##                attitude                      in             contactOnly 
 ##               0.1487500               0.1025000               0.1487500 
 ##                   rMean                 end_exp          pgp_donate_end 
-##               0.3168447               0.3168447               0.3264444 
+##               0.3020000               0.3020000               0.3264444 
 ##          pgp_amount_end pastoralists_index_rank      farmers_index_rank 
-##               0.8522000               0.0140000               0.3168447 
+##               0.8522000               0.0140000               0.3020000 
 ##     outgroup_index_rank 
-##               0.3168447</code></pre>
+##               0.3020000</code></pre>
 <pre class="r"><code>p.adjust(p=commListPs, method = &quot;holm&quot;)</code></pre>
 <pre><code>##                attitude                      in             contactOnly 
 ##                  0.3584                  0.1845                  0.4165 
@@ -1065,6 +1067,7 @@ patterns hold for other outcomes?</p>
 communities getting worse across outcomes. But it wasn’t driven by a
 particularly bad period in a single control community. Add to appendix:
 graphs with communities disaggregated</p>
+<p>**Survey outcomes*</p>
 <pre class="r"><code># not the case that there is one big drop in control communities
 ## attitudes
 summary(ag.df$attitude_cw[ag.df$treatment %in% 1])</code></pre>
@@ -1087,6 +1090,38 @@ summary(ag.df$in_cw[ag.df$treatment %in% 1])</code></pre>
 <pre class="r"><code>summary(ag.df$in_cw[ag.df$treatment %in% 0])</code></pre>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## -0.17207 -0.08185 -0.04118  0.05516  0.22691  0.41297</code></pre>
+<div id="behavioral-outcomes" class="section level3">
+<h3>Behavioral outcomes</h3>
+<p>Skipped summary stats for most of these.</p>
+<div id="markets-pastoralist-index" class="section level4">
+<h4>Markets: pastoralist index</h4>
+<pre class="r"><code># Events: pastoralists index
+summary(events$pastoralists_index_rank[events$treatment %in% 1 &amp;
+                                       events$time %in% 0])</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    7.50   16.00   34.00   41.07   66.00   86.00</code></pre>
+<pre class="r"><code>summary(events$pastoralists_index_rank[events$treatment %in% 1 &amp;
+                                       events$time %in% 1])</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    2.50   20.00   36.00   39.48   58.50   84.50</code></pre>
+<pre class="r"><code>summary(events$pastoralists_index_rank[events$treatment %in% 0 &amp;
+                                       events$time %in% 0])</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   22.50   39.50   54.00   59.34   80.50   92.00</code></pre>
+<pre class="r"><code>summary(events$pastoralists_index_rank[events$treatment %in% 0 &amp;
+                                       events$time %in% 1])</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    2.50   23.25   47.00   46.37   68.00   88.00</code></pre>
+</div>
+<div id="markets-farmers-index" class="section level4">
+<h4>Markets: farmers index</h4>
+
+</div>
+<div id="events-outgroup-index" class="section level4">
+<h4>Events: Outgroup index</h4>
+
+</div>
+</div>
 </div>
 <div id="comment-5" class="section level2">
 <h2>Comment 5</h2>
@@ -1101,6 +1136,9 @@ non-participants were not statistically different from the control
 group. We need to be consistent with wording.</p>
 <p>.1 marginal .2 a potential trend /&gt;.2 null</p>
 <pre class="r"><code># For exact p-values: Appendix B for community-level analysis, Appendix C for individual-level.</code></pre>
+</div>
+<div id="comment-6-smaller-questions" class="section level2">
+<h2>Comment 6 (smaller questions)</h2>
 <p>Finally, a few smaller questions: • Why are conflict and violence not
 included as dependent variables? There is an assumption that violence is
 caused by poor intergroup attitudes, but it is possible that attitudes
@@ -1111,6 +1149,42 @@ it. It’s a good idea but we weren’t able to measure that. We have:
 violence_effect “In any clash that occurred in the last year, were you
 or anyone in your family negatively affected by an attack caused by [X
 group]”</p>
+<pre class="r"><code>#violence_effect
+with(rand.df[rand.df$survey %in% 0,], prop.table(table(violence_effect_num, treatment),2))</code></pre>
+<pre><code>##                    treatment
+## violence_effect_num          0          1
+##                 0   0.38281250 0.47322298
+##                 0.2 0.10351562 0.05842259
+##                 0.4 0.14062500 0.08276534
+##                 0.6 0.17578125 0.15481986
+##                 0.8 0.13085938 0.13047712
+##                 1   0.06640625 0.10029211</code></pre>
+<pre class="r"><code>with(rand.df[rand.df$survey %in% 1,], prop.table(table(violence_effect_num, treatment),2))</code></pre>
+<pre><code>##                    treatment
+## violence_effect_num          0          1
+##                 0   0.77976190 0.76622137
+##                 0.2 0.03571429 0.03435115
+##                 0.4 0.03174603 0.02958015
+##                 0.6 0.04563492 0.04293893
+##                 0.8 0.03571429 0.06106870
+##                 1   0.07142857 0.06583969</code></pre>
+<pre class="r"><code># violence work effect
+with(rand.df[rand.df$survey %in% 0,], prop.table(table(violence_work_effect, treatment),2))</code></pre>
+<pre><code>##                     treatment
+## violence_work_effect          0          1
+##                    0 0.05671642 0.02086957
+##                    1 0.05074627 0.04173913
+##                    2 0.07164179 0.04521739
+##                    3 0.21194030 0.26782609
+##                    4 0.60895522 0.62434783</code></pre>
+<pre class="r"><code>with(rand.df[rand.df$survey %in% 1,], prop.table(table(violence_work_effect, treatment),2))</code></pre>
+<pre><code>##                     treatment
+## violence_work_effect          0          1
+##                    0 0.09929078 0.13000000
+##                    1 0.09929078 0.05000000
+##                    2 0.07092199 0.11333333
+##                    3 0.25531915 0.17666667
+##                    4 0.47517730 0.53000000</code></pre>
 <p>• Were the enumerators who carried out the market observations aware
 of a community’s treatment status? If such observations were not
 treatment-blind, should we be concerned about biased reporting of
@@ -1118,6 +1192,47 @@ intergroup contact?</p>
 <p><strong>Response</strong> Lisa’s email .</p>
 <p>Method appendix Unaware of hypotheses Enumerator differences: take
 out Israel and Hadiza?</p>
+<pre class="r"><code>### robustness checks without hadiza/israel
+load(&quot;../obs_dat/b_analysis/obsDat_truePs_rb.rda&quot;)
+### robustness checks with only hadiza/israel
+load(&quot;../obs_dat/b_analysis/obsDat_truePs_had.rda&quot;)
+
+# without
+behObs_enumsCheck &lt;- rbind(mark_pasts, mark_pasts_rb,
+                           mark_farms, mark_farms_rb,
+                           out_ind, out_ind_rb)
+colnames(behObs_enumsCheck) &lt;- c(&quot;coefficient&quot;, &quot;p-value&quot;)
+rownames(behObs_enumsCheck) &lt;- c(&quot;market-pastoralists_all&quot;,
+                                 &quot;market-pastoralists_without&quot;,
+                                 &quot;market-farmers_all&quot;,
+                                 &quot;market-farmers_without&quot;,
+                                 &quot;events-outgroup_all&quot;,
+                                 &quot;events-outgroup_without&quot;)
+behObs_enumsCheck &lt;- round(behObs_enumsCheck,3)
+behObs_enumsCheck_tab &lt;- knitr::kable(behObs_enumsCheck, format=&quot;latex&quot;)
+
+# only them
+behObs_enumsOnly &lt;- rbind(mark_pasts_had, mark_farms_had, out_ind_had)
+colnames(behObs_enumsOnly) &lt;- c(&quot;coefficient&quot;, &quot;p-value&quot;)
+rownames(behObs_enumsOnly) &lt;- c(&quot;market-pastoralists_enum&quot;,
+                                 &quot;market-farmers_enum&quot;,
+                                 &quot;events-outgroup_enum&quot;)</code></pre>
+<p><strong>Chris written description for appendix</strong>: Enumerators
+(for surveys and for behavioral observation) were not informed of a
+community’s treatment status, but two of the enumerators for behavioral
+observations were involved in administering the intervention. They also
+only made observations at treatment sites. If their knowledge of program
+aims affected their observations (or if their observations became more
+positive over time for other reasons), our estimates of the treatment
+effect could be inflated.</p>
+<p>We removed observations from these two enumerators as a robustness
+check. We also checked their change over time. Coefficients with their
+data removed are very similar to coefficients with their data included,
+and <span class="math inline">\(p\)</span>-values are higher mainly as a
+result of fewer observations (and therefore degrees of freedom).
+Descriptively, the two enumerators involved in administering the
+intervention observed <em>less</em> interaction in treatment sites over
+time relative to other enumerators.</p>
 </div>
 </div>
 <div id="review-2" class="section level1">
@@ -1199,10 +1314,126 @@ characterizing pastoralists as overwhelmingly Fulani and Muslim etc.
 There might be little reason to question this, but I noticed that
 individual characteristics are dropped from the survey analysis in the
 supplemental index…if I am understanding that reference properly.</p>
-<p><strong>Response</strong> In appendix, add exploratory regression
-that also uses individual’s demographic characteristics Potentially add
-something about site selection or clarify the anti-grazing policies were
-implemented after site selection.</p>
+<p><strong>Response</strong> In appendix: - table showing demographic
+characteristics of fulani vs farmers: (1) overall, (2) benue, (3)
+nasarawa - add exploratory regression that also uses individual’s
+demographic characteristics? Potentially add something about site
+selection or clarify the anti-grazing policies were implemented after
+site selection.</p>
+<pre class="r"><code># table showing demographic characteristics of fulani vs farmers: (1) overall, (2) benue, (3) nasarawa
+## make variables
+rand.df$survey &lt;- ifelse(rand.df$survey %in% 0, &quot;baseline&quot;, &quot;endline&quot;)
+rand.df$christian &lt;- ifelse(rand.df$religion %in% &quot;christian&quot;, 1, 0)
+rand.df$muslim &lt;- ifelse(rand.df$religion %in% &quot;muslim&quot;, 1, 0)
+rand.df$farming &lt;- ifelse(rand.df$occupation %in% c(&quot;farm&quot;,&quot;both&quot;), 1, 0)
+rand.df$pastoralism &lt;- ifelse(rand.df$occupation %in% c(&quot;pastor&quot;,&quot;both&quot;), 1, 0)
+rand.df$trading &lt;- ifelse(rand.df$occupation %in% &quot;trade&quot;, 1, 0)
+rand.df$fulani &lt;- rand.df$ethnic2fulani
+
+## List of group variables and summary variables
+group_vars &lt;- c(&quot;farm_pastor&quot;, &quot;state&quot;, &quot;survey&quot;)
+summary_vars &lt;- c(&quot;age&quot;, &quot;female&quot;, &quot;income_month&quot;, 
+                  &quot;fulani&quot;, &quot;christian&quot;, &quot;muslim&quot;,
+                  &quot;farming&quot;, &quot;pastoralism&quot;, &quot;trading&quot;,
+                  &quot;radio&quot;)
+
+#show: age, gender, income, house_size, ethnic, religion, occupation, radio
+# overall
+demo_tab_overall &lt;- rand.df %&gt;% dplyr::select(farm_pastor,summary_vars) %&gt;%
+  group_by(farm_pastor) %&gt;%
+  summarise(across(everything(), mean, na.rm=T))
+
+# by state
+demo_tab_state &lt;- rand.df %&gt;% dplyr::select(farm_pastor, state,summary_vars) %&gt;%
+  group_by(farm_pastor, state) %&gt;%
+  summarise(across(everything(), mean, na.rm=T))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;farm_pastor&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code># farm_pastor,state, survey -- too complex
+#rand.df %&gt;% dplyr::select(group_vars,summary_vars) %&gt;%
+#  group_by(farm_pastor, survey, state) %&gt;%
+#  summarise(across(everything(), mean, na.rm=T))
+
+# tables
+demo_tab_overall1 &lt;- knitr::kable(demo_tab_overall, format=&quot;latex&quot;)
+demo_tab_state1 &lt;- knitr::kable(demo_tab_state, format=&quot;latex&quot;)</code></pre>
+<p><strong>add exploratory regression that also uses individual’s
+demographic characteristics for ag.df</strong></p>
+<pre class="r"><code>#compare to newList coefs
+compCoefs &lt;- sapply(newList, function(x) x$coef[x$base %in% 1])
+names(compCoefs) &lt;- outcome_list
+
+# make vars for ag.df that aren&#39;t in ag.df
+needVars &lt;- c(&quot;christian&quot;, &quot;farming&quot;, &quot;pastoralism&quot;, &quot;trading&quot;,
+              &quot;community&quot;, &quot;survey&quot;)
+demo_df &lt;- rand.df %&gt;% filter(survey==&quot;baseline&quot;)%&gt;%
+  dplyr::select(all_of(needVars)) %&gt;%
+  group_by(community) %&gt;%
+  summarise(across(everything(), mean, na.rm=T))
+
+# merge into ag.df
+new_ag.df &lt;- ag.df %&gt;% left_join(demo_df, by=c(&quot;comm&quot;=&quot;community&quot;)) %&gt;%
+  as.data.frame()
+
+# make vars to control for in regression
+summary_vars_reg &lt;- c(&quot;age_base&quot;, &quot;female_base&quot;, &quot;income_month_base&quot;, 
+                     &quot;ethnic2fulani_base&quot;, paste(needVars[1:4]))
+
+# looping
+contr_reg_coefs &lt;- data.frame(contr_coef = numeric(0))
+for(i in 1:length(outcome_list_qip))
+{
+  #reg formula
+  fmla &lt;- paste(outcome_list_qip[i], &quot;~ treatment +state +&quot;, 
+              paste(summary_vars_reg, collapse=&quot;+&quot;))
+  
+  contr_reg_coefs[i,] &lt;- summary(lm(fmla, data=new_ag.df))$coefficients[2,1]
+}
+comp_df &lt;- cbind(compCoefs, contr_reg_coefs)
+comp_df[&#39;total (excludes pgp_amount)&#39;,] &lt;- colSums(comp_df[!rownames(comp_df) %in% &quot;pgp_amount_end&quot;,])
+comp_df$difference &lt;- comp_df$compCoefs-comp_df$contr_coef
+names(comp_df) &lt;- c(&quot;paper&quot;, &quot;check&quot;, &quot;difference&quot;)
+
+# kable
+comp_df1 &lt;- knitr::kable(comp_df, format=&quot;latex&quot;)</code></pre>
+<p><strong>add exploratory regression that also uses individual’s
+demographic characteristics for individual-level stuff</strong></p>
+<pre class="r"><code>#compare to newList coefs
+compCoefs_ind &lt;- sapply(newList_ind, function(x) x$thecoef[x$base %in% 1 &amp; grepl(&quot;-part&quot;, rownames(x))])
+names(compCoefs_ind) &lt;- c(outcome_list[c(1:3,6:7)])
+
+# make vars that aren&#39;t in panel.df
+panel.df$christian_y0 &lt;- ifelse(panel.df$religion_y0 %in% &quot;christian&quot;, 1, 0)
+panel.df$farming_y0 &lt;- ifelse(panel.df$occupation_y0 %in% c(&quot;farm&quot;,&quot;both&quot;), 1, 0)
+panel.df$pastoralism_y0 &lt;- ifelse(panel.df$occupation_y0 %in% c(&quot;pastor&quot;,&quot;both&quot;), 1, 0)
+panel.df$trading_y0 &lt;- ifelse(panel.df$occupation_y0 %in% &quot;trade&quot;, 1, 0)
+panel.df$female_y0 &lt;- ifelse(panel.df$gender_y0 %in% &quot;female&quot;, 1, 0)
+panel.df$fulani_y0 &lt;- ifelse(panel.df$ethnic2_y0 %in% &quot;fulani&quot;, 1, 0)
+
+# make vars to control for in regression
+summary_vars_reg_ind &lt;- c(&quot;age_y0&quot;, &quot;female_y0&quot;, &quot;income_month_y0&quot;, 
+                     &quot;fulani_y0&quot;, &quot;christian_y0&quot;,
+                     &quot;farming_y0&quot;, &quot;pastoralism_y0&quot;, &quot;trading_y0&quot;)
+
+# looping
+outcome_list_ind &lt;- outcome_list_qip[c(1:3,6:7)]
+outcome_list_ind &lt;- gsub(&quot;_end&quot;, &quot;_y1&quot;, outcome_list_ind)
+contr_reg_coefs &lt;- data.frame(contr_coef = numeric(0))
+for(i in 1:length(outcome_list_ind))
+{
+  #reg formula
+  fmla &lt;- paste(outcome_list_ind[i], &quot;~ treatment +state +&quot;, 
+              paste(summary_vars_reg_ind, collapse=&quot;+&quot;))
+  
+  contr_reg_coefs[i,] &lt;- summary(lm(fmla, data=panel.df))$coefficients[2,1]
+}
+comp_df_ind &lt;- cbind(compCoefs_ind, contr_reg_coefs)
+comp_df_ind[&#39;total (excludes pgp_amount)&#39;,] &lt;- colSums(comp_df_ind[!rownames(comp_df_ind) %in% &quot;pgp_amount_end&quot;,])
+comp_df_ind$difference &lt;- comp_df_ind$compCoefs-comp_df_ind$contr_coef
+names(comp_df_ind) &lt;- c(&quot;paper&quot;, &quot;check&quot;, &quot;difference&quot;)
+
+# kable
+comp_df_ind1 &lt;- knitr::kable(comp_df_ind, format=&quot;latex&quot;)</code></pre>
 </div>
 </div>
 <div id="misc" class="section level1">
