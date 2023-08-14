@@ -42,14 +42,14 @@ Order: Contact, Perceptions Security, Attitudes, PGG.
 
 ```{r}
 outcome <- ag.coefs
-outcome <- outcome[grepl("Trust|contact|in_cw|end_exp|rMean|pgp", outcome$var),]
+outcome <- outcome[grepl("attitude|contact|in_cw|end_exp|rMean|pgp", outcome$var),]
 outcome <- outcome[,c("var", "size", "ll_size", "ul_size")]
 names(outcome) <- c("var", "coef_sd", "ll_sd", "ul_sd")
-outcome$var <- c("Self-reported Attitudes", "Self-reported Contact", 
-                 "Perceptions of Security",
-                 "Public Goods Amount", "Public Goods Donation",
-                 "Contact Willingness", "Endorsement Experiment")
-outcome$outcome_type <- c("atts", "con", "in","pgg", "pgg", "con", "atts")
+outcome$var <- c("Self-reported Attitudes", "Perceptions of Security",
+                 "Self-reported Contact",
+                 "Contact Willingness", "Endorsement Experiment",
+                 "Public Goods Donation", "Public Goods Amount")
+outcome$outcome_type <- c("atts", "in", "con", "con", "atts", "pgg", "pgg")
 
 outcome2$outcome_type <- "con"
 outcome2$Data <- "Behavior"
@@ -60,9 +60,9 @@ outcome2$df <- NULL
 outcome$Data <- "Survey"
 outcome$Data[outcome$outcome_type %in% "pgg"] <- "Behavior"
 svyObs_outcomes <- rbind(outcome, outcome2)
-svyObs_outcomes$hypothesis <- c("Attitudes", "Contact", "Security", 
-                                "Cooperation", "Cooperation", "Contact",
-                                "Attitudes", 
+svyObs_outcomes$hypothesis <- c("Attitudes", "Security", "Contact", 
+                                "Contact","Attitudes",
+                                "Cooperation", "Cooperation", 
                                 "Contact", "Contact", "Contact")
 res <- svyObs_outcomes
 res$hypothesisF <-
@@ -105,11 +105,11 @@ Need two point estimates & CI per outcome.
 
 ```{r}
 outcome_ind <- ind.coefs
-outcome_ind <- outcome_ind[grepl("Trust|contact|in_cw|pgp", outcome_ind$var),]
+outcome_ind <- outcome_ind[grepl("attitude|contact|in_cw|pgp", outcome_ind$var),]
 outcome_ind <- outcome_ind[,c(1,grep("^size.*(non|part)", names(outcome_ind)))]
-outcome_ind$var <- c("Self-reported Attitudes", "Self-reported Contact", 
-                 "Perceptions of Security", "Public Goods Amount",
-                 "Public Goods Donation")
+outcome_ind$var <- c("Self-reported Attitudes", "Perceptions of Security", 
+                     "Self-reported Contact", 
+                     "Public Goods Donation", "Public Goods Amount")
 part <- outcome_ind[,c(1,grep("part", names(outcome_ind)))]
 non <- outcome_ind[,c(1,grep("non", names(outcome_ind)))]
 names(part) <- gsub("_part", "", names(part))

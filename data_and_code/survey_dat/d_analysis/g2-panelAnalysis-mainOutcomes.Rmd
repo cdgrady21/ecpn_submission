@@ -87,8 +87,8 @@ panel.df$tr_n <- as.numeric(panel.df$tr_f)
 
 ```{r}
 # matrices sooooo fast
-system.time(replicate(10000, data.frame(thecoef=c(NA, NA), truep=c(NA, NA))))
-system.time(replicate(10000, matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))))
+#system.time(replicate(10000, data.frame(thecoef=c(NA, NA), truep=c(NA, NA))))
+#system.time(replicate(10000, matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))))
 
 #chris: doesnt work with pgp
 analysis.fun <- function(var,nsims)
@@ -214,166 +214,44 @@ save(placeboList_ind, file="pl_list_of_coefs_and_ps_ind.Rda")
 load("pl_list_of_coefs_and_ps_ind.Rda")
 ```
 
+# NPC
+
+Now NPC (NPC now defunct, not on CRAN, i am using an old version.)
+
+```{r, eval=F}
+npc <- NPC::NPC(panel.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c("attitude_cw", "in_cw", 'contactOnly_cw'), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=10000, seed=952022,
+             print.steps=FALSE)
+(p_combP <- npc$p.values['NPC']) # cumulative
+npc # all of them
+
+```
+
 
 *************
 
 
+### Save 
 
-
-
-
-
-
-### Percent Experiment / Rand Exp
+For use to make coefplots
 
 ```{r}
-strat.fun("rand_outcome_y0")
-(p_randp1 <- com.fun(var="rand_outcome", nsims=1000))
-#(p_randp1 <- com.fun1(var="rand_outcome_y1", nsims=1000))
+save(panel.df, newList_ind, placeboList_ind, file="g2-panelAnal_coefplots.Rdata")
 
 ```
 
-
-### Intergroup Affect
-
- 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
-pastoralists will trust each other more and feel more positively towards the outgroup than individuals
-
-Variables: `r paste(xVars, collapse=", ")`
-
-```{r}
-strat.fun("x_cw_y0")
-(p_xp1 <- com.fun1(var="x_cw", nsims=1000))
-trustp_ind <- com.fun1(var="x_index", nsims=1000)
-```
-
-The p-value is `r p_xp1$truep`.
-
-### Social Cohesion
-
- 1. Individuals involved in the planning and implementing of projects that benefit both farmers and
-pastoralists will trust each other more and feel more positively towards the outgroup than individuals
-
-Cohesion1 Vars: `r paste(cohesVars1, collapse=", ")`
-
-Cohesion2 Vars: `r paste(cohesVars2, collapse=", ")`
-
-```{r}
-strat.fun("cohes_cw_y0")
-(p_cohesp <- com.fun('cohes_cw', nsims=1000))
-```
-
-The p-value is `r p_cohesp$truep`.
-
-This index has two components.  The first set of questions are abstract things like "Are people in this area willing to help their neighbors across ethnic and religious lines?".  Before we ask these questions we say "I am going to ask you about people in this area, including people from the outgroup."
-
-The second set are concrete hypothetical situations that directly relate to the outgroup, like "If something unfortunate happened to someone from your group in this community, such as a serious illness or the death of a parent, how likely is it that some people in the community from the outgroup would get together to help them?"
-
-#### Cohesion 1, abstract questions
-
-```{r}
-strat.fun("cohes1_cw_y0")
-com.fun('cohes1_cw', nsims=1000)
-```
-
-
-#### Cohesion 2, concrete hypotheticals
-
-```{r}
-strat.fun("cohes2_cw_y0")
-(p_cohesp2 <- com.fun('cohes2_cw', nsims=1000))
-```
-
-The p-value is `r p_cohesp2$truep`.
-
-
-### PGG
-
- 2. Individuals involved in the planning and implementing of projects that benefit both farmers and
-pastoralists will cooperate more in the PGG than individuals who did not participate in these activities.
-
-#### Donation Amount
-
-```{r pgg1}
-## no baseline, so differencing
-(p_pgpp1 <- com.fun1('pgp_amount_y1', nsims=1000))
-```
-
-The p-value is `r p_pgpp1$truep`.
-
-#### Donate yes/no
-
-```{r}
-(p_pgpp2 <- com.fun1('pgp_donate_y1', 1000))
-```
-
-The p-value is `r p_pgpp2$truep`.
-
-<!--
-#### Donation variance
+For cross-level combined hypothesis test
 
 ```{r, eval=F}
-com.fun('pgp_meanDist_y1', 1000)
+save(p_combP,panel.df, file="g2-panelAnal.Rdata")
+
 ```
 
-All people in treatment communities have lower donation variance, but there is no difference between committee members and non-committee members in treatment areas.
--->
-
-### Intergroup Contact / Interaction
-
- 3. Individuals involved in the planning and implementing of projects that benefit both farmers and
-pastoralists will interact more with the outgroup than individuals who did not participate in these
-activities.
-
-**Note: this is also a mechanism and is in the mechanism section.**
-
-Intergroup interaction variables: `r paste(contactVars[c(1:4,7)], collapse=", ")`
+For referencing these values
 
 ```{r}
-strat.fun("contactOnly_cw_y0")
-(p_conp1 <- com.fun1('contactOnly_cw', 1000))
-strat.fun("contactOnly_index_y0")
-conp_ind <- com.fun1('contactOnly_index', 1000)
+save.image("g2-panelAnalComplete.Rdata")
 ```
-
-The p-value of `r p_conp1$truep` suggests the relationship we see between committee members, non-committee treatment members, and control communities on our contact index is very unlikely to arise due to chance alone.  People in treatment communities, _especially committee members_, have a greater increased in intergroup interaction than people in control areas.
-
-**Robustness check** with alternative measure
-
-```{r, eval=F}
-strat.fun("contactOnly_cats_cw_y0")
-(p_conp1.1 <- com.fun1('contactOnly_cats_cw', 1000))
-strat.fun("contactOnly_cats_index_y0")
-conp_ind.1 <- com.fun1('contactOnly_cats_index', 1000)
-
-lm_robust(contactOnly_cats_cw~tr_n, clusters=community, data=panel.df)
-```
-
-
-### Insecurity 
-
-Insecurity Vars: `r paste(inVars, collapse=", ")`
-
-```{r}
-strat.fun("in_cw_y0")
-(p_inp1 <- com.fun1('in_cw', 1000))
-inp_ind <- com.fun1('in_index', 1000)
-```
-
-All people in treatment areas became more secure relative to control areas, and there is only a small difference between committee and non-committee members.  The p-value of `r p_inp1$truep` suggests the relationship we see between committee members, non-committee treatment members, and control communities on our insecurity index could arise due to chance alone.
-
-
-## Placebo - attitudes about violence.
-
-Attitudes about violence: `r vioVars`
-
-```{r resolve}
-strat.fun("vio_cw_y0")
-(p_viop1 <- com.fun1('vio_cw', 1000))
-(p_viop1 <- com.fun1('vio_index', 1000))
-vio1p <- p_viop1
-```
-
-
-
 

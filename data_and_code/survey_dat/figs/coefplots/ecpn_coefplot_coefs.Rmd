@@ -13,27 +13,24 @@ library(plyr)
 library(dplyr)
 library(tidyr)
 
-load("../d_analysis/g-aggAnalComplete.Rdata")
-load("../d_analysis/g2-panelAnalComplete.Rdata")
-#rm("thedf")
+load("../../d_analysis/g-aggAnal_coefplots.Rdata")
+load("../../d_analysis/g2-panelAnal_coefplots.Rdata")
+# don't need so many things
+#load("../../d_analysis/g-aggAnalComplete.Rdata")
+#load("../../d_analysis/g2-panelAnalComplete.Rdata")
 
 # Setup Wanted Vars
 
 # coef name list
 ## aggregate
-ag.vars <- c('allTrust_cw', 'contactOnly_cw', "in_cw", 'pgp_amount_end', 'pgp_donate_end',
-                               'threat_cw', 'cohes1_cw', 'cohes2_cw',
-                               'bene_cw', 'clash_cw', "barg_cw",
-             'list_exp', 'rand_lm', 'rMean', 'end_exp')
+ag.vars <- c("attitude_cw", "in_cw", 'contactOnly_cw',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
 setdiff(ag.vars, names(ag.df))
 
-
-
-
 ## individual
-ind.vars <- c('allTrust_cw', 'contactOnly_cw', "in_cw", 'pgp_amount_y1', 'pgp_donate_y1',
-                               'threat_cw', 'cohes1_cw', 'cohes2_cw',
-                               'bene_cw', 'clash_cw', "barg_cw")
+ind.vars <- c('attitude_cw', "in_cw", 'contactOnly_cw',
+              'pgp_donate_y1', 'pgp_amount_y1')
 setdiff(ind.vars, names(panel.df))
 
 
@@ -62,126 +59,44 @@ strat.fun <- function(var,thedf){
 
 ## Effect Sizes
 
-Functions to get coefficient from OLS and SD of each variable
+Get coefficient from OLS and SD of each variable
 
 ```{r}
-ag_coef <- c(trust1[[1]], con1[[1]], in1[[1]],
-               pgp1[[1]], pgp2[[1]],
-               threat1[[1]], expan1[[1]],
-               cohes2_1[[1]], bene2[[1]],
-               clash1[[1]], barg[[1]],
-               list1[[1]], rand1[[1]],
-               rand2[[1]], end1[[1]])
+## add "base" var to PGG outcomes
+newList[[6]]$base <- c(1,rep(0,3))
+newList[[7]]$base <- c(1,rep(0,3))
+# get coefs
+ag_coef <- sapply(newList, function(x) x$coef[x$base %in% 1])
+names(ag_coef) <- ag.vars
 
-# get SD of _base 
-ag_SD <- c(sd(ag.df$allTrust_cw_base), sd(ag.df$contactOnly_cw_base), sd(ag.df$in_cw_base),
-              sd(ag.df$pgp_amount_end), sd(ag.df$pgp_donate_end),
-              sd(ag.df$threat_cw_base), sd(ag.df$cohes1_cw_base),
-              sd(ag.df$cohes2_cw_base), sd(ag.df$bene_cw_base),
-              sd(ag.df$clash_cw_base), sd(ag.df$barg_cw_base),
-              sd(ag.df$list_exp_base), sd(ag.df$rand_lm),
-              sd(ag.df$rMean), sd(ag.df$end_exp_base)
-              )
+# get SD of _base
+ag_sd <- sapply(ag.df[,c(paste0(ag.vars[1:5], "_base"),ag.vars[6:7])],
+       sd, na.rm=T)
 
-pan_coef <- c(p_trustp1[[1]], p_contactp1[[1]], p_inp1[[1]],
-               p_pgpp1[[1]], p_pgpp2[[1]],
-               p_threatp1[[1]], p_expanp1[[1]],
-               p_cohes2p1[[1]], p_benep1[[1]],
-               p_clashp1[[1]], p_bargp1[[1]]
-                 )
+# same for individual-level panel data
+## add "base" var to PGG outcomes
+newList_ind[[4]]$base <- c(rep(1,2),rep(0,6))
+newList_ind[[5]]$base <- c(rep(1,2),rep(0,6))
+pan_coef <- sapply(newList_ind, function(x) x$thecoef[x$base %in% 1])
+rownames(pan_coef) <- c("non", "part")
+colnames(pan_coef) <- ind.vars
 
-pan_SD <- c(sd(panel.df$allTrust_cw_y0), sd(panel.df$contactOnly_cw_y0), sd(panel.df$in_cw_y0),
-              sd(panel.df$pgp_amount_y1), sd(panel.df$pgp_donate_y1),
-              sd(panel.df$threat_cw_y0), sd(panel.df$cohes1_cw_y0),
-              sd(panel.df$cohes2_cw_y0), sd(panel.df$bene_cw_y0),
-              sd(panel.df$clash_cw_y0), sd(panel.df$barg_cw_y0))
-
-coef.fun <- function(var,thedf)
-{
-  
-  # pgp - panel
-  if(grepl("y1", var)){
-  the_fmla <- reformulate(paste0("tr_f+state"), response=var)
-  the_lm <- lm(the_fmla, data=thedf)
-  thesd  <- sd(thedf[,var], na.rm=T)
-  size_non <- coef(the_lm)['tr_f1.0']#/thesd
-  size_part <- coef(the_lm)['tr_f1.1']#/thesd
-  
-  return(c(size_non, size_part))
-  }
-  
-  # pgp - ag
-  else if(grepl("end", var)){
-  the_fmla <- reformulate(paste0("treatment+state"), response=var)
-  the_lm <- lm(the_fmla, data=thedf)
-  thesd  <- sd(thedf[,var], na.rm=T)
-  size <- coef(the_lm)['treatment']#/thesd
-  
-  return(size)
-  }
-  
-  # panel.df, controlling for
-  else if(all(names(thedf)[1:5] %in% names(panel.df)[1:5]) &  strat.fun(paste0(var, "_y0"), thedf=panel.df)=="Controlling-for: true.fun"){
-  the_fmla <- reformulate(paste0("tr_f+state+",var, "_y0"), response=paste0(var, "_y1"))
-  the_lm <- lm(the_fmla, data=thedf)
-  thesd  <- sd(thedf[,paste0(var, "_y0")], na.rm=T)
-  size_non <- coef(the_lm)['tr_f1.0']#/thesd
-  size_part <- coef(the_lm)['tr_f1.1']#/thesd
-  
-  return(c(size_non, size_part))
-  }
-  
-  # panel.df, differencing/pgg
-  else if(all(names(thedf)[1:5] %in% names(panel.df)[1:5]) &  strat.fun(paste0(var, "_y0"), thedf=panel.df)=="Difference: true.fun1"){
-  the_fmla <- reformulate(paste0("tr_f+state"), response=var)
-  the_lm <- lm(the_fmla, data=thedf)
-  thesd  <- sd(thedf[,var], na.rm=T)
-  size_non <- coef(the_lm)['tr_f1.0']#/thesd
-  size_part <- coef(the_lm)['tr_f1.1']#/thesd
-  
-  return(c(size_non, size_part))
-  }
-  
-  # ag.df, controlling for
-  else if(all(names(thedf)[1:5] %in% names(ag.df)[1:5]) &  strat.fun(paste0(var, "_base"), thedf=ag.df)=="Controlling-for: true.fun"){
-  the_fmla <- reformulate(paste0("treatment+state+",var, "_base"), response=paste0(var, "_end"))
-  the_lm <- lm(the_fmla, data=thedf)
-  thesd  <- sd(thedf[,paste0(var, "_base")], na.rm=T)
-  size <- coef(the_lm)['treatment']#/thesd
-  
-  return(size)
-  }
-  
-  # ag.df, differencing/pgg
-  else if(all(names(thedf)[1:5] %in% names(ag.df)[1:5]) &  strat.fun(paste0(var, "_base"), thedf=ag.df)=="Difference: true.fun1"){
-  the_fmla <- reformulate(paste0("treatment+state"), response=var)
-  the_lm <- lm(the_fmla, data=thedf)
-  thesd  <- sd(thedf[,var], na.rm=T)
-  size <- coef(the_lm)['treatment']#/thesd
-  
-  return(size)
-  }
-  
-  # unknown things
-  else(paste("FAIL"))
-}
-
-#coef.fun("x_cw", panel.df)
-#coef.fun("x_cw", ag.df)
-#coef.fun("pgp_amount_y1", panel.df)
-#coef.fun("pgp_amount_end", ag.df)
+pan_sd <- sapply(panel.df[,c(paste0(ind.vars[1:3], "_y0"),ind.vars[4:5])],
+       sd, na.rm=T)
 ```
+
+Put together as coefs and SDs.
 
 Aggregate df
 
 ```{r}
-#get coefficient from ols
+#var name, coef, and sd
 ag.coefs <- matrix(NA, nrow=length(ag.vars), ncol=3)
 for(i in 1:length(ag.vars))
 {
   ag.coefs[i,1] <- ag.vars[i]
   ag.coefs[i,2] <- ag_coef[i]
-  ag.coefs[i,3] <- ag_SD[i]
+  ag.coefs[i,3] <- ag_sd[i]
   
 }
 ag.coefs <- as.data.frame(ag.coefs)
@@ -192,46 +107,23 @@ ag.coefs[,2:3] <- sapply(ag.coefs[,2:3], function(x) {as.numeric(as.character(x)
 
 ```
 
-Panel - tr_n
+Panel - tr_f (participants and nonparticipants)
 
 ```{r}
-# get coefficients from ols
-ind.coefs <- matrix(NA, nrow=length(ind.vars), ncol=3)
+# var name, coef, sd
+ind.coefs <- matrix(NA, nrow=length(ind.vars), ncol=4)
 for(i in 1:length(ind.vars))
 {
   ind.coefs[i,1] <- ind.vars[i]
-  ind.coefs[i,2] <- pan_coef[i]
-  ind.coefs[i,3] <- pan_SD[i]
-  
+  ind.coefs[i,2:3] <- pan_coef[1:2,i]
+  ind.coefs[i,4] <- pan_sd[i]
 }
 
 ind.coefs <- as.data.frame(ind.coefs)
-names(ind.coefs) <- c("var", "coef_ind", "sd")
+names(ind.coefs) <- c("var", "coef_non", "coef_part", "sd")
 
 # make numeric
-ind.coefs[,2:3] <- sapply(ind.coefs[,2:3], function(x) {as.numeric(as.character(x))})
-
-```
-
-Panel - tr_f
-
-```{r}
-# get coefficients from ols
-ind.coefs2 <- matrix(NA, nrow=length(ind.vars), ncol=4)
-for(i in 1:length(ind.vars))
-{
-  ind.coefs2[i,1] <- ind.vars[i]
-  ind.coefs2[i,2:3] <- coef.fun(paste0(ind.vars)[i], panel.df)
-  ind.coefs2[i,4] <- pan_SD[i]
-}
-
-ind.coefs2 <- as.data.frame(ind.coefs2)
-names(ind.coefs2) <- c("var", "coef_non", "coef_part", "sd")
-
-# make numeric
-ind.coefs2[,2:4] <- sapply(ind.coefs2[,2:4], function(x) {as.numeric(as.character(x))})
-
-ind.coefs <- cbind(ind.coefs, ind.coefs2[,c("coef_non", "coef_part")])
+ind.coefs[,2:4] <- sapply(ind.coefs[,2:4], function(x) {as.numeric(as.character(x))})
 ```
 
 ## Bootstrap Conf Intervals
@@ -241,8 +133,8 @@ ind.coefs <- cbind(ind.coefs, ind.coefs2[,c("coef_non", "coef_part")])
 
 Need to resample the way we sampled (sample 9 sites in Nas, sample 6 sites in Ben).  Then do lm(outcome~treatment) newly for each resample to make a distribution, then take 2.5th quartile and 97.5th quartile from that distribution.  Do that for every variable in ag.vars and add it to ag.coefs as ll and ul.
 
-
-```{r}
+```{r, eval=F}
+# takes awhile to run
 # function to resample and lm 1,000 times, then take 0.025 and 0.975 quantiles.
 agBoot.fun <- function(var)
 {
@@ -250,14 +142,16 @@ agBoot.fun <- function(var)
   for(i in 1:1000)
   {
     # sample PSUs within state
-  boot.nas <- ag.df[ag.df$state %in% "nas",] %>% group_by(psu) %>%
-    nest() %>%
-    sample_n(size=9, replace=T) %>%
-    unnest() %>% as.data.frame(.)
-  boot.ben <- ag.df[ag.df$state %in% "ben",] %>% group_by(psu) %>%
-    nest() %>%
-    sample_n(size=6, replace=T) %>%
-    unnest() %>% as.data.frame(.)
+  boot.nas <- ag.df %>%
+    filter(state %in% "nas") %>%
+    distinct(psu) %>%
+    sample_n(size = 9, replace = TRUE) %>%
+    inner_join(ag.df, by = "psu")
+  boot.ben <- ag.df %>%
+    filter(state %in% "ben") %>%
+    distinct(psu) %>%
+    sample_n(size = 6, replace = TRUE) %>%
+    inner_join(ag.df, by = "psu")
   boot.samp <- rbind(boot.nas, boot.ben)
   
   # do regression
@@ -291,7 +185,7 @@ agBoot.fun <- function(var)
 #agBoot.fun(var="x_cw")
 #agBoot.fun(var="in_cw")
 #agBoot.fun(var="pgp_amount_end")
-agBoot.fun(var="contactOnly_cw")
+#agBoot.fun(var="contactOnly_cw")
 
 
 # apply function to ag.vars and add to ag.coefs as columns ll and ul
@@ -303,7 +197,9 @@ ag.coefs[,c("size", "ll_size", "ul_size")] <- ag.coefs[,c(2,4:5)]/ag.coefs[,3]
 
 save(ag.coefs, file="ag.coefs.Rdata")
 ```
-
+```{r}
+load("ag.coefs.Rdata")
+```
 
 
 ### Participant - Nonparticipant - Control Comparison
@@ -316,7 +212,7 @@ Also want a plot showing full participants and nonparticipants vs control.
 Need to resample the way we sampled (sample ~10 individuals within each comm).  Then do lm(outcome~treatment) newly for each resample to make a distribution, then take 2.5th quartile and 97.5th quartile from that distribution.  Do that for every variable in ind.vars and add it to ind.coefs as ll and ul.
 
 
-```{r}
+```{r, eval=F}
 # will need to do sep regs for part-control and non-control to get SEs.
 ## the one-model SEs will give me the wrong SEs for participants, since it will be participants vs Non, instead of participants vs control.
 require(purrr)
@@ -329,80 +225,72 @@ indBoot.fun <- function(var)
   for(i in 1:1000)
   {
     # Resample communities
-  boot.nas2 <- panel.df[panel.df$state %in% "nas",] %>% group_by(psu) %>%
-    nest() %>%
-    sample_n(size=9, replace=T) %>%
-    unnest() %>%
-    as.data.frame(.)
-  boot.ben2 <- panel.df[panel.df$state %in% "ben",] %>% group_by(psu) %>%
-    nest() %>%
-    sample_n(size=6, replace=T) %>%
-    unnest() %>%
-    as.data.frame(.)
+  boot.nas2 <- panel.df %>%
+    filter(state %in% "nas") %>%
+    distinct(psu) %>%
+    sample_n(size = 9, replace = TRUE) %>%
+    inner_join(panel.df, by = "psu")
+  boot.ben2 <- panel.df %>%
+    filter(state %in% "ben") %>%
+    distinct(psu) %>%
+    sample_n(size = 6, replace = TRUE) %>%
+    inner_join(panel.df, by = "psu")
   boot.samp2 <- rbind(boot.nas2, boot.ben2)
   
   # do regression
   ## endline only
   if(grepl("_y1", var)){
-    lm.boot <- lm(boot.samp2[,var]~tr_n+state, data=boot.samp2)
     lm.boot2 <- lm(boot.samp2[,var]~tr_f+state, data=boot.samp2)
     
-    boot.coef[i] <- summary(lm.boot)$coefficients[2,1]
     non.coef[i] <- summary(lm.boot2)$coefficients[2,1]
     part.coef[i] <- summary(lm.boot2)$coefficients[3,1]
   }
   ## controlling-fr
   else if(!grepl("_y1", var) & strat.fun(paste0(var, "_y0"), thedf=panel.df)=="Controlling-for: true.fun"){
-    lm.boot <- lm(boot.samp2[,paste0(var, "_y1")]~tr_n+state+boot.samp2[,paste0(var, "_y0")], data=boot.samp2)
     lm.boot2 <- lm(boot.samp2[,paste0(var, "_y1")]~tr_f+state+boot.samp2[,paste0(var, "_y0")], data=boot.samp2)
     
-    boot.coef[i] <- summary(lm.boot)$coefficients[2,1]
     non.coef[i] <- summary(lm.boot2)$coefficients[2,1]
     part.coef[i] <- summary(lm.boot2)$coefficients[3,1]
   }
   ## differencing
   else if(!grepl("_y1", var) & strat.fun(paste0(var, "_y0"), thedf=panel.df)=="Difference: true.fun1"){
-    lm.boot <- lm(boot.samp2[,var]~tr_n+state, data=boot.samp2)
     lm.boot2 <- lm(boot.samp2[,var]~tr_f+state, data=boot.samp2)
     
-    boot.coef[i] <- summary(lm.boot)$coefficients[2,1]
     non.coef[i] <- summary(lm.boot2)$coefficients[2,1]
     part.coef[i] <- summary(lm.boot2)$coefficients[3,1]
   }
   
   }
   
-  ll_ind <- quantile(boot.coef,0.025)
-  ul_ind <- quantile(boot.coef,0.975)
   ll_non <- quantile(non.coef,0.025)
   ul_non <- quantile(non.coef,0.975)
   ll_part <- quantile(part.coef,0.025)
   ul_part <- quantile(part.coef,0.975)
   
   #return(cbind(boot.coef, non.coef, part.coef))
-  return(cbind(ll_ind, ul_ind, 
-               ll_non,ul_non, 
+  return(cbind(ll_non,ul_non, 
                ll_part, ul_part))
   
 }
-#system.time(indBoot.fun(var="x_cw"))
+#system.time(indBoot.fun(var="attitude_cw"))
 #system.time(indBoot.fun(var="in_cw"))
 #system.time(indBoot.fun(var="pgp_amount_y1"))
 
 
 # apply function to ind.vars and add to ind2.coefs as columns ll_non/part and ul_non/part
 set.seed(2353)
-system.time(ind.coefs[,c("ll_ind", "ul_ind", "ll_non", "ul_non", "ll_part", "ul_part")] <- t(sapply(ind.vars, indBoot.fun)))
+system.time(ind.coefs[,c("ll_non", "ul_non", "ll_part", "ul_part")] <- t(sapply(ind.vars, indBoot.fun)))
 
 # make the cols in terms of sd
-ind.coefs[,c("size_ind", "size_ll_ind", "size_ul_ind",
-             "size_non", "size_ll_non", "size_ul_non",
-             "size_part", "size_ll_part", "size_ul_part")] <- ind.coefs[,c("coef_ind", "ll_ind", "ul_ind",
-                                                                            "coef_non", "ll_non", "ul_non",
+ind.coefs[,c("size_non", "size_ll_non", "size_ul_non",
+             "size_part", "size_ll_part", "size_ul_part")] <- ind.coefs[,c("coef_non", "ll_non", "ul_non",
                                                                             "coef_part", "ll_part", "ul_part")]/ind.coefs[,"sd"]
 
 
 save(ind.coefs, file="ind.coefs.Rdata")
+```
+```{r}
+load("ind.coefs.Rdata")
 ```
 
 

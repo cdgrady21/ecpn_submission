@@ -340,7 +340,7 @@ p.adjust(commListPs[c(3,4,8:10)], method="none")
 p.adjust(commListPs[c(3,4,8:10)], method="fdr")
 p.adjust(commListPs[c(3,4,8:10)], method="holm")
 
-### insecurity (its own family, could consider it an attitude)
+### insecurity (its own hypothesis family)
 p.adjust(commListPs[c(1,2,5)], method="none")
 p.adjust(commListPs[c(1,2,5)], method="fdr")
 p.adjust(commListPs[c(1,2,5)], method="holm")
@@ -526,6 +526,8 @@ summary(ag.df$in_cw[ag.df$treatment %in% 0])
 \includegraphics[width=\linewidth]{../survey_dat/figs/did_plots/inComm_plot_disag.png}
 \caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:in_comm_dis}
 \end{figure}
+
+Chris: this section also add all finished DiD plots with lines only for TR and CO aggregated together, including endorsement exp and percent exp.
 
 ### Behavioral outcomes
 

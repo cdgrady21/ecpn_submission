@@ -13,7 +13,7 @@ output:
 
 <!--Chris: notes
 
-Want to replace all lm() with lm_lin() but lm_lin() does not allow me to vary treatment in a function.-->
+could replace all lm() with lm_lin() but lm_lin() does not allow me to vary treatment in a function.-->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -21,6 +21,7 @@ set.seed(962022)
 rm(list=ls())
 load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
 load("../c_creating_dataframes/rand_df.Rdata")
+rm(list=ls(pattern="Var|var|Cols"))
 
 #True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
 load("true_fun.rda")
@@ -169,7 +170,7 @@ save(var_tab, file="list_of_rank_bin_raw.Rda")
 load("list_of_rank_bin_raw.Rda")
 ```
 
-Now NPC (NPC now defunct, not on CRAN)
+Now NPC (NPC now defunct, not on CRAN, i am using an old version.)
 
 ```{r, eval=F}
 npc <- NPC::NPC(ag.df, tr.var = "treatment", tr.label = 1, 
@@ -249,41 +250,6 @@ load("pl_list_of_coefs_and_ps.Rda")
 ```
 
 
-**atts towards violence**: `r paste(vioVars, collapse=", ")`
-
-```{r}
-# violence
-strat.fun("vio_cw_base")
-vio1 <- true.fun1("vio_cw", "treatment")
-
-strat.fun("violence_group.criminals_base")
-vio1 <- true.fun1("vio_cw", "treatment")
-
-
-#true.fun("vio_cw", "treatment")
-#true.fun1("vio_index", "treatment")
-#true.fun("vio_index", "treatment")
-```
-
-No effect.  If there was social desirability bias to tell enumerators what they wanted to hear in TR comms but not CO comms, would probably see it here.
-
-**atts towards ppl from other religions**
-
-```{r}
-# other religions
-strat.fun("outgroup_atts_group.trust_rel_base")
-rel1 <- true.fun1("outgroup_atts_group.trust_rel", "treatment")
-```
-
-**Radio listening**
-
-```{r}
-# radio
-strat.fun("radio_base")
-rad1 <- true.fun("radio", "treatment")
-
-```
-
 **Attitudes towards actors in dispute resolution**
 
 ```{r}
@@ -305,148 +271,18 @@ disp1 <- true.fun("disp_index", "treatment")
 Old
 
 
-
-
-
-
-
-# Intergroup Trust
-
-**attitude**: `r paste(attitudeVars, collapse=", ")`
-
-```{r, eval=F}
-lm_robust(attitude_cw ~ treatment, clusters = psu, fixed_effects = state, data = ag.df)
-lm_robust(attitude_cw_end ~ treatment + attitude_cw_base, clusters = psu, fixed_effects = state, data = ag.df)
-
-# group
-(trust1_farm <- true.fun('allTrust_cw', 'treatment', dat=farmers))
-(trust1_past <- true.fun('allTrust_cw', 'treatment', dat=pastors))
-
-# state
-lm_robust(allTrust_cw ~ treatment, clusters = psu, data = nas)
-lm_robust(allTrust_cw ~ treatment, clusters = psu, data = ben)
-
-# both
-lm_robust(allTrust_cw ~ treatment * state, clusters=psu, data=farmers)
-lm_robust(allTrust_cw ~ treatment * state, clusters=psu, data=pastors)
-```
-
-The coefficient of `r round(trust1$coef,5)` is  `r round(trust1$coef/sd(ag.df$allTrust_cw),3)` standard deviations.
-
-## Insecurity Effects
-
-```{r}
-# select
-strat.fun("in_cw_base")
-lm_robust(in_cw ~ treatment, clusters = psu, fixed_effects = state, data = ag.df)
-
-# true pvals
-(in1 <- true.fun1('in_cw', 'treatment'))
-in_ind <- true.fun1('in_index', 'treatment')
-
-# select
-strat.fun("vioExp_cw_base")
-
-# both state/group
-lm_robust(in_cw ~ treatment * state, clusters=psu, data=farmers)
-lm_robust(in_cw ~ treatment * state, clusters=psu, data=pastors)
-```
-
-
-## Contact
-
-Intergroup interaction variables: `r paste(contactVars[c(1:4,7)], collapse=", ")`
-
-```{r con}
-strat.fun("contactOnly_cw_base")
-(con1 <- true.fun1('contactOnly_cw', 'treatment'))
-strat.fun("contactOnly_index_base")
-con_ind <- true.fun1('contactOnly_index', 'treatment')
-
-lm_robust(contactOnly_cw ~ treatment, clusters = psu, fixed_effects = state, data = ag.df)
-
-# both state/group
-lm_robust(contactOnly_cw ~ treatment * state, clusters=psu, data=farmers)
-lm_robust(contactOnly_cw ~ treatment * state, clusters=psu, data=pastors)
-```
-
-The coefficient of `r round(con1$coef,5)` is  `r round(con1$coef/sd(ag.df$contactOnly_cw),3)` standard deviations.
-
-**Robustness check** with alternative measure
-
-```{r, eval=F}
-strat.fun("contactOnly_cats_cw_base")
-(con1.1 <- true.fun1('contactOnly_cats_cw', 'treatment'))
-strat.fun("contactOnly_cats_index_base")
-con_ind.1 <- true.fun1('contactOnly_cats_index', 'treatment')
-
-```
-
-## PGP -- Group Coordination
-
-### Donation Amount
-
-```{r}
-(pgp1 <- true.fun('pgp_amount_end', 'treatment'))
-```
-
-Treatment sites donated less.
-
-### Donate yes/no
-
-```{r}
-(pgp2 <- true.fun('pgp_donate_end', 'treatment'))
-```
-
-
-## Affect
-
-# Survey Experiments
-
-These all relate to outgroup affect and would probably go somewhere in the outgroup affect category if we didn't include them on their own.
-
-
-## Rand Exp
-
-Note: this is not a "Randomized Response" experiment, which, similar to a list exp, tries to get honest responses from respondents.  This is an experiment that asks respondents if they would join a group or join a community with **5%/25%/50%/75%** outgroup members.  Higher values means more people say "Yes".  
-
-Each community is assigned their relationship between Outgroup % and "Yes" (how much less likely they are to say "Yes" as outgroup % increases) at baseline and endline.  rand_lm is that relationship at endline - that relationship at baseline.  Higher values good.
-
-```{r rand}
-strat.fun("rand_lm_base")
-(rand1 <- true.fun1('rand_lm', 'treatment'))
-```
-
-There is no difference between treatment and control communities in their willingness to join groups/communities with increasing numbers of outgroup members.
-
-### Rand Exp 2
-
-The analysis of the linear relationship between % outgroup and willingness to join/live fails if the treatment influences _all_ categories, including the lowest 5% category.  To determine if there was a wholesale increase at every category, we can instead analyze the percentage of respondents who say "yes" in treatment comms vs. control comms, blocked by percentage outgroup members and clustered at PSU.
-
-```{r}
-strat.fun("rMean_base")
-(rand2 <- true.fun1('rMean', 'treatment'))
-```
-
-## Endorsement Experiment
-
-```{r end}
-strat.fun("end_exp_base")
-(end1 <- true.fun('end_exp', 'treatment'))
-```
-
-The coefficient of `r round(end1$coef,5)` is  `r round(end1$coef/sd(ag.df$end_exp),3)` standard deviations.
-
-
-******
-
-
 # Save 
+
+For use to make coefplots
+
+```{r}
+save(ag.df, newList, placeboList, file="g-aggAnal_coefplots.Rdata")
+
+```
 
 For combining pvals across levels of analysis.
 
 ```{r save1, eval=F}
-combP <- GlobP_un
 save(ag.df, combP, file="g-aggAnal.Rdata")
 
 ```
@@ -454,15 +290,6 @@ save(ag.df, combP, file="g-aggAnal.Rdata")
 For referencing these values
 
 ```{r save2}
+rm(thelm, i)
 save.image("g-aggAnalComplete.Rdata")
-```
-
-For appendices.  chris: need to add con1.1 for alternative contact coding.
-
-```{r save3}
-save(trust_ind, in_ind, con_ind,
-     vio1,
-     threat1, emp1, persp1, expan1,
-     file="z_appendices_ag.Rdata")
-
 ```

@@ -1,7 +1,6 @@
 ---
 title: "d_obsDat_figs"
 author: "Christopher Grady"
-date: "September 7, 2020"
 output: html_document
 ---
 
