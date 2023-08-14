@@ -6,8 +6,8 @@
 ]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{iftex}
 \usepackage{float}
+\usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
@@ -163,7 +163,7 @@ of the ECPN development project or of Mercy Corps.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\DocumentationTok{\#\# mediation awareness/participation}
+\DocumentationTok{\#\# mediation participation}
 \FunctionTok{table}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{ecpn\_group.negotiation, }\AttributeTok{exclude=}\FunctionTok{c}\NormalTok{())}
 \end{Highlighting}
 \end{Shaded}
@@ -176,27 +176,29 @@ of the ECPN development project or of Mercy Corps.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{table}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{heard\_MC\_group.heard\_MC, }\AttributeTok{exclude=}\FunctionTok{c}\NormalTok{())}
+\FunctionTok{table}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{ecpn\_group.neg\_exposure, }\AttributeTok{exclude=}\FunctionTok{c}\NormalTok{())}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## 
 ##    0    1 <NA> 
-##  979  559 1553
+##   37   40 3014
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{table}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{heard\_MC\_group.part\_MC, }\AttributeTok{exclude=}\FunctionTok{c}\NormalTok{())}
+\NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{mediation }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{ (rand.df}\SpecialCharTok{$}\NormalTok{ecpn\_group.negotiation }\SpecialCharTok{\%in\%} \DecValTok{1} \SpecialCharTok{|}
+\NormalTok{                               rand.df}\SpecialCharTok{$}\NormalTok{ecpn\_group.neg\_exposure }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{mediation }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{survey }\SpecialCharTok{\%in\%} \DecValTok{0}\NormalTok{, }\ConstantTok{NA}\NormalTok{, rand.df}\SpecialCharTok{$}\NormalTok{mediation)}
+\NormalTok{mediat\_tab1 }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{mediation, rand.df}\SpecialCharTok{$}\NormalTok{treatment)}
+\FunctionTok{rownames}\NormalTok{(mediat\_tab1) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"None"}\NormalTok{, }\StringTok{"Exposure"}\NormalTok{)}
+\FunctionTok{colnames}\NormalTok{(mediat\_tab1) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Control"}\NormalTok{, }\StringTok{"Treatment"}\NormalTok{)}
+
+\NormalTok{mediat\_tab }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(mediat\_tab1, }\AttributeTok{format=}\StringTok{"latex"}\NormalTok{)}
+\FunctionTok{save}\NormalTok{(mediat\_tab, }\AttributeTok{file=}\StringTok{"mediat\_tab.Rda"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-## 
-##    0    1 <NA> 
-##  475   79 2537
-\end{verbatim}
 
 Bigger effects among people aware/used QIP, people aware/used borehole?
 Among TR group, does qip/borehole awareness and use predict improved
@@ -471,6 +473,8 @@ Show the analysis
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\FunctionTok{save}\NormalTok{(benefit\_df, }\AttributeTok{file=}\StringTok{"benefit\_df.Rda"}\NormalTok{)}
+
 \CommentTok{\# coefficients for each "benefit variables" across outcomes}
 \DocumentationTok{\#\# no meaningful trend, but coef/tstat/pval could be affected by PGG being weird negative outcome}
 \NormalTok{benefitVar\_df}
@@ -488,6 +492,8 @@ Show the analysis
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\FunctionTok{save}\NormalTok{(benefitVar\_df, }\AttributeTok{file=}\StringTok{"benefitVar\_df.Rda"}\NormalTok{)}
+
 \CommentTok{\# coefficients for each "benefit variables" across outcomes, removing PGG}
 \DocumentationTok{\#\# no clear trend, seems slightly suggestive that benefiting weakly improved outcomes.}
 \NormalTok{benefitVar\_df\_svy}
@@ -502,6 +508,13 @@ Show the analysis
 ## qip_aware_end                0.37744566 0.2541144  2.11439939
 ## all                                  NA 0.2993760  1.16436913
 \end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{save}\NormalTok{(benefitVar\_df\_svy, }\AttributeTok{file=}\StringTok{"benefitVar\_df\_svy.Rda"}\NormalTok{)}
+\CommentTok{\#chris: I think these saves are redundant with saves in the previous code chunk.}
+\end{Highlighting}
+\end{Shaded}
 
 Unecessary Robustness check
 
@@ -552,70 +565,21 @@ chris: more here. (did more but could do even more)
 
 \CommentTok{\# Benue pastoralists: are they less aware and do they use/benefit from projects less?}
 \DocumentationTok{\#\# yes, they are less aware and use the borehole less (mixed on other project, which was done earlier)}
-\FunctionTok{lm\_robust}\NormalTok{(qip\_group.borehole\_use\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
-                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,])}
-\end{Highlighting}
-\end{Shaded}
+\NormalTok{BenPast\_borehole\_use }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(}\FunctionTok{lm\_robust}\NormalTok{(qip\_group.borehole\_use\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
+                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,]))[}\DecValTok{2}\NormalTok{,}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\NormalTok{BenPast\_borehole\_aware }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(}\FunctionTok{lm\_robust}\NormalTok{(qip\_group.borehole\_aware\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
+                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,]))[}\DecValTok{2}\NormalTok{,}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\NormalTok{BenPast\_qip\_aware }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(}\FunctionTok{lm\_robust}\NormalTok{(qip\_aware\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
+                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,]))[}\DecValTok{2}\NormalTok{,}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\NormalTok{BenPast\_qip\_benefit }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(}\FunctionTok{lm\_robust}\NormalTok{(qip\_ben\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
+                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,]))[}\DecValTok{2}\NormalTok{,}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\NormalTok{BenPast\_Benefit }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(BenPast\_borehole\_aware, BenPast\_borehole\_use,}
+\NormalTok{                     BenPast\_qip\_aware, BenPast\_qip\_benefit)}
+\FunctionTok{rownames}\NormalTok{(BenPast\_Benefit) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Borehole Awareness"}\NormalTok{, }\StringTok{"Borehole Use"}\NormalTok{,}
+                               \StringTok{"QIP Awareness"}\NormalTok{, }\StringTok{"QIP Benefit"}\NormalTok{)}
+\FunctionTok{save}\NormalTok{(BenPast\_Benefit, }\AttributeTok{file=}\StringTok{"BenPast\_Benefit.Rda"}\NormalTok{)}
 
-\begin{verbatim}
-##               Estimate Std. Error   t value     Pr(>|t|)   CI Lower   CI Upper
-## (Intercept)  0.4632439 0.06076430  7.623618 5.587948e-05  0.3235646  0.6029232
-## ben_past    -0.3406948 0.06563456 -5.190784 5.832725e-03 -0.5199676 -0.1614221
-##                   DF
-## (Intercept) 8.148559
-## ben_past    4.174049
-\end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{lm\_robust}\NormalTok{(qip\_group.borehole\_aware\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
-                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,])}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##               Estimate Std. Error   t value     Pr(>|t|)   CI Lower   CI Upper
-## (Intercept)  0.7152896 0.08396237  8.519169 2.476459e-05  0.5222848  0.9082945
-## ben_past    -0.4309759 0.09939244 -4.336103 1.118970e-02 -0.7024542 -0.1594976
-##                   DF
-## (Intercept) 8.148559
-## ben_past    4.174049
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{lm\_robust}\NormalTok{(qip\_aware\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
-                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,])}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##               Estimate Std. Error   t value     Pr(>|t|)   CI Lower   CI Upper
-## (Intercept)  0.5762138 0.09732716  5.920380 0.0003292883  0.3524872 0.79994036
-## ben_past    -0.2907236 0.11767188 -2.470629 0.0662888960 -0.6121299 0.03068276
-##                   DF
-## (Intercept) 8.148559
-## ben_past    4.174049
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{lm\_robust}\NormalTok{(qip\_ben\_end}\SpecialCharTok{\textasciitilde{}}\NormalTok{ben\_past,}
-                            \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{ag.df[ag.df}\SpecialCharTok{$}\NormalTok{treatment }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{,])}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##                Estimate Std. Error    t value    Pr(>|t|)   CI Lower  CI Upper
-## (Intercept)  0.52276923 0.08578581  6.0938892 0.000270639  0.3255728 0.7199656
-## ben_past    -0.06443589 0.10115950 -0.6369732 0.557407490 -0.3407407 0.2118689
-##                   DF
-## (Intercept) 8.148559
-## ben_past    4.174049
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{\# benue pastoralist differences?}
 \DocumentationTok{\#\# is the TR effect weaker among Benue pastoralists?}
 \DocumentationTok{\#\# chris: is this reg correct?  Or should it just be all benue pastoralists?  Or should it only be TR Ben pastoralists (rather than TR interaction, seeing if TR effect is weaker among Ben Pastoralists)?}
@@ -699,26 +663,18 @@ chris: more here. (did more but could do even more)
 \begin{Highlighting}[]
 \NormalTok{benPast\_pvalues }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(benPastList, }\ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{p.value)}
 \NormalTok{benPast\_tstat }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(benPastList, }\ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{statistic)}
+\NormalTok{benPast\_estimate }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(benPastList, }\ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{estimate)}
 \FunctionTok{rownames}\NormalTok{(benPast\_pvalues) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"intercept\_p"}\NormalTok{, }\StringTok{"ben\_past\_p"}\NormalTok{, }\StringTok{"tr\_p"}\NormalTok{, }\StringTok{"benpast:tr\_p"}\NormalTok{)}
 \FunctionTok{rownames}\NormalTok{(benPast\_tstat) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"intercept\_t"}\NormalTok{, }\StringTok{"ben\_past\_t"}\NormalTok{, }\StringTok{"tr\_t"}\NormalTok{, }\StringTok{"benpast:tr\_t"}\NormalTok{)}
+\FunctionTok{rownames}\NormalTok{(benPast\_estimate) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"intercept\_coef"}\NormalTok{, }\StringTok{"ben\_past\_coef"}\NormalTok{, }\StringTok{"tr\_coef"}\NormalTok{, }\StringTok{"benpast:tr\_coef"}\NormalTok{)}
+\NormalTok{benPast\_tab }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(benPast\_estimate[}\DecValTok{4}\NormalTok{,], benPast\_pvalues[}\DecValTok{4}\NormalTok{,], benPast\_tstat[}\DecValTok{4}\NormalTok{,])}
+\FunctionTok{colnames}\NormalTok{(benPast\_tab) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"coef"}\NormalTok{, }\StringTok{"pvalue"}\NormalTok{, }\StringTok{"tstat"}\NormalTok{)}
 
-\FunctionTok{mean}\NormalTok{(benPast\_pvalues[}\StringTok{\textquotesingle{}benpast:tr\_p\textquotesingle{}}\NormalTok{,])}
+\NormalTok{all\_mean }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FunctionTok{mean}\NormalTok{(benPast\_tab[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\NormalTok{]), }\FunctionTok{colMeans}\NormalTok{(benPast\_tab[,}\DecValTok{2}\SpecialCharTok{:}\DecValTok{3}\NormalTok{]))}
+\NormalTok{benPast\_tab }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(benPast\_tab, all\_mean)}
+\FunctionTok{save}\NormalTok{(benPast\_tab, }\AttributeTok{file=}\StringTok{"benPast\_tab.Rda"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-## [1] 0.5763561
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{mean}\NormalTok{(benPast\_tstat[}\StringTok{\textquotesingle{}benpast:tr\_t\textquotesingle{}}\NormalTok{,])}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] -0.1788604
-\end{verbatim}
 
 \hypertarget{comment-2}{%
 \subsection{Comment 2}\label{comment-2}}
@@ -754,22 +710,9 @@ this.
 \NormalTok{commListPs }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(commListPs, obsDat\_truePs}\SpecialCharTok{$}\NormalTok{truep)}
 \FunctionTok{names}\NormalTok{(commListPs) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(outcome\_list, }\FunctionTok{rownames}\NormalTok{(obsDat\_truePs))}
 
-\CommentTok{\# rebecca}
 \DocumentationTok{\#\# separate into our hypothesis families}
 \DocumentationTok{\#\#\# contact}
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{8}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##             contactOnly                   rMean pastoralists_index_rank 
-##                  0.0595                  0.2389                  0.0014 
-##      farmers_index_rank     outgroup_index_rank 
-##                  0.2416                  0.1856
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
+\NormalTok{con\_none }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{8}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
 \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{8}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)], }\AttributeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -783,65 +726,31 @@ this.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{8}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\NormalTok{con\_holm }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{8}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
+\NormalTok{con\_ps }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(con\_none, con\_holm))}
+\NormalTok{con\_ps}\SpecialCharTok{$}\NormalTok{family }\OtherTok{\textless{}{-}} \StringTok{"Contact"}
+\FunctionTok{names}\NormalTok{(con\_ps) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"None"}\NormalTok{, }\StringTok{"Holm"}\NormalTok{, }\StringTok{"Family"}\NormalTok{)}
 
-\begin{verbatim}
-##             contactOnly                   rMean pastoralists_index_rank 
-##                  0.2380                  0.5568                  0.0070 
-##      farmers_index_rank     outgroup_index_rank 
-##                  0.5568                  0.5568
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \DocumentationTok{\#\#\# insecurity (its own hypothesis family)}
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
+\NormalTok{in\_none }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\DecValTok{2}\NormalTok{], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
+\FunctionTok{p.adjust}\NormalTok{(commListPs[}\DecValTok{2}\NormalTok{], }\AttributeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## attitude       in  end_exp 
-##   0.0448   0.0205   0.2117
+##     in 
+## 0.0205
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"fdr"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\NormalTok{in\_holm }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\DecValTok{2}\NormalTok{], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
+\NormalTok{in\_ps }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(in\_none, in\_holm))}
+\NormalTok{in\_ps}\SpecialCharTok{$}\NormalTok{family }\OtherTok{\textless{}{-}} \StringTok{"Insecurity"}
+\FunctionTok{names}\NormalTok{(in\_ps) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"None"}\NormalTok{, }\StringTok{"Holm"}\NormalTok{, }\StringTok{"Family"}\NormalTok{)}
 
-\begin{verbatim}
-## attitude       in  end_exp 
-##   0.0672   0.0615   0.2117
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## attitude       in  end_exp 
-##   0.0896   0.0615   0.2117
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \DocumentationTok{\#\#\# attitudes}
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## attitude  end_exp 
-##   0.0448   0.2117
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
+\NormalTok{att\_none }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
 \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -853,29 +762,13 @@ this.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\NormalTok{att\_holm }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
+\NormalTok{att\_ps }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(att\_none, att\_holm))}
+\NormalTok{att\_ps}\SpecialCharTok{$}\NormalTok{family }\OtherTok{\textless{}{-}} \StringTok{"Attitudes"}
+\FunctionTok{names}\NormalTok{(att\_ps) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"None"}\NormalTok{, }\StringTok{"Holm"}\NormalTok{, }\StringTok{"Family"}\NormalTok{)}
 
-\begin{verbatim}
-## attitude  end_exp 
-##   0.0896   0.2117
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \DocumentationTok{\#\#\# cooperation}
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## pgp_donate_end pgp_amount_end 
-##         0.2938         0.8522
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
+\NormalTok{pgg\_none }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{)], }\AttributeTok{method=}\StringTok{"none"}\NormalTok{)}
 \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{)], }\AttributeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -887,18 +780,27 @@ this.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\NormalTok{pgg\_holm }\OtherTok{\textless{}{-}} \FunctionTok{p.adjust}\NormalTok{(commListPs[}\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{)], }\AttributeTok{method=}\StringTok{"holm"}\NormalTok{)}
+\NormalTok{pgg\_ps }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(pgg\_none, pgg\_holm))}
+\NormalTok{pgg\_ps}\SpecialCharTok{$}\NormalTok{family }\OtherTok{\textless{}{-}} \StringTok{"Cooperation"}
+\FunctionTok{names}\NormalTok{(pgg\_ps) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"None"}\NormalTok{, }\StringTok{"Holm"}\NormalTok{, }\StringTok{"Family"}\NormalTok{)}
 
-\begin{verbatim}
-## pgp_donate_end pgp_amount_end 
-##         0.5876         0.8522
-\end{verbatim}
+\CommentTok{\#table}
+\NormalTok{holm\_tab }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(con\_ps, in\_ps, att\_ps, pgg\_ps)}
+\NormalTok{holm\_tab}\SpecialCharTok{$}\NormalTok{Family }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(holm\_tab}\SpecialCharTok{$}\NormalTok{Family, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Contact"}\NormalTok{, }\StringTok{"Insecurity"}\NormalTok{, }\StringTok{"Attitudes"}\NormalTok{, }\StringTok{"Cooperation"}\NormalTok{))}
+\NormalTok{holm\_tab }\OtherTok{\textless{}{-}}\NormalTok{ holm\_tab }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rownames\_to\_column}\NormalTok{(}\AttributeTok{var =} \StringTok{"Outcome"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(Family, Holm)}
+\NormalTok{holm\_tab}\SpecialCharTok{$}\NormalTok{Outcome }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Pastoralists in Market"}\NormalTok{, }\StringTok{"Self{-}reported contact"}\NormalTok{,}
+                       \StringTok{"Contact willingness"}\NormalTok{, }\StringTok{"Farmers in Market"}\NormalTok{,}
+                       \StringTok{"Outgroup event attendance"}\NormalTok{, }\StringTok{"Perceptions of security"}\NormalTok{,}
+                       \StringTok{"Self{-}reported attitudes"}\NormalTok{, }\StringTok{"Endorsement Experiment"}\NormalTok{,}
+                       \StringTok{"Public Goods Donation"}\NormalTok{, }\StringTok{"Public Goods Amount"}\NormalTok{)}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\DocumentationTok{\#\#\# all}
+\FunctionTok{save}\NormalTok{(holm\_tab, }\AttributeTok{file=}\StringTok{"holm\_tab.Rda"}\NormalTok{)}
+
+
+\DocumentationTok{\#\#\# all {-}{-} pastoralist index always significant}
 \FunctionTok{p.adjust}\NormalTok{(}\AttributeTok{p=}\NormalTok{commListPs, }\AttributeTok{method =} \StringTok{"none"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -946,6 +848,23 @@ this.
 ##                  1.0000                  0.0140                  1.0000 
 ##     outgroup_index_rank 
 ##                  1.0000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{p.adjust}\NormalTok{(}\AttributeTok{p=}\NormalTok{commListPs, }\AttributeTok{method =} \StringTok{"bonferroni"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                attitude                      in             contactOnly 
+##                   0.448                   0.205                   0.595 
+##                   rMean                 end_exp          pgp_donate_end 
+##                   1.000                   1.000                   1.000 
+##          pgp_amount_end pastoralists_index_rank      farmers_index_rank 
+##                   1.000                   0.014                   1.000 
+##     outgroup_index_rank 
+##                   1.000
 \end{verbatim}
 
 Individual-level (only interested in participant-control differences)
@@ -1089,7 +1008,7 @@ analysis doesn't use randomization inference, but similar.
 survey outcomes attitudes, insecurity, contact - \textasciitilde0.20 SD
 for survey experiments (endorsement, percent exp) - 1.0 SD for market
 pastoralists index - \textasciitilde0.20 SDs for events outgroup index
-\emph{Ind-level} - Between 0.15 and 0.35 SD for survey outcomes atts,
+\emph{Ind-level} - Between 0.2 and 0.7 SD for survey outcomes atts,
 insec, contact. Atts weakest, contact strongest.
 
 \begin{Shaded}
@@ -1155,8 +1074,53 @@ Run it over taus from 0-1 for one survey outcome.
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{load}\NormalTok{(}\StringTok{"new\_power.Rdata"}\NormalTok{)}
+
+\FunctionTok{png}\NormalTok{(}\StringTok{"power\_figure.png"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(possibleTaus}\SpecialCharTok{$}\NormalTok{possibleTaus, possibleTaus}\SpecialCharTok{$}\NormalTok{pow, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{, }\AttributeTok{pch=}\DecValTok{16}\NormalTok{, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{,}\AttributeTok{ylab=}\StringTok{"Power"}\NormalTok{, }
+     \AttributeTok{xlab=} \FunctionTok{expression}\NormalTok{(tau), }\AttributeTok{main=} \StringTok{"ECPN Community{-}Level Power Analysis"}\NormalTok{, }
+     \AttributeTok{cex.main=}\NormalTok{.}\DecValTok{9}\NormalTok{, }\AttributeTok{xlim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{), }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{a=}\NormalTok{.}\DecValTok{8}\NormalTok{, }\AttributeTok{b =} \DecValTok{0}\NormalTok{, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{, }\AttributeTok{lty=}\DecValTok{2}\NormalTok{)}
+\FunctionTok{dev.off}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+Chris: did individual-level power analysis with EGAP power calculator
+(\url{https://egap.shinyapps.io/power-app/}). Alpha = 0.05, Tau =
+0.40SD, ICC=0.05, 15 clusters per arm, up to 300 repondents per cluster
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ICC}\SpecialCharTok{::}\FunctionTok{ICCest}\NormalTok{(community, attitude\_cw, }\AttributeTok{data=}\NormalTok{panel.df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $ICC
+## [1] 0.09594549
+## 
+## $LowerCI
+## [1] 0.0242701
+## 
+## $UpperCI
+## [1] 0.2222037
+## 
+## $N
+## [1] 29
+## 
+## $k
+## [1] 9.886262
+## 
+## $varw
+## [1] 0.06166755
+## 
+## $vara
+## [1] 0.006544653
+\end{verbatim}
 
 \hypertarget{comment-4}{%
 \subsection{Comment 4}\label{comment-4}}
@@ -1490,30 +1454,60 @@ Israel and Hadiza?
 \FunctionTok{rownames}\NormalTok{(behObs\_enumsOnly) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"market{-}pastoralists\_enum"}\NormalTok{,}
                                  \StringTok{"market{-}farmers\_enum"}\NormalTok{,}
                                  \StringTok{"events{-}outgroup\_enum"}\NormalTok{)}
+\NormalTok{behObs\_enumsOnly\_tab }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(behObs\_enumsOnly, }\AttributeTok{format=}\StringTok{"latex"}\NormalTok{)}
+
+\CommentTok{\# Save}
+\FunctionTok{save}\NormalTok{(behObs\_enumsCheck\_tab, }\AttributeTok{file=}\StringTok{"behObs\_enumsCheck\_tab.Rda"}\NormalTok{)}
+\FunctionTok{save}\NormalTok{(behObs\_enumsOnly\_tab, }\AttributeTok{file=}\StringTok{"behObs\_enumsOnly\_tab.Rda"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \textbf{Chris written description for appendix}: Enumerators (for
 surveys and for behavioral observation) were not informed of a
 community's treatment status, but two of the enumerators for behavioral
-observations were involved in administering the intervention. They also
-only made observations at treatment sites. If their knowledge of program
-aims affected their observations (or if their observations became more
-positive over time for other reasons), our estimates of the treatment
-effect could be inflated.
+observations interacted with the research team frequently and may have
+intuited the study's hypotheses. They also only made observations at
+treatment sites. If their intuition of program aims affected their
+observations (or if their observations became more positive over time
+for other reasons), our estimates of the treatment effect could be
+inflated.
 
-We removed observations from these two enumerators as a robustness
-check. We also checked their change over time. Coefficients with their
-data removed are very similar to coefficients with their data included,
-and \(p\)-values are higher mainly as a result of fewer observations
-(and therefore degrees of freedom). Descriptively, the two enumerators
-involved in administering the intervention observed \emph{less}
-interaction in treatment sites over time relative to other enumerators.
+We checked the change over time in outcomes they reported.
+Descriptively, the two senior enumerators observed \emph{less}
+interaction in treatment sites over time, suggesting that they were not
+influenced by knowledge of the study's hypotheses. As a robustness
+check, we then repeated the main analysis but removed observations from
+these two enumerators. Coefficients with their data removed are very
+similar to coefficients with their data included; \(p\)-values are
+higher mainly as a result of fewer observations (and therefore degrees
+of freedom).
+
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsOnly_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows the baseline-endline change in outcomes for the two senior enumerators who may have intuited the study's hypotheses. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events). The two enumerators reported decreases in market outcomes in treatment sites and no change to event outcomes in treatment sites, suggesting that they were not influenced by knowledge of the study's hypotheses.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+market-pastoralists\_enum & -4.4079254 & 0.1744306\\
+\hline
+market-farmers\_enum & -10.8863636 & 0.0161117\\
+\hline
+events-outgroup\_enum & 0.1363636 & 0.9929502\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
 
 \begin{table}[H]
 \begin{center}
 \label{tab:behObs_enumsCheck_tab}
-\caption{\textbf{Robustness check for behavioral observations} This table shows robustness checks for behavioral observations outcomes. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show  outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
+\caption{\textbf{Robustness check for behavioral observations} This table shows behavioral observation outcomes with two senior enumerators removed. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
 \smallskip
 
 \begin{tabular}{l|r|r}
@@ -1642,15 +1636,16 @@ site selection.
 \NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{christian }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{religion }\SpecialCharTok{\%in\%} \StringTok{"christian"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{muslim }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{religion }\SpecialCharTok{\%in\%} \StringTok{"muslim"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{farming }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{occupation }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"farm"}\NormalTok{,}\StringTok{"both"}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
-\NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{pastoralism }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{occupation }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"pastor"}\NormalTok{,}\StringTok{"both"}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{pastoral }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{occupation }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"pastor"}\NormalTok{,}\StringTok{"both"}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{trading }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(rand.df}\SpecialCharTok{$}\NormalTok{occupation }\SpecialCharTok{\%in\%} \StringTok{"trade"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{fulani }\OtherTok{\textless{}{-}}\NormalTok{ rand.df}\SpecialCharTok{$}\NormalTok{ethnic2fulani}
+\NormalTok{rand.df}\SpecialCharTok{$}\NormalTok{income }\OtherTok{\textless{}{-}}\NormalTok{ rand.df}\SpecialCharTok{$}\NormalTok{income\_month}
 
 \DocumentationTok{\#\# List of group variables and summary variables}
 \NormalTok{group\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"farm\_pastor"}\NormalTok{, }\StringTok{"state"}\NormalTok{, }\StringTok{"survey"}\NormalTok{)}
-\NormalTok{summary\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"female"}\NormalTok{, }\StringTok{"income\_month"}\NormalTok{, }
+\NormalTok{summary\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"female"}\NormalTok{, }\StringTok{"income"}\NormalTok{, }
                   \StringTok{"fulani"}\NormalTok{, }\StringTok{"christian"}\NormalTok{, }\StringTok{"muslim"}\NormalTok{,}
-                  \StringTok{"farming"}\NormalTok{, }\StringTok{"pastoralism"}\NormalTok{, }\StringTok{"trading"}\NormalTok{,}
+                  \StringTok{"farming"}\NormalTok{, }\StringTok{"pastoral"}\NormalTok{, }\StringTok{"trading"}\NormalTok{,}
                   \StringTok{"radio"}\NormalTok{)}
 
 \CommentTok{\#show: age, gender, income, house\_size, ethnic, religion, occupation, radio}
@@ -1658,6 +1653,7 @@ site selection.
 \NormalTok{demo\_tab\_overall }\OtherTok{\textless{}{-}}\NormalTok{ rand.df }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(farm\_pastor,summary\_vars) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{group\_by}\NormalTok{(farm\_pastor) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{summarise}\NormalTok{(}\FunctionTok{across}\NormalTok{(}\FunctionTok{everything}\NormalTok{(), mean, }\AttributeTok{na.rm=}\NormalTok{T))}
+\NormalTok{demo\_tab\_overall }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(demo\_tab\_overall[,}\DecValTok{1}\NormalTok{], }\FunctionTok{round}\NormalTok{(demo\_tab\_overall[,}\DecValTok{2}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(demo\_tab\_overall)],}\DecValTok{2}\NormalTok{))}
 
 \CommentTok{\# by state}
 \NormalTok{demo\_tab\_state }\OtherTok{\textless{}{-}}\NormalTok{ rand.df }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(farm\_pastor, state,summary\_vars) }\SpecialCharTok{\%\textgreater{}\%}
@@ -1673,6 +1669,8 @@ site selection.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{demo\_tab\_state }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(demo\_tab\_state[,}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{], }\FunctionTok{round}\NormalTok{(demo\_tab\_state[,}\DecValTok{3}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(demo\_tab\_state)],}\DecValTok{2}\NormalTok{))}
+
 \CommentTok{\# farm\_pastor,state, survey {-}{-} too complex}
 \CommentTok{\#rand.df \%\textgreater{}\% dplyr::select(group\_vars,summary\_vars) \%\textgreater{}\%}
 \CommentTok{\#  group\_by(farm\_pastor, survey, state) \%\textgreater{}\%}
@@ -1681,6 +1679,10 @@ site selection.
 \CommentTok{\# tables}
 \NormalTok{demo\_tab\_overall1 }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(demo\_tab\_overall, }\AttributeTok{format=}\StringTok{"latex"}\NormalTok{)}
 \NormalTok{demo\_tab\_state1 }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(demo\_tab\_state, }\AttributeTok{format=}\StringTok{"latex"}\NormalTok{)}
+
+\CommentTok{\# Save}
+\FunctionTok{save}\NormalTok{(demo\_tab\_overall1, }\AttributeTok{file=}\StringTok{"demo\_tab\_overall1.Rda"}\NormalTok{)}
+\FunctionTok{save}\NormalTok{(demo\_tab\_state1, }\AttributeTok{file=}\StringTok{"demo\_tab\_state1.Rda"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1692,11 +1694,11 @@ site selection.
 
 \begin{tabular}{l|r|r|r|r|r|r|r|r|r|r}
 \hline
-farm\_pastor & age & female & income\_month & fulani & christian & muslim & farming & pastoralism & trading & radio\\
+farm\_pastor & age & female & income & fulani & christian & muslim & farming & pastoral & trading & radio\\
 \hline
-farmers & 36.30900 & 0.4276402 & 42235.09 & 0.0032595 & 0.6395046 & 0.3474576 & 0.8018253 & 0.0026076 & 0.1199478 & 2.316456\\
+farmers & 36.31 & 0.43 & 42235.09 & 0 & 0.64 & 0.35 & 0.80 & 0.00 & 0.12 & 2.32\\
 \hline
-pastoralists & 34.65511 & 0.4611432 & 30407.69 & 0.9993577 & 0.0012845 & 0.9987155 & 0.1252408 & 0.8484265 & 0.0892742 & 1.460171\\
+pastoralists & 34.66 & 0.46 & 30407.69 & 1 & 0.00 & 1.00 & 0.13 & 0.85 & 0.09 & 1.46\\
 \hline
 \end{tabular}
 
@@ -1712,15 +1714,15 @@ pastoralists & 34.65511 & 0.4611432 & 30407.69 & 0.9993577 & 0.0012845 & 0.99871
 
 \begin{tabular}{l|l|r|r|r|r|r|r|r|r|r|r}
 \hline
-farm\_pastor & state & age & female & income\_month & fulani & christian & muslim & farming & pastoralism & trading & radio\\
+farm\_pastor & state & age & female & income & fulani & christian & muslim & farming & pastoral & trading & radio\\
 \hline
-farmers & ben & 36.31987 & 0.4090909 & 32521.10 & 0.0016835 & 0.9814815 & 0.0016835 & 0.9663300 & 0.0033670 & 0.0151515 & 2.504363\\
+farmers & ben & 36.32 & 0.41 & 32521.10 & 0 & 0.98 & 0.00 & 0.97 & 0.00 & 0.02 & 2.50\\
 \hline
-farmers & nas & 36.30213 & 0.4393617 & 48373.50 & 0.0042553 & 0.4234043 & 0.5659574 & 0.6978723 & 0.0021277 & 0.1861702 & 2.200431\\
+farmers & nas & 36.30 & 0.44 & 48373.50 & 0 & 0.42 & 0.57 & 0.70 & 0.00 & 0.19 & 2.20\\
 \hline
-pastoralists & ben & 35.03531 & 0.3916533 & 24947.04 & 1.0000000 & 0.0032103 & 0.9967897 & 0.0417335 & 0.8796148 & 0.0979133 & 1.554120\\
+pastoralists & ben & 35.04 & 0.39 & 24947.04 & 1 & 0.00 & 1.00 & 0.04 & 0.88 & 0.10 & 1.55\\
 \hline
-pastoralists & nas & 34.40150 & 0.5074946 & 34050.07 & 0.9989293 & 0.0000000 & 1.0000000 & 0.1809422 & 0.8276231 & 0.0835118 & 1.395556\\
+pastoralists & nas & 34.40 & 0.51 & 34050.07 & 1 & 0.00 & 1.00 & 0.18 & 0.83 & 0.08 & 1.40\\
 \hline
 \end{tabular}
 
@@ -1738,8 +1740,8 @@ demographic characteristics for ag.df}
 \FunctionTok{names}\NormalTok{(compCoefs) }\OtherTok{\textless{}{-}}\NormalTok{ outcome\_list}
 
 \CommentTok{\# make vars for ag.df that aren\textquotesingle{}t in ag.df}
-\NormalTok{needVars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"christian"}\NormalTok{, }\StringTok{"farming"}\NormalTok{, }\StringTok{"pastoralism"}\NormalTok{, }\StringTok{"trading"}\NormalTok{,}
-              \StringTok{"community"}\NormalTok{, }\StringTok{"survey"}\NormalTok{)}
+\NormalTok{needVars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"christian"}\NormalTok{, }\StringTok{"farming"}\NormalTok{, }\StringTok{"pastoral"}\NormalTok{, }\StringTok{"trading"}\NormalTok{,}
+              \StringTok{"income"}\NormalTok{, }\StringTok{"community"}\NormalTok{, }\StringTok{"survey"}\NormalTok{)}
 \NormalTok{demo\_df }\OtherTok{\textless{}{-}}\NormalTok{ rand.df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(survey}\SpecialCharTok{==}\StringTok{"baseline"}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}
 \NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\FunctionTok{all\_of}\NormalTok{(needVars)) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{group\_by}\NormalTok{(community) }\SpecialCharTok{\%\textgreater{}\%}
@@ -1750,7 +1752,7 @@ demographic characteristics for ag.df}
   \FunctionTok{as.data.frame}\NormalTok{()}
 
 \CommentTok{\# make vars to control for in regression}
-\NormalTok{summary\_vars\_reg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"age\_base"}\NormalTok{, }\StringTok{"female\_base"}\NormalTok{, }\StringTok{"income\_month\_base"}\NormalTok{, }
+\NormalTok{summary\_vars\_reg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"age\_base"}\NormalTok{, }\StringTok{"female\_base"}\NormalTok{, }
                      \StringTok{"ethnic2fulani\_base"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(needVars[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{4}\NormalTok{]))}
 
 \CommentTok{\# looping}
@@ -1770,6 +1772,9 @@ demographic characteristics for ag.df}
 
 \CommentTok{\# kable}
 \NormalTok{comp\_df1 }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(comp\_df, }\AttributeTok{format=}\StringTok{"latex"}\NormalTok{)}
+
+\CommentTok{\# save}
+\FunctionTok{save}\NormalTok{(comp\_df1, }\AttributeTok{file=}\StringTok{"comp\_df1.Rda"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1783,21 +1788,21 @@ demographic characteristics for ag.df}
 \hline
   & paper & check & difference\\
 \hline
-attitude & 0.1160135 & 0.0797845 & 0.0362290\\
+attitude & 0.1160135 & 0.0770404 & 0.0389731\\
 \hline
-in & 0.1590911 & 0.1707606 & -0.0116695\\
+in & 0.1590911 & 0.1681601 & -0.0090690\\
 \hline
-contactOnly & 0.1377790 & 0.1097815 & 0.0279975\\
+contactOnly & 0.1377790 & 0.1066938 & 0.0310852\\
 \hline
-rMean & 0.0621330 & -0.0069742 & 0.0691072\\
+rMean & 0.0621330 & -0.0080656 & 0.0701985\\
 \hline
-end\_exp & 0.1225162 & 0.2666481 & -0.1441319\\
+end\_exp & 0.1225162 & 0.2701144 & -0.1475982\\
 \hline
-pgp\_donate\_end & 0.0224200 & 0.0215383 & 0.0008817\\
+pgp\_donate\_end & 0.0224200 & 0.0218400 & 0.0005800\\
 \hline
-pgp\_amount\_end & -35.1235007 & -32.4336138 & -2.6898869\\
+pgp\_amount\_end & -35.1235007 & -32.4998039 & -2.6236968\\
 \hline
-total (excludes pgp\_amount) & 0.6199528 & 0.6415387 & -0.0215860\\
+total (excludes pgp\_amount) & 0.6199528 & 0.6357832 & -0.0158305\\
 \hline
 \end{tabular}
 
@@ -1817,15 +1822,16 @@ demographic characteristics for individual-level stuff}
 \CommentTok{\# make vars that aren\textquotesingle{}t in panel.df}
 \NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{christian\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{religion\_y0 }\SpecialCharTok{\%in\%} \StringTok{"christian"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{farming\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{occupation\_y0 }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"farm"}\NormalTok{,}\StringTok{"both"}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
-\NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{pastoralism\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{occupation\_y0 }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"pastor"}\NormalTok{,}\StringTok{"both"}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{pastoral\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{occupation\_y0 }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"pastor"}\NormalTok{,}\StringTok{"both"}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{trading\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{occupation\_y0 }\SpecialCharTok{\%in\%} \StringTok{"trade"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{female\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{gender\_y0 }\SpecialCharTok{\%in\%} \StringTok{"female"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 \NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{fulani\_y0 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(panel.df}\SpecialCharTok{$}\NormalTok{ethnic2\_y0 }\SpecialCharTok{\%in\%} \StringTok{"fulani"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{panel.df}\SpecialCharTok{$}\NormalTok{income\_y0 }\OtherTok{\textless{}{-}}\NormalTok{ panel.df}\SpecialCharTok{$}\NormalTok{income\_month\_y0}
 
 \CommentTok{\# make vars to control for in regression}
-\NormalTok{summary\_vars\_reg\_ind }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"age\_y0"}\NormalTok{, }\StringTok{"female\_y0"}\NormalTok{, }\StringTok{"income\_month\_y0"}\NormalTok{, }
+\NormalTok{summary\_vars\_reg\_ind }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"age\_y0"}\NormalTok{, }\StringTok{"female\_y0"}\NormalTok{, }\StringTok{"income\_y0"}\NormalTok{, }
                      \StringTok{"fulani\_y0"}\NormalTok{, }\StringTok{"christian\_y0"}\NormalTok{,}
-                     \StringTok{"farming\_y0"}\NormalTok{, }\StringTok{"pastoralism\_y0"}\NormalTok{, }\StringTok{"trading\_y0"}\NormalTok{)}
+                     \StringTok{"farming\_y0"}\NormalTok{, }\StringTok{"pastoral\_y0"}\NormalTok{, }\StringTok{"trading\_y0"}\NormalTok{)}
 
 \CommentTok{\# looping}
 \NormalTok{outcome\_list\_ind }\OtherTok{\textless{}{-}}\NormalTok{ outcome\_list\_qip[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{,}\DecValTok{6}\SpecialCharTok{:}\DecValTok{7}\NormalTok{)]}
@@ -1846,6 +1852,9 @@ demographic characteristics for individual-level stuff}
 
 \CommentTok{\# kable}
 \NormalTok{comp\_df\_ind1 }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(comp\_df\_ind, }\AttributeTok{format=}\StringTok{"latex"}\NormalTok{)}
+
+\CommentTok{\# save}
+\FunctionTok{save}\NormalTok{(comp\_df\_ind1, }\AttributeTok{file=}\StringTok{"comp\_df\_ind1.Rda"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 

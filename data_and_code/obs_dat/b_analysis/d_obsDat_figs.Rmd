@@ -14,6 +14,9 @@ library(dplyr)
 library(ggplot2)
 library(estimatr)
 
+# colors
+grps <-c("1", "0")
+color.codes<-as.character(c("#FC8D59", "#00BFC4"))
 ```
 
 # Overview
@@ -69,10 +72,6 @@ markets.df2b <- markets.df %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
 markets.df2b$treatment <- as.factor(as.character(markets.df2b$treatment))
-
-# colors
-grps <-c("1", "0")
-color.codes<-as.character(c("#FC8D59", "#00BFC4"))
 ```
 
 ## Plots
@@ -267,11 +266,10 @@ dev.off()
 
 ## Make Plot dataframes.
 
-First, fix things in main df.
+First, fix things in main df if needed.
 
 ```{r}
 #events$treatment <- as.character(events$treatment)
-
 quantile(events$outgroupPerc_index_rank, seq(0,1,0.1),na.rm=T)
 ```
 
@@ -318,6 +316,11 @@ events.df1b <- events.df %>%
   as.data.frame()
 events.df1b$treatment <- as.factor(as.character(events.df1b$treatment))
 
+##remove sites that don't have t1 and t2
+checkTab <- table(events.df1b$site, events.df1b$time)
+siteList <- rownames(checkTab)[checkTab[,1]+checkTab[,2]==2]
+events.df1b <- events.df1b[events.df1b$site %in% siteList,]
+
 ########
 
 # at tr/co-level & t1/t2-level
@@ -347,7 +350,7 @@ dev.off()
 ```
 
 
-### markets.df1b == site-level & t1/t2-time
+### events.df1b == site-level & t1/t2-time
 ```{r}
 events_outgroup_siteTime.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df1b,
@@ -363,7 +366,7 @@ dev.off()
 ```
 
 
-### markets.df2 == tr/co-level and month-level.
+### events.df2 == tr/co-level and month-level.
 ```{r}
 event_outgroup_TrMonth.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df2,
@@ -379,7 +382,7 @@ dev.off()
 ```
 
 
-### markets.df2b == tr/co-level, t1/t2-level.
+### events.df2b == tr/co-level, t1/t2-level.
 ```{r}
 event_outgroup_TrTime.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df2b,

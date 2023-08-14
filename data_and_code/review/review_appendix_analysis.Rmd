@@ -124,6 +124,8 @@ outcome_list_qip <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(ou
 
 ben_vars <- c("qip_group.borehole_use_end", "qip_group.borehole_aware_end",
               "qip_ben_end", "qip_aware_end")
+ben_vars_tab <- c("Borehole use", "Borehole aware",
+              "QIP benefit", "QIP aware")
 ben_out_df <- expand.grid(ben_vars = ben_vars,
                     out_vars = outcome_list_qip)
 
@@ -186,8 +188,11 @@ for(i in 1:length(outcome_list))
   benefit_df[i,2] <- mean(all_pvalues["var_p",colnames(all_pvalues)[grepl(paste(outcome_list[i]), colnames(all_pvalues))]])
   benefit_df[i,3] <- mean(all_tstat["var_t",colnames(all_tstat)[grepl(paste(outcome_list[i]), colnames(all_tstat))]])
 }
-rownames(benefit_df) <- outcome_list
-benefit_df["all",] <- c(NA, mean(all_pvalues["var_p",]), mean(all_tstat["var_t",]))
+outcome_list_tabs <- c("Attitudes", "Security", "Contact",
+                       "Contact Willingness", "Endorsement Exp",
+                       "PGG Donation", "PGG Amount")
+rownames(benefit_df) <- outcome_list_tabs
+benefit_df["All",] <- c(NA, mean(all_pvalues["var_p",]), mean(all_tstat["var_t",]))
 save(benefit_df, file="benefit_df.Rda")
 
 
@@ -200,7 +205,7 @@ for(i in 1:length(ben_vars))
   benefitVar_df[i,2] <- mean(all_pvalues["var_p",colnames(all_pvalues)[grepl(paste(ben_vars[i]), colnames(all_pvalues))]])
    benefitVar_df[i,3] <- mean(all_tstat["var_t",colnames(all_tstat)[grepl(paste(ben_vars[i]), colnames(all_tstat))]])
 }
-rownames(benefitVar_df) <- ben_vars
+rownames(benefitVar_df) <- ben_vars_tab
 benefitVar_df["all",] <- c(NA, mean(all_pvalues["var_p",]), mean(all_tstat["var_t",]))
 save(benefitVar_df, file="benefitVar_df.Rda")
 
@@ -218,7 +223,7 @@ for(i in 1:length(ben_vars))
   benefitVar_df_svy[i,2] <- mean(all_pvalues_svy["var_p",colnames(all_pvalues_svy)[grepl(paste(ben_vars[i]), colnames(all_pvalues_svy))]])
    benefitVar_df_svy[i,3] <- mean(all_tstat_svy["var_t",colnames(all_tstat_svy)[grepl(paste(ben_vars[i]), colnames(all_tstat_svy))]])
 }
-rownames(benefitVar_df_svy) <- ben_vars
+rownames(benefitVar_df_svy) <- ben_vars_tab
 benefitVar_df_svy["all",] <- c(NA, mean(all_pvalues_svy["var_p",]), mean(all_tstat_svy["var_t",]))
 save(benefitVar_df_svy, file="benefitVar_df_svy.Rda")
 ```
@@ -325,9 +330,10 @@ rownames(benPast_tstat) <- c("intercept_t", "ben_past_t", "tr_t", "benpast:tr_t"
 rownames(benPast_estimate) <- c("intercept_coef", "ben_past_coef", "tr_coef", "benpast:tr_coef")
 benPast_tab <- cbind(benPast_estimate[4,], benPast_pvalues[4,], benPast_tstat[4,])
 colnames(benPast_tab) <- c("coef", "pvalue", "tstat")
+rownames(benPast_tab) <- outcome_list_tabs
 
-all_mean <- c(mean(benPast_tab[1:5,1]), colMeans(benPast_tab[,2:3]))
-benPast_tab <- rbind(benPast_tab, all_mean)
+All <- c(mean(benPast_tab[1:5,1]), colMeans(benPast_tab[,2:3]))
+benPast_tab <- rbind(benPast_tab, All)
 save(benPast_tab, file="benPast_tab.Rda")
 ```
 
@@ -358,9 +364,9 @@ names(commListPs) <- c(outcome_list, rownames(obsDat_truePs))
 
 ## separate into our hypothesis families
 ### contact
-contact_none <- p.adjust(commListPs[c(3,4,8:10)], method="none")
+con_none <- p.adjust(commListPs[c(3,4,8:10)], method="none")
 p.adjust(commListPs[c(3,4,8:10)], method="fdr")
-contact_holm <- p.adjust(commListPs[c(3,4,8:10)], method="holm")
+con_holm <- p.adjust(commListPs[c(3,4,8:10)], method="holm")
 con_ps <- as.data.frame(cbind(con_none, con_holm))
 con_ps$family <- "Contact"
 names(con_ps) <- c("None", "Holm", "Family")
@@ -706,16 +712,30 @@ colnames(behObs_enumsOnly) <- c("coefficient", "p-value")
 rownames(behObs_enumsOnly) <- c("market-pastoralists_enum",
                                  "market-farmers_enum",
                                  "events-outgroup_enum")
+behObs_enumsOnly_tab <- knitr::kable(behObs_enumsOnly, format="latex")
+
+# Save
+save(behObs_enumsCheck_tab, file="behObs_enumsCheck_tab.Rda")
+save(behObs_enumsOnly_tab, file="behObs_enumsOnly_tab.Rda")
 ```
 
-**Chris written description for appendix**: Enumerators (for surveys and for behavioral observation) were not informed of a community's treatment status, but two of the enumerators for behavioral observations were involved in administering the intervention. They also only made observations at treatment sites. If their knowledge of program aims affected their observations (or if their observations became more positive over time for other reasons), our estimates of the treatment effect could be inflated.
+**Chris written description for appendix**: Enumerators (for surveys and for behavioral observation) were not informed of a community's treatment status, but two of the enumerators for behavioral observations interacted with the research team frequently and may have intuited the study's hypotheses. They also only made observations at treatment sites. If their intuition of program aims affected their observations (or if their observations became more positive over time for other reasons), our estimates of the treatment effect could be inflated.
 
-We removed observations from these two enumerators as a robustness check.  We also checked their change over time. Coefficients with their data removed are very similar to coefficients with their data included, and $p$-values are higher mainly as a result of fewer observations (and therefore degrees of freedom). Descriptively, the two enumerators involved in administering the intervention observed _less_ interaction in treatment sites over time relative to other enumerators. 
+We checked the change over time in outcomes they reported. Descriptively, the two senior enumerators observed _less_ interaction in treatment sites over time, suggesting that they were not influenced by knowledge of the study's hypotheses. As a robustness check, we then repeated the main analysis but removed observations from these two enumerators.   Coefficients with their data removed are very similar to coefficients with their data included; $p$-values are higher mainly as a result of fewer observations (and therefore degrees of freedom). 
+
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsOnly_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows the baseline-endline change in outcomes for the two senior enumerators who may have intuited the study's hypotheses. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events). The two enumerators reported decreases in market outcomes in treatment sites and no change to event outcomes in treatment sites, suggesting that they were not influenced by knowledge of the study's hypotheses.}
+\smallskip
+`r behObs_enumsOnly_tab`
+\end{center}
+\end{table}
 
 \begin{table}[H]
 \begin{center}
 \label{tab:behObs_enumsCheck_tab}
-\caption{\textbf{Robustness check for behavioral observations} This table shows robustness checks for behavioral observations outcomes. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show  outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
+\caption{\textbf{Robustness check for behavioral observations} This table shows behavioral observation outcomes with two senior enumerators removed. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
 \smallskip
 `r behObs_enumsCheck_tab`
 \end{center}
@@ -766,15 +786,16 @@ rand.df$survey <- ifelse(rand.df$survey %in% 0, "baseline", "endline")
 rand.df$christian <- ifelse(rand.df$religion %in% "christian", 1, 0)
 rand.df$muslim <- ifelse(rand.df$religion %in% "muslim", 1, 0)
 rand.df$farming <- ifelse(rand.df$occupation %in% c("farm","both"), 1, 0)
-rand.df$pastoralism <- ifelse(rand.df$occupation %in% c("pastor","both"), 1, 0)
+rand.df$pastoral <- ifelse(rand.df$occupation %in% c("pastor","both"), 1, 0)
 rand.df$trading <- ifelse(rand.df$occupation %in% "trade", 1, 0)
 rand.df$fulani <- rand.df$ethnic2fulani
+rand.df$income <- rand.df$income_month
 
 ## List of group variables and summary variables
 group_vars <- c("farm_pastor", "state", "survey")
-summary_vars <- c("age", "female", "income_month", 
+summary_vars <- c("age", "female", "income", 
                   "fulani", "christian", "muslim",
-                  "farming", "pastoralism", "trading",
+                  "farming", "pastoral", "trading",
                   "radio")
 
 #show: age, gender, income, house_size, ethnic, religion, occupation, radio
@@ -782,11 +803,13 @@ summary_vars <- c("age", "female", "income_month",
 demo_tab_overall <- rand.df %>% dplyr::select(farm_pastor,summary_vars) %>%
   group_by(farm_pastor) %>%
   summarise(across(everything(), mean, na.rm=T))
+demo_tab_overall <- cbind(demo_tab_overall[,1], round(demo_tab_overall[,2:ncol(demo_tab_overall)],2))
 
 # by state
 demo_tab_state <- rand.df %>% dplyr::select(farm_pastor, state,summary_vars) %>%
   group_by(farm_pastor, state) %>%
   summarise(across(everything(), mean, na.rm=T))
+demo_tab_state <- cbind(demo_tab_state[,1:2], round(demo_tab_state[,3:ncol(demo_tab_state)],2))
 
 # farm_pastor,state, survey -- too complex
 #rand.df %>% dplyr::select(group_vars,summary_vars) %>%
@@ -796,6 +819,10 @@ demo_tab_state <- rand.df %>% dplyr::select(farm_pastor, state,summary_vars) %>%
 # tables
 demo_tab_overall1 <- knitr::kable(demo_tab_overall, format="latex")
 demo_tab_state1 <- knitr::kable(demo_tab_state, format="latex")
+
+# Save
+save(demo_tab_overall1, file="demo_tab_overall1.Rda")
+save(demo_tab_state1, file="demo_tab_state1.Rda")
 ```
 
 \begin{table}[H]
@@ -825,8 +852,8 @@ compCoefs <- sapply(newList, function(x) x$coef[x$base %in% 1])
 names(compCoefs) <- outcome_list
 
 # make vars for ag.df that aren't in ag.df
-needVars <- c("christian", "farming", "pastoralism", "trading",
-              "community", "survey")
+needVars <- c("christian", "farming", "pastoral", "trading",
+              "income", "community", "survey")
 demo_df <- rand.df %>% filter(survey=="baseline")%>%
   dplyr::select(all_of(needVars)) %>%
   group_by(community) %>%
@@ -837,7 +864,7 @@ new_ag.df <- ag.df %>% left_join(demo_df, by=c("comm"="community")) %>%
   as.data.frame()
 
 # make vars to control for in regression
-summary_vars_reg <- c("age_base", "female_base", "income_month_base", 
+summary_vars_reg <- c("age_base", "female_base", 
                      "ethnic2fulani_base", paste(needVars[1:4]))
 
 # looping
@@ -857,6 +884,9 @@ names(comp_df) <- c("paper", "check", "difference")
 
 # kable
 comp_df1 <- knitr::kable(comp_df, format="latex")
+
+# save
+save(comp_df1, file="comp_df1.Rda")
 ```
 
 \begin{table}[H]
@@ -879,15 +909,16 @@ names(compCoefs_ind) <- c(outcome_list[c(1:3,6:7)])
 # make vars that aren't in panel.df
 panel.df$christian_y0 <- ifelse(panel.df$religion_y0 %in% "christian", 1, 0)
 panel.df$farming_y0 <- ifelse(panel.df$occupation_y0 %in% c("farm","both"), 1, 0)
-panel.df$pastoralism_y0 <- ifelse(panel.df$occupation_y0 %in% c("pastor","both"), 1, 0)
+panel.df$pastoral_y0 <- ifelse(panel.df$occupation_y0 %in% c("pastor","both"), 1, 0)
 panel.df$trading_y0 <- ifelse(panel.df$occupation_y0 %in% "trade", 1, 0)
 panel.df$female_y0 <- ifelse(panel.df$gender_y0 %in% "female", 1, 0)
 panel.df$fulani_y0 <- ifelse(panel.df$ethnic2_y0 %in% "fulani", 1, 0)
+panel.df$income_y0 <- panel.df$income_month_y0
 
 # make vars to control for in regression
-summary_vars_reg_ind <- c("age_y0", "female_y0", "income_month_y0", 
+summary_vars_reg_ind <- c("age_y0", "female_y0", "income_y0", 
                      "fulani_y0", "christian_y0",
-                     "farming_y0", "pastoralism_y0", "trading_y0")
+                     "farming_y0", "pastoral_y0", "trading_y0")
 
 # looping
 outcome_list_ind <- outcome_list_qip[c(1:3,6:7)]
@@ -908,6 +939,9 @@ names(comp_df_ind) <- c("paper", "check", "difference")
 
 # kable
 comp_df_ind1 <- knitr::kable(comp_df_ind, format="latex")
+
+# save
+save(comp_df_ind1, file="comp_df_ind1.Rda")
 ```
 
 \begin{table}[H]

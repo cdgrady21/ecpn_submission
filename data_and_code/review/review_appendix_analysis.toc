@@ -3,14 +3,14 @@
 \contentsline {subsection}{Comment 2}{10}{section*.4}%
 \contentsline {subsection}{Comment 3}{14}{section*.5}%
 \contentsline {subsection}{Comment 4}{16}{section*.6}%
-\contentsline {subsubsection}{Behavioral outcomes}{20}{section*.7}%
+\contentsline {subsubsection}{Behavioral outcomes}{19}{section*.7}%
 \contentsline {paragraph}{Markets: pastoralist index}{20}{section*.8}%
 \contentsline {paragraph}{Markets: farmers index}{20}{figure.5}%
 \contentsline {paragraph}{Events: Outgroup index}{20}{figure.6}%
 \contentsline {subsection}{Comment 5}{20}{section*.11}%
-\contentsline {subsection}{Comment 6 (smaller questions)}{24}{section*.12}%
+\contentsline {subsection}{Comment 6 (smaller questions)}{20}{section*.12}%
 \contentsline {section}{Review 2}{26}{section*.13}%
 \contentsline {subsection}{Comment 1}{26}{section*.14}%
 \contentsline {subsection}{Comment 2}{27}{section*.15}%
-\contentsline {section}{Misc}{30}{section*.16}%
-\contentsline {subsection}{Power analysis}{30}{section*.17}%
+\contentsline {section}{Misc}{31}{section*.16}%
+\contentsline {subsection}{Power analysis}{31}{section*.17}%

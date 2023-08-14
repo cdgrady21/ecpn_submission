@@ -35,6 +35,46 @@
 \makeatother
 \usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -59,12 +99,13 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={Promoting Peace Amid Intergroup Conflict: An Intergroup Contact Field Experiment in Nigeria\_Supplementary Information},
+  pdftitle={How Contact Can Promote Societal Change Amid Intergroup Conflict: An Intergroup Contact Field Experiment in Nigeria - Supplementary Information},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\title{Promoting Peace Amid Intergroup Conflict: An Intergroup Contact
-Field Experiment in Nigeria\_Supplementary Information}
+\title{How Contact Can Promote Societal Change Amid Intergroup Conflict:
+An Intergroup Contact Field Experiment in Nigeria - Supplementary
+Information}
 \author{}
 \date{\vspace{-2.5em}}
 
@@ -118,6 +159,9 @@ as they were sampled.
 \hypertarget{appendix-b-robustness-checks-for-community-analysis}{%
 \subsection{Appendix B: Robustness checks for community
 analysis}\label{appendix-b-robustness-checks-for-community-analysis}}
+
+\hypertarget{survey-outcomes}{%
+\subsubsection{Survey outcomes}\label{survey-outcomes}}
 
 These tables shows results with different ways of making indices
 (additive vs inverse-covariance weighted), different models for
@@ -268,6 +312,78 @@ Differencing & 0.123 & 0.212 & 1\\
 Donation (binary) & 0.022 & 0.294\\
 \hline
 Donation amount & -35.124 & 0.852\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\hypertarget{behvioral-outcomes}{%
+\subsubsection{Behvioral outcomes}\label{behvioral-outcomes}}
+
+Enumerators (for surveys and for behavioral observation) were not
+informed of a community's treatment status, but two of the enumerators
+for behavioral observations interacted with the research team frequently
+and may have intuited the study's hypotheses. They also only made
+observations at treatment sites. If their intuition of program aims
+affected their observations (or if their observations became more
+positive over time for other reasons), our estimates of the treatment
+effect could be inflated.
+
+We first checked the change over time in outcomes they reported.
+Descriptively, the two senior enumerators observed \emph{less}
+interaction in treatment sites over time, suggesting that they were not
+influenced by knowledge of the study's hypotheses. As a robustness
+check, we then repeated the main analysis but removed observations from
+these two enumerators. Coefficients with their data removed are very
+similar to coefficients with their data included; \(p\)-values are
+higher mainly as a result of fewer observations (and therefore degrees
+of freedom).
+
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsOnly_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows the baseline-endline change in outcomes for the two senior enumerators who may have intuited the study's hypotheses. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events). The two enumerators reported decreases in market outcomes in treatment sites and no change to event outcomes in treatment sites, suggesting that they were not influenced by knowledge of the study's hypotheses.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+market-pastoralists\_enum & -4.4079254 & 0.1744306\\
+\hline
+market-farmers\_enum & -10.8863636 & 0.0161117\\
+\hline
+events-outgroup\_enum & 0.1363636 & 0.9929502\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsCheck_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows behavioral observation outcomes with two senior enumerators removed. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & coefficient & p-value\\
+\hline
+market-pastoralists\_all & 12.532 & 0.001\\
+\hline
+market-pastoralists\_without & 10.285 & 0.103\\
+\hline
+market-farmers\_all & 3.339 & 0.242\\
+\hline
+market-farmers\_without & 1.286 & 0.456\\
+\hline
+events-outgroup\_all & 9.228 & 0.186\\
+\hline
+events-outgroup\_without & 6.333 & 0.136\\
 \hline
 \end{tabular}
 
@@ -831,16 +947,19 @@ Part: Differencing & -0.079 & 0.616 & 0\\
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{appendix-f-state-level-differences}{%
-\subsection{Appendix F: State-level
-differences}\label{appendix-f-state-level-differences}}
+\hypertarget{appendix-f-state-level-heterogeneous-effects}{%
+\subsection{Appendix F: State-level heterogeneous
+effects}\label{appendix-f-state-level-heterogeneous-effects}}
+
+This looks at heterogeneous effects by state. This is a low-power
+analysis. There are no significant differences in treatment effect by
+state.
 
 Coefficients and p-values estimating state-level heterogeneous effects
 were calculated with robust OLS regression using site-level clusters.
 The regression interacted the treatment indicator with the state
-indicator. This is a low-power analysis. There are no significant
-differences in treatment effect by state. Benue was the reference
-category so this table shows differences for Nasarawa.
+indicator. Benue was the reference category so this table shows
+differences for Nasarawa.
 
 \begin{table}[H]
 \begin{center}
@@ -878,12 +997,124 @@ PGG amount & -84.807 & 0.442\\
 \subsection{Appendix G: Farmer-pastoralist
 differences}\label{appendix-g-farmer-pastoralist-differences}}
 
+We show demographic differences between farmers and pastoralists. We
+also shows regressions using demographic characteristics as control
+variables to confirm that accounting for these variables does not change
+the study's results.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:demo_tab_overall1}
+\caption{\textbf{Farmer and Pastoralist Demographics} This table shows demographic characteristics for farming groups and pastoralist groups}
+\smallskip
+
+\begin{tabular}{l|r|r|r|r|r|r|r|r|r|r}
+\hline
+farm\_pastor & age & female & income & fulani & christian & muslim & farming & pastoral & trading & radio\\
+\hline
+farmers & 36.31 & 0.43 & 42235.09 & 0 & 0.64 & 0.35 & 0.80 & 0.00 & 0.12 & 2.32\\
+\hline
+pastoralists & 34.66 & 0.46 & 30407.69 & 1 & 0.00 & 1.00 & 0.13 & 0.85 & 0.09 & 1.46\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:demo_tab_state1}
+\caption{\textbf{Farmer and Pastoralist Demographics by State} This table shows demographic characteristics for farming groups and pastoralist groups, separating respondents from Nasarawa and Benue}
+\smallskip
+
+\begin{tabular}{l|l|r|r|r|r|r|r|r|r|r|r}
+\hline
+farm\_pastor & state & age & female & income & fulani & christian & muslim & farming & pastoral & trading & radio\\
+\hline
+farmers & ben & 36.32 & 0.41 & 32521.10 & 0 & 0.98 & 0.00 & 0.97 & 0.00 & 0.02 & 2.50\\
+\hline
+farmers & nas & 36.30 & 0.44 & 48373.50 & 0 & 0.42 & 0.57 & 0.70 & 0.00 & 0.19 & 2.20\\
+\hline
+pastoralists & ben & 35.04 & 0.39 & 24947.04 & 1 & 0.00 & 1.00 & 0.04 & 0.88 & 0.10 & 1.55\\
+\hline
+pastoralists & nas & 34.40 & 0.51 & 34050.07 & 1 & 0.00 & 1.00 & 0.18 & 0.83 & 0.08 & 1.40\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:comp_df1}
+\caption{\textbf{Regressions with community-average demographic variables} This table shows coefficients from each survey regression either (1) the version in the paper that does not control for demographic characteristics, or (2) a regression that aggregated demographic characteristics to the community-level and included them as control variables. The coefficients are similar -- the sum of the coefficients when controlling for demographic characteristics is slightly larger.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & paper & check & difference\\
+\hline
+attitude & 0.1160135 & 0.0770404 & 0.0389731\\
+\hline
+in & 0.1590911 & 0.1681601 & -0.0090690\\
+\hline
+contactOnly & 0.1377790 & 0.1066938 & 0.0310852\\
+\hline
+rMean & 0.0621330 & -0.0080656 & 0.0701985\\
+\hline
+end\_exp & 0.1225162 & 0.2701144 & -0.1475982\\
+\hline
+pgp\_donate\_end & 0.0224200 & 0.0218400 & 0.0005800\\
+\hline
+pgp\_amount\_end & -35.1235007 & -32.4998039 & -2.6236968\\
+\hline
+total (excludes pgp\_amount) & 0.6199528 & 0.6357832 & -0.0158305\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:comp_df_ind1}
+\caption{\textbf{Regressions with individual demographic variables} This table shows coefficients from each survey regression either (1) the version in the paper that does not control for demographic characteristics, or (2) a regression that includes individual-level demographic characteristics as control variables. The coefficients are similar -- the sum of the coefficients when controlling for demographic characteristics is slightly smaller.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & paper & check & difference\\
+\hline
+attitude & 0.0602411 & 0.0515518 & 0.0086894\\
+\hline
+in & 0.0495368 & 0.0461179 & 0.0034189\\
+\hline
+contactOnly & 0.0975058 & 0.0451252 & 0.0523806\\
+\hline
+pgp\_donate\_end & 0.0203803 & 0.0405599 & -0.0201796\\
+\hline
+pgp\_amount\_end & -53.7397532 & -38.3723911 & -15.3673621\\
+\hline
+total (excludes pgp\_amount) & 0.2276640 & 0.1833548 & 0.0443092\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+This looks at heterogeneous effects by group (farmers and pastoralists).
+This is a low-power analysis. There are no significant differences in
+treatment effect by farmer/pastoralist.
+
 Coefficients and p-values estimating farmer/pastoralist heterogeneous
 effects were calculated with robust OLS regression using site-level
 clusters and fixed effects for state. The regression interacted the
-treatment indicator with the state indicator. There are no significant
-differences in treatment effect by farmer/pastoralist. Farmers were the
-reference category so this table shows differences for pastoralists.
+treatment indicator with the state indicator. Farmers were the reference
+category so this table shows differences for pastoralists.
 
 \begin{table}[H]
 \begin{center}
@@ -917,9 +1148,9 @@ PGG amount & 23.284 & 0.784\\
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{appendix-z-survey-questions}{%
-\subsection{Appendix Z: Survey
-Questions}\label{appendix-z-survey-questions}}
+\hypertarget{appendix-h-survey-questions}{%
+\subsection{Appendix H: Survey
+Questions}\label{appendix-h-survey-questions}}
 
 \textbf{Attitudes}
 
@@ -1103,5 +1334,447 @@ envelope. Remember, you are welcome to donate none, some, or all of the
 money to the project committee. After that we are finished and you may
 continue your day. We will come back and publicly announce how much
 money your community's project committee will receive.''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-i-alternative-explanations}{%
+\subsection{Appendix I: Alternative
+explanations}\label{appendix-i-alternative-explanations}}
+
+It is possible that the effects of our intervention are due to impact of
+the development project around which the contact was organized, rather
+than intergroup contact itself. The effect could also be due to
+mediation provided to some community leaders. We ran three analyses to
+disentangle the effects of contact from the effects of the development
+projects and mediation.
+
+\hypertarget{effect-of-contact-vs.-effect-of-development-projects}{%
+\subsubsection{Effect of contact vs.~effect of development
+projects}\label{effect-of-contact-vs.-effect-of-development-projects}}
+
+The first was to determine if treatment effects were significantly
+larger for communities where larger proportions of people were aware of,
+used, and perceived benefit from the projects. In treatment communities,
+we predicted outcome change with (1) awareness of boreholes, (2) use of
+boreholes, (3) awareness of quick-impact projects, and (4) perceived
+benefit from quick-impact projects. If treatment effects are due to
+development projects and not contact, we would expect larger effects
+where a greater proportion of respondents were aware of, used, and
+benefited from the development projects.
+
+Our analysis shows that awareness, use, and benefit from the projects is
+not significantly related to any outcome (the mean p-value is
+\textasciitilde0.32). It's also not the case that any of those variables
+separately (awareness, use, and benefit) are related to improvements on
+any outcome. Though the p-values are insignificant, the mean t-statistic
+for the awareness/use/benefit variables is positive, possibly suggesting
+that the development projects, while not explaining the bulk of the
+treatment effect, may have increased the effect. The tables show the
+mean coefficient, \(p\)-value, and t-statistic for each outcome being
+predicted by each ``benefit'' variable.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:benefit_df_tab}
+\caption{\textbf{Benefit variables affect on outcomes.} Mean coefficient, $p$-value, and t-statistic for each outcome, across benefit variables. Benefit variables are not significantly related to any outcome.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefs & pvals & tstat\\
+\hline
+Attitudes & 0.1936077 & 0.1836764 & 0.9056779\\
+\hline
+Security & 0.2448961 & 0.2794338 & 1.2928731\\
+\hline
+Contact & 0.3207580 & 0.2643255 & 1.3698100\\
+\hline
+Contact Willingness & 0.3714763 & 0.0915421 & 1.9362679\\
+\hline
+Endorsement Exp & 0.1398422 & 0.6779022 & 0.3172168\\
+\hline
+PGG Donation & -0.0306856 & 0.2763725 & -1.3456686\\
+\hline
+PGG Amount & -35.9157762 & 0.4960119 & -0.7851551\\
+\hline
+All & NA & 0.3241806 & 0.5272889\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:benefitVar_df_svy_tab}
+\caption{\textbf{Benefit variables affect on outcomes.} Mean coefficient, $p$-value, and t-statistic for each benefit variables, across outcomes. This tables removes Public Goods Game outcomes because (1) their coefficients are on a different scale than the survey outcomes and (2) the coefficients and t-statistics are negative, which could hide the effect of benefit variables on the other outcomes. However, this table shows that benefit variables are not significantly related to any survey outcome.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coefs & pvals & tstat\\
+\hline
+Borehole use & 0.3355362 & 0.2547888 & 1.5838113\\
+\hline
+Borehole aware & 0.2377543 & 0.3878788 & 0.9939178\\
+\hline
+QIP benefit & 0.0657282 & 0.3007221 & -0.0346520\\
+\hline
+QIP aware & 0.3774457 & 0.2541144 & 2.1143994\\
+\hline
+all & NA & 0.2993760 & 1.1643691\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+Second, we looked at whether pastoralists in Benue differed from the
+rest of the sample. Pastoralists in Benue benefited least from the
+development projects (especially the main project that built boreholes)
+because they became displaced from where the boreholes were constructed
+prior to the endline survey. Here we (1) confirm that pastoralists in
+Benue were less likely to be aware of, use, or benefit from the
+development projects and (2) see no significant outcome differences
+between pastoralists in Benue and the rest of the sample (mean p-value
+\textasciitilde0.58).
+
+\begin{table}[H]
+\begin{center}
+\label{tab:BenPast_Benefit_tab}
+\caption{\textbf{Benefit pastoralists awareness and benefit from development projects.} Coefficients, t-statistics, and $p$-values comparing Benue pastoralists in the treatment group to the rest of the treatment group. Benue pastoralists were significantly less likely to be aware of the boreholes or use the boreholes; they were marginally less likely to be aware of the quick-impact projects.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & estimate & statistic & p.value\\
+\hline
+Borehole Awareness & -0.4309759 & -4.3361033 & 0.0111897\\
+\hline
+Borehole Use & -0.3406948 & -5.1907843 & 0.0058327\\
+\hline
+QIP Awareness & -0.2907236 & -2.4706291 & 0.0662889\\
+\hline
+QIP Benefit & -0.0644359 & -0.6369732 & 0.5574075\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:benPast_tab}
+\caption{\textbf{Benefit outcomes for pastoralists in the treatment group.} Coefficients, $p$-values, and t-statistics comparing Benue pastoralists in the treatment group to the rest of the treatment group. Treatment effects are not smaller among Benue pastoralists than the rest of the treatment group. Note: the mean coefficient excludes the Public Goods Game, which is on a different scale than the other variables; it is included in the $p$-value and t-statistic.}
+\smallskip
+
+\begin{tabular}{l|r|r|r}
+\hline
+  & coef & pvalue & tstat\\
+\hline
+Attitudes & -0.0317303 & 0.8260431 & -0.2398319\\
+\hline
+Security & -0.1668610 & 0.6400484 & -0.5187857\\
+\hline
+Contact & 0.2343247 & 0.3188031 & 1.1945197\\
+\hline
+Contact Willingness & 0.0301262 & 0.8672572 & 0.1820363\\
+\hline
+Endorsement Exp & -0.5074066 & 0.1968861 & -1.6571511\\
+\hline
+PGG Donation & -0.0342750 & 0.5305509 & -0.7077525\\
+\hline
+PGG Amount & 49.9043759 & 0.6549041 & 0.4949424\\
+\hline
+All & -0.0883094 & 0.5763561 & -0.1788604\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\hypertarget{effect-of-contact-vs.-effect-of-mediation}{%
+\subsubsection{Effect of contact vs.~effect of
+mediation}\label{effect-of-contact-vs.-effect-of-mediation}}
+
+The third analysis concerned mediation. While we cannot rule out that
+the effect was due to the meditation training, only 52 of the over 1000
+endline respondents in treatment sites were aware of the mediation
+intervention.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:mediat_tab}
+\caption{\textbf{Mediation Exposure.} Exposure to mediation in treatment and control sites in endline survey. Only 52 randomly selected respondents in treatment had any exposure to mediation. No control respondents had exposure to mediation.}
+\smallskip
+
+\begin{tabular}{l|r|r}
+\hline
+  & Control & Treatment\\
+\hline
+None & 504 & 996\\
+\hline
+Exposure & 0 & 52\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-j-family-wise-error-rate-fwer}{%
+\subsection{Appendix J: Family-Wise Error Rate
+(FWER)}\label{appendix-j-family-wise-error-rate-fwer}}
+
+To control the FWER, we conducted within-family hypothesis corrections
+using the Holm correction. For two of our outcomes (pastoralists in
+market and perceptions of insecurity), the findings remain statistically
+significant. For the two other outcomes (self-reported contact and
+attitudes), significance levels shift from statistically significant to
+marginally significant (.04 to .08). This means we have a significant
+\(p\)-value for our hypothesis families about intergroup contact and
+about insecurity; we have a marginally significant \(p\)-value for our
+hypothesis family about attitudes; we have no signifcant \(p\)-value for
+our hypothesis family about cooperation.
+
+Note: the outcome measuring pastoralists in the market remains
+statistically significant even if using the bonferonni correction to
+correct for all (vs.~within family) hypothesis tests in the analysis.
+
+The exploratory individual-level data has only one outcome per family
+(except for the Cooperation family, for which no \(p\)-values were
+significant without correction). We therefore do not show ``corrected''
+individual-level \(p\)-values. If we put all individual-level hypotheses
+into a single family and use the Holm correction, the
+\emph{Self-reported contact} outcome changes from significant
+(\(p\)=0.018) to marginally significant(\(p\)=0.088). None of the other
+outcomes were significant or marginally significant before correction.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:holm_tab}
+\caption{\textbf{P-values controlling the family-wise error rate.}}
+\smallskip
+
+\begin{tabular}{l|r|r|l}
+\hline
+Outcome & None & Holm & Family\\
+\hline
+Pastoralists in Market & 0.0014 & 0.0070 & Contact\\
+\hline
+Self-reported contact & 0.0595 & 0.2380 & Contact\\
+\hline
+Contact willingness & 0.2389 & 0.5568 & Contact\\
+\hline
+Farmers in Market & 0.2416 & 0.5568 & Contact\\
+\hline
+Outgroup event attendance & 0.1856 & 0.5568 & Contact\\
+\hline
+Perceptions of security & 0.0205 & 0.0205 & Insecurity\\
+\hline
+Self-reported attitudes & 0.0448 & 0.0896 & Attitudes\\
+\hline
+Endorsement Experiment & 0.2117 & 0.2117 & Attitudes\\
+\hline
+Public Goods Donation & 0.2938 & 0.5876 & Cooperation\\
+\hline
+Public Goods Amount & 0.8522 & 0.8522 & Cooperation\\
+\hline
+\end{tabular}
+
+
+\end{center}
+\end{table}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-k-power-analysis}{%
+\subsection{Appendix K: Power
+Analysis}\label{appendix-k-power-analysis}}
+
+At community level, we could detect effects of \textasciitilde0.60 SDs
+with 0.80 power. We expected better power for our actual analysis
+because our power analysis does not use randomization inference to
+generate true p-values. We simulated our community-level power analysis
+with the following code.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# using insecurity as the default outcome, as it is our strongest survey outcome at the community level. outcome\_list\_qip[2] = "in\_cw".}
+\NormalTok{bigPow.fn }\OtherTok{\textless{}{-}}\ControlFlowTok{function}\NormalTok{(nsims, }\AttributeTok{var=}\NormalTok{outcome\_list\_qip[}\DecValTok{2}\NormalTok{], tau)}
+\NormalTok{\{}
+\NormalTok{  newPow.fn }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(var, tau)}
+\NormalTok{\{}
+    \CommentTok{\# 6 TR sites from Nas, 4 from Ben}
+\NormalTok{    newtr\_nas }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{unique}\NormalTok{(ag.df}\SpecialCharTok{$}\NormalTok{psu[ag.df}\SpecialCharTok{$}\NormalTok{state }\SpecialCharTok{\%in\%} \StringTok{"nas"}\NormalTok{]), }\AttributeTok{size=}\DecValTok{6}\NormalTok{)}
+\NormalTok{    newtr\_ben }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{unique}\NormalTok{(ag.df}\SpecialCharTok{$}\NormalTok{psu[ag.df}\SpecialCharTok{$}\NormalTok{state }\SpecialCharTok{\%in\%} \StringTok{"ben"}\NormalTok{]), }\AttributeTok{size=}\DecValTok{4}\NormalTok{)}
+\NormalTok{    newtr }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(newtr\_nas), }\FunctionTok{as.character}\NormalTok{(newtr\_ben))}
+\NormalTok{    df }\OtherTok{\textless{}{-}}\NormalTok{ ag.df}
+\NormalTok{    df[,}\StringTok{"newtr"}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{psu }\SpecialCharTok{\%in\%}\NormalTok{ newtr, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+  
+  \CommentTok{\# make endline outcome with TR effect tau}
+\NormalTok{  df[, }\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)] }\OtherTok{\textless{}{-}}\NormalTok{ (df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)]}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)]))}\SpecialCharTok{/}\FunctionTok{sd}\NormalTok{(df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)])}
+  \CommentTok{\#scale(df[,paste0(var,"\_end")])}
+\NormalTok{  df[df}\SpecialCharTok{$}\NormalTok{newtr }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)] }\OtherTok{\textless{}{-}}\NormalTok{ df[df}\SpecialCharTok{$}\NormalTok{newtr }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)]}\SpecialCharTok{+}\NormalTok{tau}
+  
+  \CommentTok{\# for baseline control, also scale}
+\NormalTok{  df[, }\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_base"}\NormalTok{)] }\OtherTok{\textless{}{-}}\NormalTok{ (df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_base"}\NormalTok{)]}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_base"}\NormalTok{)]))}\SpecialCharTok{/}\FunctionTok{sd}\NormalTok{(df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_base"}\NormalTok{)])}
+  
+  \CommentTok{\# lm}
+\NormalTok{  lm1 }\OtherTok{\textless{}{-}} \FunctionTok{lm\_robust}\NormalTok{(df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_end"}\NormalTok{)]}\SpecialCharTok{\textasciitilde{}}\NormalTok{df[,}\StringTok{\textquotesingle{}newtr\textquotesingle{}}\NormalTok{]}\SpecialCharTok{+}\NormalTok{df[,}\FunctionTok{paste0}\NormalTok{(var,}\StringTok{"\_base"}\NormalTok{)]}\SpecialCharTok{+}\NormalTok{state, }
+                   \AttributeTok{clusters =}\NormalTok{ psu, }\AttributeTok{data=}\NormalTok{df)}
+  
+\NormalTok{  want }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(lm1)[}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{]}
+  \FunctionTok{return}\NormalTok{(want)}
+\NormalTok{  \}}
+  
+\NormalTok{  check }\OtherTok{\textless{}{-}} \FunctionTok{do}\NormalTok{(nsims)}\SpecialCharTok{*}\FunctionTok{newPow.fn}\NormalTok{(}\AttributeTok{var=}\NormalTok{var, }\AttributeTok{tau=}\NormalTok{tau)}
+\NormalTok{  pval }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(check}\SpecialCharTok{\textless{}}\FloatTok{0.05}\NormalTok{)}
+  \FunctionTok{return}\NormalTok{(pval)}
+\NormalTok{\}}
+
+\CommentTok{\# run power analysis for tau 0{-}1}
+\NormalTok{possibleTaus }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\FloatTok{0.1}\NormalTok{)}
+\NormalTok{possibleTaus }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(possibleTaus)}
+\FunctionTok{system.time}\NormalTok{(}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(possibleTaus))}
+\NormalTok{\{}
+\NormalTok{  possibleTaus[i, }\StringTok{"pow"}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{bigPow.fn}\NormalTok{(}\AttributeTok{nsims=}\DecValTok{3000}\NormalTok{, }\AttributeTok{tau=}\NormalTok{possibleTaus[i,}\DecValTok{1}\NormalTok{])}
+\NormalTok{\}}
+\NormalTok{)}
+\NormalTok{possibleTaus}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/review/power_figure.png}
+\caption{Community-level power analysis.}\label{fig:pow_comm}
+\end{figure}
+
+At individual level, we could detect effects of \textasciitilde0.40 SDs
+with 0.80 power. We expected better power for our actual analysis
+because our power analysis does not use randomization inference to
+generate true p-values. We used the
+\href{https://egap.shinyapps.io/power-app/}{EGAP power calculator} for
+the individual-level power analysis. The parameters were: Alpha = 0.05,
+Tau = 0.40 SD, ICC=0.05, 15 clusters per arm, up to 300 respondents per
+cluster.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/review/power_figure_ind.png}
+\caption{Individual-level power analysis.}\label{fig:pow_ind}
+\end{figure}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-l-difference-in-differences-plots}{%
+\subsection{Appendix L: Difference-in-differences
+plots}\label{appendix-l-difference-in-differences-plots}}
+
+Many effects are driven by worsening conditions in control communities.
+Given the small number of control communities, it's possible that the
+effects could be driven by a particularly bad period in a single control
+community. It's also possible that there could be ceiling or floor
+effects. These plots show that (1) the effects are not driven by a large
+drop in a single control community/site and (2) the overall effect is
+not demonstrating a floor below which no community-site falls.
+
+\hypertarget{survey-outcomes-1}{%
+\subsubsection{Survey outcomes}\label{survey-outcomes-1}}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:att_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:att_comm_dis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:con_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:con_comm_dis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:in_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:in_comm_dis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:end_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:perc_comm}
+\end{figure}
+
+\hypertarget{behavioral-outcomes}{%
+\subsubsection{Behavioral outcomes}\label{behavioral-outcomes}}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:market_past_TrTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:market_past_siteTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:market_farm_TrTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:market_farm_siteTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:market_past_TrTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:events_outgroup_siteTime}
+\end{figure}
 
 \end{document}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  14 AUG 2023 10:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  14 AUG 2023 16:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -128,8 +128,6 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
 (Font)                  OT1/cmr/bx/it --> OT1/lmr/bx/it on input line 37.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 (Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
-) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
-Package: iftex 2022/02/03 v1.0f TeX engine tests
 ) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count271
@@ -137,6 +135,8 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \float@box=\box53
 \@float@everytoks=\toks22
 \@floatcapt=\box54
+) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
 ) (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 LaTeX Font Info:    Trying to load font information for T1+lmr on input line 112.
@@ -450,86 +450,80 @@ LaTeX Font Warning: Font shape `T1/lmtt/bx/it' in size <10> not available
 (Font)              Font shape `T1/lmtt/b/sl' tried instead on input line 166.
 
 [2] [3] [4] [5] [6]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 455.
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 457.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 
 LaTeX Font Warning: Font shape `TS1/lmtt/bx/it' in size <10> not available
-(Font)              Font shape `TS1/lmtt/b/sl' tried instead on input line 455.
+(Font)              Font shape `TS1/lmtt/b/sl' tried instead on input line 457.
 
 [7] [8] [9] [10] [11] [12] [13] [14] [15]
-<../survey_dat/figs/did_plots/attitudeComm.plot_disag.png, id=145, 578.16pt x 433.62pt>
+<../survey_dat/figs/did_plots/attitudeComm.plot_disag.png, id=146, 578.16pt x 433.62pt>
 File: ../survey_dat/figs/did_plots/attitudeComm.plot_disag.png Graphic file (type png)
 <use ../survey_dat/figs/did_plots/attitudeComm.plot_disag.png>
-Package pdftex.def Info: ../survey_dat/figs/did_plots/attitudeComm.plot_disag.png  used on input line 1204.
+Package pdftex.def Info: ../survey_dat/figs/did_plots/attitudeComm.plot_disag.png  used on input line 1168.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
-<../survey_dat/figs/did_plots/conComm_plot_disag.png, id=146, 578.16pt x 433.62pt>
+ [16] [17 <../survey_dat/figs/did_plots/attitudeComm.plot_disag.png>]
+<../survey_dat/figs/did_plots/conComm_plot_disag.png, id=160, 578.16pt x 433.62pt>
 File: ../survey_dat/figs/did_plots/conComm_plot_disag.png Graphic file (type png)
 <use ../survey_dat/figs/did_plots/conComm_plot_disag.png>
-Package pdftex.def Info: ../survey_dat/figs/did_plots/conComm_plot_disag.png  used on input line 1233.
+Package pdftex.def Info: ../survey_dat/figs/did_plots/conComm_plot_disag.png  used on input line 1197.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
-<../survey_dat/figs/did_plots/inComm_plot_disag.png, id=147, 578.16pt x 433.62pt>
+ [18 <../survey_dat/figs/did_plots/conComm_plot_disag.png>]
+<../survey_dat/figs/did_plots/inComm_plot_disag.png, id=167, 578.16pt x 433.62pt>
 File: ../survey_dat/figs/did_plots/inComm_plot_disag.png Graphic file (type png)
 <use ../survey_dat/figs/did_plots/inComm_plot_disag.png>
-Package pdftex.def Info: ../survey_dat/figs/did_plots/inComm_plot_disag.png  used on input line 1262.
+Package pdftex.def Info: ../survey_dat/figs/did_plots/inComm_plot_disag.png  used on input line 1226.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [16] [17 <../survey_dat/figs/did_plots/attitudeComm.plot_disag.png>] [18 <../survey_dat/figs/did_plots/conComm_plot_disag.png>] [19 <../survey_dat/figs/did_plots/inComm_plot_disag.png>]
-<../obs_dat/b_analysis/market_pasts_siteTime.plot.png, id=174, 578.16pt x 433.62pt>
+ [19 <../survey_dat/figs/did_plots/inComm_plot_disag.png>]
+<../obs_dat/b_analysis/market_pasts_siteTime.plot.png, id=178, 578.16pt x 433.62pt>
 File: ../obs_dat/b_analysis/market_pasts_siteTime.plot.png Graphic file (type png)
 <use ../obs_dat/b_analysis/market_pasts_siteTime.plot.png>
-Package pdftex.def Info: ../obs_dat/b_analysis/market_pasts_siteTime.plot.png  used on input line 1329.
+Package pdftex.def Info: ../obs_dat/b_analysis/market_pasts_siteTime.plot.png  used on input line 1293.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
-<../obs_dat/b_analysis/market_farms_siteTime.plot.png, id=175, 578.16pt x 433.62pt>
+<../obs_dat/b_analysis/market_farms_siteTime.plot.png, id=179, 578.16pt x 433.62pt>
 File: ../obs_dat/b_analysis/market_farms_siteTime.plot.png Graphic file (type png)
 <use ../obs_dat/b_analysis/market_farms_siteTime.plot.png>
-Package pdftex.def Info: ../obs_dat/b_analysis/market_farms_siteTime.plot.png  used on input line 1338.
+Package pdftex.def Info: ../obs_dat/b_analysis/market_farms_siteTime.plot.png  used on input line 1302.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
-<../obs_dat/b_analysis/events_outgroup_siteTime.plot.png, id=176, 578.16pt x 433.62pt>
+<../obs_dat/b_analysis/events_outgroup_siteTime.plot.png, id=180, 578.16pt x 433.62pt>
 File: ../obs_dat/b_analysis/events_outgroup_siteTime.plot.png Graphic file (type png)
 <use ../obs_dat/b_analysis/events_outgroup_siteTime.plot.png>
-Package pdftex.def Info: ../obs_dat/b_analysis/events_outgroup_siteTime.plot.png  used on input line 1347.
+Package pdftex.def Info: ../obs_dat/b_analysis/events_outgroup_siteTime.plot.png  used on input line 1311.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
  [20] [21 <../obs_dat/b_analysis/market_pasts_siteTime.plot.png>] [22 <../obs_dat/b_analysis/market_farms_siteTime.plot.png>] [23 <../obs_dat/b_analysis/events_outgroup_siteTime.plot.png>] [24] [25] [26] [27]
-Overfull \hbox (165.82713pt too wide) in paragraph at lines 1693--1702
+Overfull \hbox (22.382pt too wide) in paragraph at lines 1695--1704
  [] 
  []
 
 
-Overfull \hbox (198.99416pt too wide) in paragraph at lines 1713--1726
+Overfull \hbox (55.54903pt too wide) in paragraph at lines 1715--1728
  [] 
  []
 
-[28]
-Underfull \hbox (badness 1275) in paragraph at lines 1809--1810
+[28] [29]
+Underfull \hbox (badness 1275) in paragraph at lines 1814--1815
 []\T1/lmr/bx/n/10 add ex-ploratory re-gres-sion that also uses in-di-vid-ual's de-mo-graphic char-ac-ter-is-tics for
  []
 
-[29] [30]
-Underfull \vbox (badness 10000) detected at line 1963
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1963
- []
-
-[31] [32] (./review_appendix_analysis.aux)
+[30] [31] [32] [33] (./review_appendix_analysis.aux)
 Package rerunfilecheck Info: File `review_appendix_analysis.out' has not changed.
 (rerunfilecheck)             Checksum: 2C706221B36981F72476199B8C8500A9;1306.
  ) 
 Here is how much of TeX's memory you used:
- 11307 strings out of 478025
- 179904 string characters out of 5838745
- 1871299 words of memory out of 5000000
- 31182 multiletter control sequences out of 15000+600000
+ 11310 strings out of 478025
+ 179944 string characters out of 5838745
+ 1872299 words of memory out of 5000000
+ 31183 multiletter control sequences out of 15000+600000
  564395 words of font info for 79 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,8n,76p,634b,576s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,8n,76p,766b,582s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtko10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on review_appendix_analysis.pdf (32 pages, 724789 bytes).
+Output written on review_appendix_analysis.pdf (33 pages, 728650 bytes).
 PDF statistics:
- 336 PDF objects out of 1000 (max. 8388607)
- 261 compressed objects within 3 object streams
- 77 named destinations out of 1000 (max. 500000)
+ 344 PDF objects out of 1000 (max. 8388607)
+ 268 compressed objects within 3 object streams
+ 79 named destinations out of 1000 (max. 500000)
  127 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,11 +1,21 @@
 \contentsline {section}{Supplementary Information}{1}{section*.2}%
 \contentsline {subsection}{Appendix A: Randomization Inference and Bootstrapping}{1}{section*.3}%
 \contentsline {subsection}{Appendix B: Robustness checks for community analysis}{2}{section*.4}%
-\contentsline {subsection}{Appendix C: Robustness checks for individual analysis}{3}{section*.5}%
-\contentsline {subsection}{Appendix D: Balance Tests}{5}{section*.6}%
-\contentsline {subsection}{Appendix E: Placebo tests}{6}{section*.7}%
-\contentsline {subsubsection}{Community.}{7}{section*.8}%
-\contentsline {subsubsection}{Individual}{8}{section*.9}%
-\contentsline {subsection}{Appendix F: State-level differences}{10}{section*.10}%
-\contentsline {subsection}{Appendix G: Farmer-pastoralist differences}{10}{section*.11}%
-\contentsline {subsection}{Appendix Z: Survey Questions}{11}{section*.12}%
+\contentsline {subsubsection}{Survey outcomes}{2}{section*.5}%
+\contentsline {subsubsection}{Behvioral outcomes}{3}{section*.6}%
+\contentsline {subsection}{Appendix C: Robustness checks for individual analysis}{4}{section*.7}%
+\contentsline {subsection}{Appendix D: Balance Tests}{6}{section*.8}%
+\contentsline {subsection}{Appendix E: Placebo tests}{7}{section*.9}%
+\contentsline {subsubsection}{Community.}{8}{section*.10}%
+\contentsline {subsubsection}{Individual}{9}{section*.11}%
+\contentsline {subsection}{Appendix F: State-level heterogeneous effects}{11}{section*.12}%
+\contentsline {subsection}{Appendix G: Farmer-pastoralist differences}{11}{section*.13}%
+\contentsline {subsection}{Appendix H: Survey Questions}{13}{section*.14}%
+\contentsline {subsection}{Appendix I: Alternative explanations}{15}{section*.15}%
+\contentsline {subsubsection}{Effect of contact vs.\nobreakspace {}effect of development projects}{15}{section*.16}%
+\contentsline {subsubsection}{Effect of contact vs.\nobreakspace {}effect of mediation}{17}{section*.17}%
+\contentsline {subsection}{Appendix J: Family-Wise Error Rate (FWER)}{17}{section*.18}%
+\contentsline {subsection}{Appendix K: Power Analysis}{18}{section*.19}%
+\contentsline {subsection}{Appendix L: Difference-in-differences plots}{20}{section*.20}%
+\contentsline {subsubsection}{Survey outcomes}{21}{section*.21}%
+\contentsline {subsubsection}{Behavioral outcomes}{29}{section*.22}%

@@ -1,5 +1,5 @@
 ---
-title: "Promoting Peace Amid Intergroup Conflict: An Intergroup Contact Field Experiment in Nigeria_Supplementary Information"
+title: "How Contact Can Promote Societal Change Amid Intergroup Conflict: An Intergroup Contact Field Experiment in Nigeria - Supplementary Information"
 output:
   pdf_document:
     toc: true
@@ -34,6 +34,8 @@ In each of these procedures, we mimic our randomization process by randomizing/r
 **********
 
 ## Appendix B: Robustness checks for community analysis
+
+### Survey outcomes
 
 These tables shows results with different ways of making indices (additive vs inverse-covariance weighted), different models for estimating effects (differencing vs controlling-for), and different ways of coding count variables (raw vs ranked).  Each table is an outcome.  Rows are results for different ways of creating the outcomes.  Columns show the coefficient from OLS regression, true p-value from randomization inference, and a binary "base" indicator showing which method was used in the paper.  
 
@@ -183,6 +185,35 @@ pgg_tab <- knitr::kable(pgg_tab, format="latex")
 \end{center}
 \end{figure}
 -->
+
+### Behvioral outcomes
+
+```{r}
+load("../data_and_code/review/behObs_enumsCheck_tab.Rda")
+load("../data_and_code/review/behObs_enumsOnly_tab.Rda")
+```
+
+Enumerators (for surveys and for behavioral observation) were not informed of a community's treatment status, but two of the enumerators for behavioral observations interacted with the research team frequently and may have intuited the study's hypotheses. They also only made observations at treatment sites. If their intuition of program aims affected their observations (or if their observations became more positive over time for other reasons), our estimates of the treatment effect could be inflated.
+
+We first checked the change over time in outcomes they reported. Descriptively, the two senior enumerators observed _less_ interaction in treatment sites over time, suggesting that they were not influenced by knowledge of the study's hypotheses. As a robustness check, we then repeated the main analysis but removed observations from these two enumerators.   Coefficients with their data removed are very similar to coefficients with their data included; $p$-values are higher mainly as a result of fewer observations (and therefore degrees of freedom). 
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsOnly_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows the baseline-endline change in outcomes for the two senior enumerators who may have intuited the study's hypotheses. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events). The two enumerators reported decreases in market outcomes in treatment sites and no change to event outcomes in treatment sites, suggesting that they were not influenced by knowledge of the study's hypotheses.}
+\smallskip
+`r behObs_enumsOnly_tab`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:behObs_enumsCheck_tab}
+\caption{\textbf{Robustness check for behavioral observations} This table shows behavioral observation outcomes with two senior enumerators removed. The first column shows coefficients from OLS regression, the second column shows $p$-values. The row names show outcomes (pastoralists in the market, farmers in the market, and outgroup attending events) and subsets of the data (all data, data without two enumerators, and data from only those two enumerators).}
+\smallskip
+`r behObs_enumsCheck_tab`
+\end{center}
+\end{table}
+
 
 **********
 
@@ -571,9 +602,11 @@ pl_rad_ind <- knitr::kable(pl_rad_ind, format="latex")
 
 **********
 
-## Appendix F: State-level differences
+## Appendix F: State-level heterogeneous effects
 
-Coefficients and p-values estimating state-level heterogeneous effects were calculated with robust OLS regression using site-level clusters. The regression interacted the treatment indicator with the state indicator.  This is a low-power analysis.  There are no significant differences in treatment effect by state. Benue was the reference category so this table shows differences for Nasarawa.
+This looks at heterogeneous effects by state. This is a low-power analysis.  There are no significant differences in treatment effect by state.
+
+Coefficients and p-values estimating state-level heterogeneous effects were calculated with robust OLS regression using site-level clusters. The regression interacted the treatment indicator with the state indicator. Benue was the reference category so this table shows differences for Nasarawa.
 
 ```{r}
 load("../data_and_code/survey_dat/d_analysis/state_list.Rda")
@@ -609,7 +642,56 @@ state_tab <- knitr::kable(state_tab, format="latex")
 
 ## Appendix G: Farmer-pastoralist differences
 
-Coefficients and p-values estimating farmer/pastoralist heterogeneous effects were calculated with robust OLS regression using site-level clusters and fixed effects for state. The regression interacted the treatment indicator with the state indicator. There are no significant differences in treatment effect by farmer/pastoralist. Farmers were the reference category so this table shows differences for pastoralists.
+We show demographic differences between farmers and pastoralists. We also shows regressions using demographic characteristics as control variables to confirm that accounting for these variables does not change the study's results.
+
+```{r}
+load("../data_and_code/review/demo_tab_overall1.Rda")
+load("../data_and_code/review/demo_tab_state1.Rda")
+
+load("../data_and_code/review/comp_df1.Rda")
+load("../data_and_code/review/comp_df_ind1.Rda")
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:demo_tab_overall1}
+\caption{\textbf{Farmer and Pastoralist Demographics} This table shows demographic characteristics for farming groups and pastoralist groups}
+\smallskip
+`r demo_tab_overall1`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:demo_tab_state1}
+\caption{\textbf{Farmer and Pastoralist Demographics by State} This table shows demographic characteristics for farming groups and pastoralist groups, separating respondents from Nasarawa and Benue}
+\smallskip
+`r demo_tab_state1`
+\end{center}
+\end{table}
+
+
+\begin{table}[H]
+\begin{center}
+\label{tab:comp_df1}
+\caption{\textbf{Regressions with community-average demographic variables} This table shows coefficients from each survey regression either (1) the version in the paper that does not control for demographic characteristics, or (2) a regression that aggregated demographic characteristics to the community-level and included them as control variables. The coefficients are similar -- the sum of the coefficients when controlling for demographic characteristics is slightly larger.}
+\smallskip
+`r comp_df1`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:comp_df_ind1}
+\caption{\textbf{Regressions with individual demographic variables} This table shows coefficients from each survey regression either (1) the version in the paper that does not control for demographic characteristics, or (2) a regression that includes individual-level demographic characteristics as control variables. The coefficients are similar -- the sum of the coefficients when controlling for demographic characteristics is slightly smaller.}
+\smallskip
+`r comp_df_ind1`
+\end{center}
+\end{table}
+
+This looks at heterogeneous effects by group (farmers and pastoralists). This is a low-power analysis. There are no significant differences in treatment effect by farmer/pastoralist.
+
+Coefficients and p-values estimating farmer/pastoralist heterogeneous effects were calculated with robust OLS regression using site-level clusters and fixed effects for state. The regression interacted the treatment indicator with the state indicator. Farmers were the reference category so this table shows differences for pastoralists.
 
 ```{r}
 load("../data_and_code/survey_dat/d_analysis/farm_list.Rda")
@@ -710,37 +792,13 @@ Your community and [joint farmer/pastoralist community] have created a project c
 
 These are your individual donation envelopes.  All the donations will be private -- only you will know how much money you donated. It essential that you keep how much you give private -- please do not tell anyone.  I have with me a donation envelope to collect donations.  Please go into your home, put however much of the 1,000 Naira you wish to donate to the project committee in the envelope, take whatever amount you want to keep for yourself, and come back to place your envelope in the donation envelope.  Remember, you are welcome to donate none, some, or all of the money to the project committee.  After that we are finished and you may continue your day.  We will come back and publicly announce how much money your community's project committee will receive."
 
+**********
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################################################
-
-******
-
-################################################
-
-# Review appendix
-
-## Appendix I: Effect of Contact vs. effect of development projects and mediation
+## Appendix I: Alternative explanations
 
 It is possible that the effects of our intervention are due to impact of the development project around which the contact was organized, rather than intergroup contact itself. The effect could also be due to mediation provided to some community leaders. We ran three analyses to disentangle the effects of contact from the effects of the development projects and mediation.
+
+### Effect of contact vs. effect of development projects
 
 The first was to determine if treatment effects were significantly larger for communities where larger proportions of people were aware of, used, and perceived benefit from the projects. In treatment communities, we predicted outcome change with (1) awareness of boreholes, (2) use of boreholes, (3) awareness of quick-impact projects, and (4) perceived benefit from quick-impact projects. If treatment effects are due to development projects and not contact, we would expect larger effects where a greater proportion of respondents were aware of, used, and benefited from the development projects.
 
@@ -749,9 +807,9 @@ load("../data_and_code/review/benefit_df.Rda")
 load("../data_and_code/review/benefitVar_df.Rda")
 load("../data_and_code/review/benefitVar_df_svy.Rda")
 
-benefit_df_tab <- knitr::kable(benefit_df)
-benefitVar_df_tab <- knitr::kable(benefitVar_df)
-benefitVar_df_svy_tab <- knitr::kable(benefitVar_df_svy)
+benefit_df_tab <- knitr::kable(benefit_df, format="latex")
+benefitVar_df_tab <- knitr::kable(benefitVar_df, format="latex")
+benefitVar_df_svy_tab <- knitr::kable(benefitVar_df_svy, format="latex")
 ```
 
 Our analysis shows that awareness, use, and benefit from the projects is not significantly related to any outcome (the mean p-value is ~0.32). It's also not the case that any of those variables separately (awareness, use, and benefit) are related to improvements on any outcome. Though the p-values are insignificant, the mean t-statistic for the awareness/use/benefit variables is positive, possibly suggesting that the development projects, while not explaining the bulk of the treatment effect, may have increased the effect. The tables show the mean coefficient, $p$-value, and t-statistic for each outcome being predicted by each "benefit" variable.
@@ -780,8 +838,8 @@ Second, we looked at whether pastoralists in Benue differed from the rest of the
 load("../data_and_code/review/BenPast_Benefit.Rda")
 load("../data_and_code/review/benPast_tab.Rda")
 
-BenPast_Benefit_tab <- knitr::kable(BenPast_Benefit)
-benPast_tab <- knitr::kable(benPast_tab)
+BenPast_Benefit_tab <- knitr::kable(BenPast_Benefit, format="latex")
+benPast_tab <- knitr::kable(benPast_tab, format="latex")
 ```
 
 \begin{table}[H]
@@ -796,12 +854,13 @@ benPast_tab <- knitr::kable(benPast_tab)
 \begin{table}[H]
 \begin{center}
 \label{tab:benPast_tab}
-\caption{\textbf{Outcomes of Benefit pastoralists in the treatment group.} Coefficients, $p$-values, and t-statistics comparing Benue pastoralists in the treatment group to the rest of the treatment group. Treatment effects are not smaller among Benue pastoralists than the rest of the treatment group. Note: the mean coefficient excludes the Public Goods Game, which is on a different scale than the other variables; it is included in the $p$-value and t-statistic.}
+\caption{\textbf{Benefit outcomes for pastoralists in the treatment group.} Coefficients, $p$-values, and t-statistics comparing Benue pastoralists in the treatment group to the rest of the treatment group. Treatment effects are not smaller among Benue pastoralists than the rest of the treatment group. Note: the mean coefficient excludes the Public Goods Game, which is on a different scale than the other variables; it is included in the $p$-value and t-statistic.}
 \smallskip
 `r benPast_tab`
 \end{center}
 \end{table}
 
+### Effect of contact vs. effect of mediation
 
 ```{r}
 load("../data_and_code/review/mediat_tab.Rda")
@@ -818,6 +877,7 @@ The third analysis concerned mediation.  While we cannot rule out that the effec
 \end{center}
 \end{table}
 
+**********
 
 ## Appendix J: Family-Wise Error Rate (FWER)
 
@@ -829,7 +889,7 @@ The exploratory individual-level data has only one outcome per family (except fo
 
 ```{r}
 load("../data_and_code/review/holm_tab.Rda")
-holm_tab <- knitr::kable(holm_tab)
+holm_tab <- knitr::kable(holm_tab, format="latex")
 ```
 
 \begin{table}[H]
@@ -841,12 +901,9 @@ holm_tab <- knitr::kable(holm_tab)
 \end{center}
 \end{table}
 
+**********
+
 ## Appendix K: Power Analysis
-
-```{r}
-load("../data_and_code/review/power_figure.png")
-
-```
 
 At community level, we could detect effects of ~0.60 SDs with 0.80 power. We expected better power for our actual analysis because our power analysis does not use randomization inference to generate true p-values.  We simulated our community-level power analysis with the following code.
 
@@ -897,7 +954,7 @@ possibleTaus
 
 ```
 
-\begin{figure}%[\sidecaptionrelwidth][t]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{../data_and_code/review/power_figure.png}
 \caption{Community-level power analysis.}\label{fig:pow_comm}
@@ -905,15 +962,103 @@ possibleTaus
 
 At individual level, we could detect effects of ~0.40 SDs with 0.80 power. We expected better power for our actual analysis because our power analysis does not use randomization inference to generate true p-values. We used the [EGAP power calculator](https://egap.shinyapps.io/power-app/) for the individual-level power analysis.  The parameters were: Alpha = 0.05, Tau = 0.40 SD, ICC=0.05, 15 clusters per arm, up to 300 respondents per cluster.
 
-\begin{figure}%[\sidecaptionrelwidth][t]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{../data_and_code/review/power_figure_ind.png}
 \caption{Individual-level power analysis.}\label{fig:pow_ind}
 \end{figure}
 
+**********
 
-## Appendix L: Small-j checks
+## Appendix L: Difference-in-differences plots
 
-Many effects in Figure 1 are driven by worsening conditions in control communities rather than improved relations in treatment communities. Given the small number of control communities (5), I worry that the effects could be driven by a particularly bad period in a single control community. Do similar patterns hold for other outcomes?
+Many effects are driven by worsening conditions in control communities. Given the small number of control communities, it's possible that the effects could be driven by a particularly bad period in a single control community. It's also possible that there could be ceiling or floor effects. These plots show that (1) the effects are not driven by a large drop in a single control community/site and (2) the overall effect is not demonstrating a floor below which no community-site falls.
 
+### Survey outcomes
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:att_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:att_comm_dis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:con_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:con_comm_dis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:in_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png}
+\caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:in_comm_dis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:end_comm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:perc_comm}
+\end{figure}
+
+### Behavioral outcomes
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:market_past_TrTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:market_past_siteTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:market_farm_TrTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:market_farm_siteTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png}
+\caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:market_past_TrTime}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png}
+\caption{Each point represents a site. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:events_outgroup_siteTime}
+\end{figure}
 
