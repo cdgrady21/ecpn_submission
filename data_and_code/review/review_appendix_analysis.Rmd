@@ -60,10 +60,19 @@ Great question. We might be able to answer this that the boreholes were largely 
 Few people participated in negotiations, relatively few were even aware of the ECPN development project or of Mercy Corps.
 
 ```{r}
-## mediation awareness/participation
+## mediation participation
 table(rand.df$ecpn_group.negotiation, exclude=c())
-table(rand.df$heard_MC_group.heard_MC, exclude=c())
-table(rand.df$heard_MC_group.part_MC, exclude=c())
+table(rand.df$ecpn_group.neg_exposure, exclude=c())
+
+rand.df$mediation <- ifelse (rand.df$ecpn_group.negotiation %in% 1 |
+                               rand.df$ecpn_group.neg_exposure %in% 1, 1, 0)
+rand.df$mediation <- ifelse(rand.df$survey %in% 0, NA, rand.df$mediation)
+mediat_tab1 <- table(rand.df$mediation, rand.df$treatment)
+rownames(mediat_tab1) <- c("None", "Exposure")
+colnames(mediat_tab1) <- c("Control", "Treatment")
+
+mediat_tab <- knitr::kable(mediat_tab1, format="latex")
+save(mediat_tab, file="mediat_tab.Rda")
 ```
 
 Bigger effects among people aware/used QIP, people aware/used borehole?  Among TR group, does qip/borehole awareness and use predict improved outcomes?
@@ -223,14 +232,18 @@ print(qipList)
 # coefficients for each outcome across "benefit" variables
 ## no meaningful trend, but most coefficients positive and pvals below 0.50, so somewhat suggestive that benefiting from the project added to improved attitudes though certainly doesn't explain them entirely.
 benefit_df
+save(benefit_df, file="benefit_df.Rda")
 
 # coefficients for each "benefit variables" across outcomes
 ## no meaningful trend, but coef/tstat/pval could be affected by PGG being weird negative outcome
 benefitVar_df
+save(benefitVar_df, file="benefitVar_df.Rda")
 
 # coefficients for each "benefit variables" across outcomes, removing PGG
 ## no clear trend, seems slightly suggestive that benefiting weakly improved outcomes.
 benefitVar_df_svy
+save(benefitVar_df_svy, file="benefitVar_df_svy.Rda")
+#chris: I think these saves are redundant with saves in the previous code chunk.
 ```
 
 Unecessary Robustness check
@@ -266,14 +279,19 @@ ag.df$ben_past <- ifelse(ag.df$state %in% "ben" & ag.df$farm_past %in% "past", 1
 
 # Benue pastoralists: are they less aware and do they use/benefit from projects less?
 ## yes, they are less aware and use the borehole less (mixed on other project, which was done earlier)
-lm_robust(qip_group.borehole_use_end~ben_past,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-lm_robust(qip_group.borehole_aware_end~ben_past,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-lm_robust(qip_aware_end~ben_past,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
-lm_robust(qip_ben_end~ben_past,
-                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,])
+BenPast_borehole_use <- tidy(lm_robust(qip_group.borehole_use_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,]))[2,c(2,4,5)]
+BenPast_borehole_aware <- tidy(lm_robust(qip_group.borehole_aware_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,]))[2,c(2,4,5)]
+BenPast_qip_aware <- tidy(lm_robust(qip_aware_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,]))[2,c(2,4,5)]
+BenPast_qip_benefit <- tidy(lm_robust(qip_ben_end~ben_past,
+                            clusters = psu, data=ag.df[ag.df$treatment %in% 1,]))[2,c(2,4,5)]
+BenPast_Benefit <- rbind(BenPast_borehole_aware, BenPast_borehole_use,
+                     BenPast_qip_aware, BenPast_qip_benefit)
+rownames(BenPast_Benefit) <- c("Borehole Awareness", "Borehole Use",
+                               "QIP Awareness", "QIP Benefit")
+save(BenPast_Benefit, file="BenPast_Benefit.Rda")
 
 
 # benue pastoralist differences?
@@ -301,11 +319,16 @@ print(benPastList)
 
 benPast_pvalues <- sapply(benPastList, function(x) x$p.value)
 benPast_tstat <- sapply(benPastList, function(x) x$statistic)
+benPast_estimate <- sapply(benPastList, function(x) x$estimate)
 rownames(benPast_pvalues) <- c("intercept_p", "ben_past_p", "tr_p", "benpast:tr_p")
 rownames(benPast_tstat) <- c("intercept_t", "ben_past_t", "tr_t", "benpast:tr_t")
+rownames(benPast_estimate) <- c("intercept_coef", "ben_past_coef", "tr_coef", "benpast:tr_coef")
+benPast_tab <- cbind(benPast_estimate[4,], benPast_pvalues[4,], benPast_tstat[4,])
+colnames(benPast_tab) <- c("coef", "pvalue", "tstat")
 
-mean(benPast_pvalues['benpast:tr_p',])
-mean(benPast_tstat['benpast:tr_t',])
+all_mean <- c(mean(benPast_tab[1:5,1]), colMeans(benPast_tab[,2:3]))
+benPast_tab <- rbind(benPast_tab, all_mean)
+save(benPast_tab, file="benPast_tab.Rda")
 ```
 
 
@@ -333,32 +356,59 @@ commListPs <- sapply(newList, function(x) x$truep[x$base %in% 1])
 commListPs <- c(commListPs, obsDat_truePs$truep)
 names(commListPs) <- c(outcome_list, rownames(obsDat_truePs))
 
-# rebecca
 ## separate into our hypothesis families
 ### contact
-p.adjust(commListPs[c(3,4,8:10)], method="none")
+contact_none <- p.adjust(commListPs[c(3,4,8:10)], method="none")
 p.adjust(commListPs[c(3,4,8:10)], method="fdr")
-p.adjust(commListPs[c(3,4,8:10)], method="holm")
+contact_holm <- p.adjust(commListPs[c(3,4,8:10)], method="holm")
+con_ps <- as.data.frame(cbind(con_none, con_holm))
+con_ps$family <- "Contact"
+names(con_ps) <- c("None", "Holm", "Family")
 
 ### insecurity (its own hypothesis family)
-p.adjust(commListPs[c(1,2,5)], method="none")
-p.adjust(commListPs[c(1,2,5)], method="fdr")
-p.adjust(commListPs[c(1,2,5)], method="holm")
+in_none <- p.adjust(commListPs[2], method="none")
+p.adjust(commListPs[2], method="fdr")
+in_holm <- p.adjust(commListPs[2], method="holm")
+in_ps <- as.data.frame(cbind(in_none, in_holm))
+in_ps$family <- "Insecurity"
+names(in_ps) <- c("None", "Holm", "Family")
 
 ### attitudes
-p.adjust(commListPs[c(1,5)], method="none")
+att_none <- p.adjust(commListPs[c(1,5)], method="none")
 p.adjust(commListPs[c(1,5)], method="fdr")
-p.adjust(commListPs[c(1,5)], method="holm")
+att_holm <- p.adjust(commListPs[c(1,5)], method="holm")
+att_ps <- as.data.frame(cbind(att_none, att_holm))
+att_ps$family <- "Attitudes"
+names(att_ps) <- c("None", "Holm", "Family")
 
 ### cooperation
-p.adjust(commListPs[c(6,7)], method="none")
+pgg_none <- p.adjust(commListPs[c(6,7)], method="none")
 p.adjust(commListPs[c(6,7)], method="fdr")
-p.adjust(commListPs[c(6,7)], method="holm")
+pgg_holm <- p.adjust(commListPs[c(6,7)], method="holm")
+pgg_ps <- as.data.frame(cbind(pgg_none, pgg_holm))
+pgg_ps$family <- "Cooperation"
+names(pgg_ps) <- c("None", "Holm", "Family")
 
-### all
+#table
+holm_tab <- rbind(con_ps, in_ps, att_ps, pgg_ps)
+holm_tab$Family <- factor(holm_tab$Family, levels = c("Contact", "Insecurity", "Attitudes", "Cooperation"))
+holm_tab <- holm_tab %>%
+  rownames_to_column(var = "Outcome") %>%
+  arrange(Family, Holm)
+holm_tab$Outcome <- c("Pastoralists in Market", "Self-reported contact",
+                       "Contact willingness", "Farmers in Market",
+                       "Outgroup event attendance", "Perceptions of security",
+                       "Self-reported attitudes", "Endorsement Experiment",
+                       "Public Goods Donation", "Public Goods Amount")
+
+save(holm_tab, file="holm_tab.Rda")
+
+
+### all -- pastoralist index always significant
 p.adjust(p=commListPs, method = "none")
 p.adjust(p=commListPs, method = "fdr")
 p.adjust(p=commListPs, method = "holm")
+p.adjust(p=commListPs, method = "bonferroni")
 ```
 
 Individual-level (only interested in participant-control differences)
@@ -417,7 +467,7 @@ _Comm-level_
 - 1.0 SD for market pastoralists index
 - ~0.20 SDs for events outgroup index
 _Ind-level_
-- Between 0.15 and 0.35 SD for survey outcomes atts, insec, contact. Atts weakest, contact strongest.
+- Between 0.2 and 0.7 SD for survey outcomes atts, insec, contact. Atts weakest, contact strongest.
 
 ```{r}
 # my original power analysis was bad. so inefficient and slow, so overcomplicated
@@ -477,8 +527,19 @@ save(possibleTaus, file="new_power.Rdata")
 ```
 ```{r}
 load("new_power.Rdata")
-```
 
+png("power_figure.png")
+plot(possibleTaus$possibleTaus, possibleTaus$pow, type="b", pch=16, col = "black",ylab="Power", 
+     xlab= expression(tau), main= "ECPN Community-Level Power Analysis", 
+     cex.main=.9, xlim=c(0,1), ylim=c(0,1))
+abline(a=.8, b = 0, col="red", lty=2)
+dev.off()
+
+```
+Chris: did individual-level power analysis with EGAP power calculator (https://egap.shinyapps.io/power-app/). Alpha = 0.05, Tau = 0.40SD, ICC=0.05, 15 clusters per arm, up to 300 repondents per cluster
+```{r}
+ICC::ICCest(community, attitude_cw, data=panel.df)
+```
 
 ## Comment 4
 

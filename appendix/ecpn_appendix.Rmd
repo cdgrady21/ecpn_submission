@@ -709,3 +709,211 @@ We have 1,000 Naira to give to you.  It is yours, and you can use it either way-
 Your community and [joint farmer/pastoralist community] have created a project committee to whom you can donate this money so that it may be used to help both communities.  The project committee has 4  people from each community.  We have found a donor that will match the funds that you all contribute to the project committee, so that if you donate 100 Naira the project committee receives 300 Naira, and if you donate all 1,000 Naira the project committee receives 3,000 Naira.  You are welcome to donate none, some, or all of the money to the project committee.
 
 These are your individual donation envelopes.  All the donations will be private -- only you will know how much money you donated. It essential that you keep how much you give private -- please do not tell anyone.  I have with me a donation envelope to collect donations.  Please go into your home, put however much of the 1,000 Naira you wish to donate to the project committee in the envelope, take whatever amount you want to keep for yourself, and come back to place your envelope in the donation envelope.  Remember, you are welcome to donate none, some, or all of the money to the project committee.  After that we are finished and you may continue your day.  We will come back and publicly announce how much money your community's project committee will receive."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################################
+
+******
+
+################################################
+
+# Review appendix
+
+## Appendix I: Effect of Contact vs. effect of development projects and mediation
+
+It is possible that the effects of our intervention are due to impact of the development project around which the contact was organized, rather than intergroup contact itself. The effect could also be due to mediation provided to some community leaders. We ran three analyses to disentangle the effects of contact from the effects of the development projects and mediation.
+
+The first was to determine if treatment effects were significantly larger for communities where larger proportions of people were aware of, used, and perceived benefit from the projects. In treatment communities, we predicted outcome change with (1) awareness of boreholes, (2) use of boreholes, (3) awareness of quick-impact projects, and (4) perceived benefit from quick-impact projects. If treatment effects are due to development projects and not contact, we would expect larger effects where a greater proportion of respondents were aware of, used, and benefited from the development projects.
+
+```{r}
+load("../data_and_code/review/benefit_df.Rda")
+load("../data_and_code/review/benefitVar_df.Rda")
+load("../data_and_code/review/benefitVar_df_svy.Rda")
+
+benefit_df_tab <- knitr::kable(benefit_df)
+benefitVar_df_tab <- knitr::kable(benefitVar_df)
+benefitVar_df_svy_tab <- knitr::kable(benefitVar_df_svy)
+```
+
+Our analysis shows that awareness, use, and benefit from the projects is not significantly related to any outcome (the mean p-value is ~0.32). It's also not the case that any of those variables separately (awareness, use, and benefit) are related to improvements on any outcome. Though the p-values are insignificant, the mean t-statistic for the awareness/use/benefit variables is positive, possibly suggesting that the development projects, while not explaining the bulk of the treatment effect, may have increased the effect. The tables show the mean coefficient, $p$-value, and t-statistic for each outcome being predicted by each "benefit" variable.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:benefit_df_tab}
+\caption{\textbf{Benefit variables affect on outcomes.} Mean coefficient, $p$-value, and t-statistic for each outcome, across benefit variables. Benefit variables are not significantly related to any outcome.}
+\smallskip
+`r benefit_df_tab`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:benefitVar_df_svy_tab}
+\caption{\textbf{Benefit variables affect on outcomes.} Mean coefficient, $p$-value, and t-statistic for each benefit variables, across outcomes. This tables removes Public Goods Game outcomes because (1) their coefficients are on a different scale than the survey outcomes and (2) the coefficients and t-statistics are negative, which could hide the effect of benefit variables on the other outcomes. However, this table shows that benefit variables are not significantly related to any survey outcome.}
+\smallskip
+`r benefitVar_df_svy_tab`
+\end{center}
+\end{table}
+
+Second, we looked at whether pastoralists in Benue differed from the rest of the sample. Pastoralists in Benue benefited least from the development projects (especially the main project that built boreholes) because they became displaced from where the boreholes were constructed prior to the endline survey. Here we (1) confirm that pastoralists in Benue were less likely to be aware of, use, or benefit from the development projects and (2) see no significant outcome differences between pastoralists in Benue and the rest of the sample (mean p-value ~0.58).
+
+```{r}
+load("../data_and_code/review/BenPast_Benefit.Rda")
+load("../data_and_code/review/benPast_tab.Rda")
+
+BenPast_Benefit_tab <- knitr::kable(BenPast_Benefit)
+benPast_tab <- knitr::kable(benPast_tab)
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:BenPast_Benefit_tab}
+\caption{\textbf{Benefit pastoralists awareness and benefit from development projects.} Coefficients, t-statistics, and $p$-values comparing Benue pastoralists in the treatment group to the rest of the treatment group. Benue pastoralists were significantly less likely to be aware of the boreholes or use the boreholes; they were marginally less likely to be aware of the quick-impact projects.}
+\smallskip
+`r BenPast_Benefit_tab`
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\label{tab:benPast_tab}
+\caption{\textbf{Outcomes of Benefit pastoralists in the treatment group.} Coefficients, $p$-values, and t-statistics comparing Benue pastoralists in the treatment group to the rest of the treatment group. Treatment effects are not smaller among Benue pastoralists than the rest of the treatment group. Note: the mean coefficient excludes the Public Goods Game, which is on a different scale than the other variables; it is included in the $p$-value and t-statistic.}
+\smallskip
+`r benPast_tab`
+\end{center}
+\end{table}
+
+
+```{r}
+load("../data_and_code/review/mediat_tab.Rda")
+```
+
+The third analysis concerned mediation.  While we cannot rule out that the effect was due to the meditation training, only 52 of the over 1000 endline respondents in treatment sites were aware of the mediation intervention.
+
+\begin{table}[H]
+\begin{center}
+\label{tab:mediat_tab}
+\caption{\textbf{Mediation Exposure.} Exposure to mediation in treatment and control sites in endline survey. Only 52 randomly selected respondents in treatment had any exposure to mediation. No control respondents had exposure to mediation.}
+\smallskip
+`r mediat_tab`
+\end{center}
+\end{table}
+
+
+## Appendix J: Family-Wise Error Rate (FWER)
+
+To control the FWER, we conducted within-family hypothesis corrections using the Holm correction.  For two of our outcomes (pastoralists in market and perceptions of insecurity), the findings remain statistically significant. For the two other outcomes (self-reported contact and attitudes), significance levels shift from statistically significant to marginally significant (.04 to .08). This means we have a significant $p$-value for our hypothesis families about intergroup contact and about insecurity; we have a marginally significant $p$-value for our hypothesis family about attitudes; we have no signifcant $p$-value for our hypothesis family about cooperation.
+
+Note: the outcome measuring pastoralists in the market remains statistically significant even if using the bonferonni correction to correct for all (vs. within family) hypothesis tests in the analysis.
+
+The exploratory individual-level data has only one outcome per family (except for the Cooperation family, for which no $p$-values were significant without correction). We therefore do not show "corrected" individual-level $p$-values.  If we put all individual-level hypotheses into a single family and use the Holm correction, the _Self-reported contact_ outcome changes from significant ($p$=0.018) to marginally significant($p$=0.088). None of the other outcomes were significant or marginally significant before correction.
+
+```{r}
+load("../data_and_code/review/holm_tab.Rda")
+holm_tab <- knitr::kable(holm_tab)
+```
+
+\begin{table}[H]
+\begin{center}
+\label{tab:holm_tab}
+\caption{\textbf{P-values controlling the family-wise error rate.}}
+\smallskip
+`r holm_tab`
+\end{center}
+\end{table}
+
+## Appendix K: Power Analysis
+
+```{r}
+load("../data_and_code/review/power_figure.png")
+
+```
+
+At community level, we could detect effects of ~0.60 SDs with 0.80 power. We expected better power for our actual analysis because our power analysis does not use randomization inference to generate true p-values.  We simulated our community-level power analysis with the following code.
+
+```{r, eval=F, echo=T}
+# using insecurity as the default outcome, as it is our strongest survey outcome at the community level. outcome_list_qip[2] = "in_cw".
+bigPow.fn <-function(nsims, var=outcome_list_qip[2], tau)
+{
+  newPow.fn <- function(var, tau)
+{
+    # 6 TR sites from Nas, 4 from Ben
+    newtr_nas <- sample(unique(ag.df$psu[ag.df$state %in% "nas"]), size=6)
+    newtr_ben <- sample(unique(ag.df$psu[ag.df$state %in% "ben"]), size=4)
+    newtr <- c(as.character(newtr_nas), as.character(newtr_ben))
+    df <- ag.df
+    df[,"newtr"] <- ifelse(df$psu %in% newtr, 1, 0)
+  
+  # make endline outcome with TR effect tau
+  df[, paste0(var,"_end")] <- (df[,paste0(var,"_end")]-mean(df[,paste0(var,"_end")]))/sd(df[,paste0(var,"_end")])
+  #scale(df[,paste0(var,"_end")])
+  df[df$newtr %in% 1, paste0(var,"_end")] <- df[df$newtr %in% 1, paste0(var,"_end")]+tau
+  
+  # for baseline control, also scale
+  df[, paste0(var,"_base")] <- (df[,paste0(var,"_base")]-mean(df[,paste0(var,"_base")]))/sd(df[,paste0(var,"_base")])
+  
+  # lm
+  lm1 <- lm_robust(df[,paste0(var,"_end")]~df[,'newtr']+df[,paste0(var,"_base")]+state, 
+                   clusters = psu, data=df)
+  
+  want <- tidy(lm1)[2,5]
+  return(want)
+  }
+  
+  check <- do(nsims)*newPow.fn(var=var, tau=tau)
+  pval <- mean(check<0.05)
+  return(pval)
+}
+
+# run power analysis for tau 0-1
+possibleTaus <- seq(0,1,0.1)
+possibleTaus <- as.data.frame(possibleTaus)
+system.time(
+for(i in 1:nrow(possibleTaus))
+{
+  possibleTaus[i, "pow"] <- bigPow.fn(nsims=3000, tau=possibleTaus[i,1])
+}
+)
+possibleTaus
+
+```
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/review/power_figure.png}
+\caption{Community-level power analysis.}\label{fig:pow_comm}
+\end{figure}
+
+At individual level, we could detect effects of ~0.40 SDs with 0.80 power. We expected better power for our actual analysis because our power analysis does not use randomization inference to generate true p-values. We used the [EGAP power calculator](https://egap.shinyapps.io/power-app/) for the individual-level power analysis.  The parameters were: Alpha = 0.05, Tau = 0.40 SD, ICC=0.05, 15 clusters per arm, up to 300 respondents per cluster.
+
+\begin{figure}%[\sidecaptionrelwidth][t]
+\centering
+\includegraphics[width=\linewidth]{../data_and_code/review/power_figure_ind.png}
+\caption{Individual-level power analysis.}\label{fig:pow_ind}
+\end{figure}
+
+
+## Appendix L: Small-j checks
+
+Many effects in Figure 1 are driven by worsening conditions in control communities rather than improved relations in treatment communities. Given the small number of control communities (5), I worry that the effects could be driven by a particularly bad period in a single control community. Do similar patterns hold for other outcomes?
+
+

@@ -13,8 +13,8 @@ library(plyr)
 library(dplyr)
 library(tidyr)
 
-load("../d_analysis/g-aggAnalComplete.Rdata")
-load("../d_analysis/g2-panelAnalComplete.Rdata")
+load("../../d_analysis/g-aggAnalComplete.Rdata")
+load("../../d_analysis/g2-panelAnalComplete.Rdata")
 #rm("thedf")
 
 # Setup Wanted Vars
