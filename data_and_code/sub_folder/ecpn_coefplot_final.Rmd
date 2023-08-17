@@ -1,0 +1,154 @@
+---
+title: "ecpn_coefplot"
+author: "cdgrady21"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+load('ag.coefs.Rdata')
+load('ind.coefs.Rdata')
+
+#load('ind2.coefs.Rdata')
+#load('ag.coefs_orig.Rdata')
+#load('ind.coefs_orig.Rdata')
+#load('ind2.coefs_orig.Rdata')
+
+## add obs data to coefs
+#load("../../../obsDat/figs/marketCoefs1.rda") # no FEs, should be unbiased
+#load("../../../obsDat/figs/eventCoefs1.rda") # no FEs
+load("../../../obs_dat/figs/obsDat_fig_dat.rda")
+
+
+```
+
+# Coefplots
+
+1. Community: Aggregate + observational outcomes
+2. Individual-level survey outcomes
+
+***************
+
+1. Aggregate + observational outcomes
+
+Order: Contact, Perceptions Security, Attitudes, PGG.
+
+```{r}
+outcome <- ag.coefs
+outcome <- outcome[grepl("attitude|contact|in_cw|end_exp|rMean|pgp", outcome$var),]
+outcome <- outcome[,c("var", "size", "ll_size", "ul_size")]
+names(outcome) <- c("var", "coef_sd", "ll_sd", "ul_sd")
+outcome$var <- c("Self-reported Attitudes", "Perceptions of Security",
+                 "Self-reported Contact",
+                 "Contact Willingness", "Endorsement Experiment",
+                 "Public Goods Donation", "Public Goods Amount")
+outcome$outcome_type <- c("atts", "in", "con", "con", "atts", "pgg", "pgg")
+
+outcome2$outcome_type <- "con"
+outcome2$Data <- "Behavior"
+outcome2$var <- c("Pastoralists in Market",
+                  "Farmers in Market",
+                  "Outgroup Event Attendance")
+outcome2$df <- NULL
+outcome$Data <- "Survey"
+outcome$Data[outcome$outcome_type %in% "pgg"] <- "Behavior"
+svyObs_outcomes <- rbind(outcome, outcome2)
+svyObs_outcomes$hypothesis <- c("Attitudes", "Security", "Contact", 
+                                "Contact","Attitudes",
+                                "Cooperation", "Cooperation", 
+                                "Contact", "Contact", "Contact")
+res <- svyObs_outcomes
+res$hypothesisF <-
+  factor(res$hypothesis,
+         levels = c("Contact", "Security", "Attitudes", "Cooperation"))
+res$varF <-
+  factor(res$var,
+         levels = c("Self-reported Contact", "Contact Willingness",
+                    "Pastoralists in Market",
+                    "Farmers in Market", "Outgroup Event Attendance",
+                    "Self-reported Attitudes", "Perceptions of Security",
+                    "Public Goods Amount", "Public Goods Donation", "Endorsement Experiment"))
+
+ggplot(data = res, aes(x = varF, y = coef_sd, color = Data)) +
+  facet_grid(vars(hypothesisF), scales="free", space = "free")+
+  geom_point()+
+  geom_errorbar(aes(ymin = ll_sd, ymax = ul_sd, color = Data), width = 0) +
+  geom_hline(yintercept = 0, linetype = 2, color = "gray")+
+  labs(y = "Effect Size & 95% CI", x = NULL)+
+  theme_bw() +
+  #theme(axis.text = element_text(size = 12))+
+  coord_flip()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  scale_y_continuous(breaks = c(-1, -0.5, 0, 0.5, 1))
+
+ggsave("coef_agg.pdf", height=6, width = 6)
+
+
+```
+
+2. Individual-level survey outcomes
+
+Survey Outcomes: 
+  - voluntary intergroup contact
+  - feelings of physical security
+  - intergroup attitudes
+
+Need two point estimates & CI per outcome.
+
+```{r}
+outcome_ind <- ind.coefs
+outcome_ind <- outcome_ind[grepl("attitude|contact|in_cw|pgp", outcome_ind$var),]
+outcome_ind <- outcome_ind[,c(1,grep("^size.*(non|part)", names(outcome_ind)))]
+outcome_ind$var <- c("Self-reported Attitudes", "Perceptions of Security", 
+                     "Self-reported Contact", 
+                     "Public Goods Donation", "Public Goods Amount")
+part <- outcome_ind[,c(1,grep("part", names(outcome_ind)))]
+non <- outcome_ind[,c(1,grep("non", names(outcome_ind)))]
+names(part) <- gsub("_part", "", names(part))
+names(non) <- gsub("_non", "", names(non))
+part$Group <- "Part"; non$Group <- "Non"
+outcome_ind <- rbind(part,non)
+outcome_ind$var <- 
+  factor(outcome_ind$var, 
+         levels = c("Public Goods Amount",
+                    "Public Goods Donation",
+                    "Self-reported Attitudes",
+                    "Perceptions of Security",
+                    "Self-reported Contact"))
+outcome_ind$Group <- factor(outcome_ind$Group, levels=
+                            c("Non", "Part"))
+outcome_ind$dat_source <-
+  factor(c("Survey", "Survey", "Survey",
+           "Behavior", "Behavior",
+           "Survey", "Survey", "Survey",
+           "Behavior", "Behavior"),
+         levels = c("Survey", "Behavior"))
+
+
+ggplot(data = outcome_ind, aes(x = var, y = size, color = Group)) +
+  facet_grid(vars(dat_source), scales="free", space = "free")+
+  geom_point(position = position_dodge(width = .3)) +
+  geom_errorbar(aes(ymin = size_ll, ymax = size_ul, color = Group), width = 0, position = position_dodge(width = .3)) +
+  geom_hline(yintercept = 0, linetype = 2, color = "gray")+
+  labs(y = "Effect Size & 95% CI", x = NULL)+
+  theme_bw() +
+  #theme(axis.text = element_text(size = 12))+
+  coord_flip()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  guides(color=guide_legend(reverse = TRUE))+
+  scale_color_manual(values = c("Part" = "#F8766D",
+                               "Non" = "#00BFC4"), name = "Group")
+
+ggsave("coef_ind.pdf", width = 5, height = 3)
+```
+
+

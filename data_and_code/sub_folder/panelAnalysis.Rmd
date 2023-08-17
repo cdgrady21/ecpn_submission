@@ -1,0 +1,200 @@
+---
+title: "g2-panelAnalysis"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(7867564)
+rm(list=ls())
+load("../b_creating_outcomes/f2-panelData.Rdata")
+
+#library(NPC) # archived
+library(estimatr)
+library(mosaic)
+library(coin)
+library(robustbase)
+
+#True p-value function.
+load("true_fun_ind.rda")
+
+#true.fun(var='x_cw', tr='treatment')
+#true.fun(var='cohes_cw_resid', tr='tr_resid') # Could be useful if confounders
+#true.fun(var='cohes_cw', tr='bene_cw')
+#true.fun(var="pgp_amount_y1", tr='treatment')
+#true.fun(var="pgp_amount_y1", tr='bene_cw')
+
+#com.fun(var="x_cw", nsims=1000)
+#com.fun1(var="x_cw", nsims=1000)
+
+#strat.fun("cohes_cw_y0")
+#strat.fun("x_cw_y0")
+```
+
+
+# Committee vs Non-committee vs. Control
+
+```{r}
+# make treatment variables
+panel.df$tr_f <- droplevels(interaction(panel.df$treatment, panel.df$committee))
+panel.df$tr_n <- as.numeric(panel.df$tr_f)
+```
+
+# Make a table of all outcomes with coefs and pvalues for the diff ways of making indices and estimating models.
+
+- Rows as outcomes; columns for CW-Cont, CW-diff, Ind-Cont, Ind-diff; each column shows coef & pvalue.
+
+- index: inverse-covariance weights ("cw") or additive ("ind")
+- model: controlling-for ("cont") or differencing ("diff")
+
+```{r}
+# matrices sooooo fast
+#system.time(replicate(10000, data.frame(thecoef=c(NA, NA), truep=c(NA, NA))))
+#system.time(replicate(10000, matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))))
+
+#chris: doesnt work with pgp
+analysis.fun <- function(var,nsims)
+{
+  if(paste0(var, "_cw_y1") %in% names(panel.df))
+  {
+    var_cw_cont <- comp.fun(paste0(var, "_cw"), nsims)
+    var_ind_cont <- comp.fun(paste0(var, "_index"), nsims)
+    var_cw_diff <- comp.fun1(paste0(var, "_cw"), nsims)
+    var_ind_diff <- comp.fun1(paste0(var, "_index"), nsims)
+    
+    which1 <- strat.fun(paste0(var, "_cw_y0"))
+    thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
+  }
+  else if(grepl("pgp", var))
+  {
+    var_cw_cont <- comp.fun1(var, nsims)
+    var_ind_cont <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    var_cw_diff <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    var_ind_diff <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    which1 <- NA
+    thebase <- NA
+  }
+  else
+  {
+    var_cw_cont <- comp.fun(var, nsims)
+    var_ind_cont <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    var_cw_diff <- comp.fun1(var, nsims)
+    var_ind_diff <- matrix(NA, nrow=2, ncol=2, dimnames=list(NULL, c("thecoef", "truep")))
+    
+    which1 <- strat.fun(var)
+    thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
+  }
+  
+  var_tab <- rbind(var_cw_cont, var_ind_cont, var_cw_diff, var_ind_diff)
+  var_tab <- cbind (var_tab, c(rep("cw_cont", 2), 
+                               rep("ind_cont",2), 
+                               rep("cw_diff",2), 
+                               rep("ind_diff",2)))
+  var_tab[4] <- thebase
+  colnames(var_tab)[3:4] <- c("version", "base")
+  var_tab[4] <- ifelse(var_tab[[4]] == var_tab[[3]], 1, 0)
+  
+  return(var_tab)
+}
+
+#(trust_tab <- analysis.fun(var='attitude', nsims=100))
+#(in_tab <- analysis.fun('in', nsims=100))
+#(con_tab <- analysis.fun('contactOnly', nsims=100))
+#(pgp_tab <- analysis.fun(var='pgp_amount_y1', nsims=100))
+
+```
+
+loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.
+
+Note: takes awhile to run (like 10 minutes) so ran once and now loading.
+
+```{r, eval=F}
+# loop over all outcomes
+outcome_list <- c("attitude", "in", 'contactOnly',
+                  #'rand_outcome', "end_exp", # dont make sense at ind-level
+                  "pgp_donate_y1", "pgp_amount_y1")
+newList_ind <- vector(mode="list", length=length(outcome_list))
+for(i in 1:length(outcome_list))
+{
+  newList_ind[[i]] <- analysis.fun(outcome_list[i], nsims=3000)
+}
+save(newList_ind, file="list_of_coefs_and_ps_ind.Rda")
+```
+```{r}
+load("list_of_coefs_and_ps_ind.Rda")
+```
+
+
+Now do it for raw vs binary category vs ranked contact outcomes.
+
+```{r, eval=F}
+#table(panel.df$contactOnly_raw_cw)
+#table(panel.df$contactOnly_cats_cw)
+#table(panel.df$contactOnly_cw)
+
+nsims=3000
+var_cw_cont <- comp.fun(paste0("contactOnly", "_cw"), nsims)
+var_cats_cont <- comp.fun(paste0("contactOnly_cats", "_cw"), nsims)
+var_raw_cont <- comp.fun(paste0("contactOnly_raw", "_cw"), nsims)
+
+var_cw_diff <- comp.fun1(paste0("contactOnly", "_cw"), nsims)
+var_cats_diff <- comp.fun1(paste0("contactOnly_cats", "_cw"), nsims)
+var_raw_diff <- comp.fun1(paste0("contactOnly_raw", "_cw"), nsims)
+
+var_tab_ind <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
+                 var_cw_diff, var_cats_diff, var_raw_diff)
+save(var_tab_ind, file="list_of_rank_bin_raw_ind.Rda")
+```
+```{r}
+load("list_of_rank_bin_raw_ind.Rda")
+```
+
+# Placebos
+
+```{r, eval=F}
+# loop over all placebo outcomes
+placebo_list <- c("vio", 
+                  "violence_group.criminals",
+                  "violence_group.defend_group",
+                  "violence_group.defend_religion",
+                  "violence_group.government", 
+                  "violence_group.maintain_culture",
+                  "violence_group.retaliate",
+                  'outgroup_atts_group.trust_rel',
+                  "radio")
+#analysis.fun(var=placebo_list[1], nsims=100)
+#analysis.fun(var=placebo_list[9],nsims=100)
+
+placeboList_ind <- vector(mode="list", length=length(placebo_list))
+for(i in 1:length(placebo_list))
+{
+  placeboList_ind[[i]] <- analysis.fun(placebo_list[i], nsims=3000)
+}
+save(placeboList_ind, file="pl_list_of_coefs_and_ps_ind.Rda")
+```
+```{r}
+load("pl_list_of_coefs_and_ps_ind.Rda")
+```
+
+# NPC
+
+Now NPC (NPC now defunct, not on CRAN, i am using an old version.)
+
+```{r, eval=F}
+npc <- NPC::NPC(panel.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c("attitude_cw", "in_cw", 'contactOnly_cw'), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=10000, seed=952022,
+             print.steps=FALSE)
+(p_combP <- npc$p.values['NPC']) # cumulative
+npc # all of them
+
+```

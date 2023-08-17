@@ -1,0 +1,129 @@
+---
+title: "obsDat_figs"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+#load("marketCoefs.rda") # has site and state FEs, but could be biased because of that
+load("marketCoefs1.rda") # no FEs, should be unbiased
+load("eventCoefs1.rda") # no FEs
+
+# load libraries
+library(ggplot2)
+```
+```{r, eval=F}
+#load original data if desired
+load("../a_clean/a_obsDat_clean.rda")
+
+# check outcomes that are the same
+test <- markets[complete.cases(markets),9:16]
+test1 <- markets[complete.cases(markets),25:34]
+cor(test1)
+```
+
+## Make the market plot
+
+Chris: getting to pretty.
+```{r}
+outcome <- markCoefs
+outcome <- outcome[grepl("rank", outcome$var) & !grepl("stalls|women|nono", outcome$var),]
+outcome[c("coef_sd", "ll_sd", "ul_sd")] <- outcome[,c("coef", "ll", "ul")]/outcome$sd
+outcome <- outcome[,c("var", "coef_sd", "ll_sd", "ul_sd")]
+outcome$outcome_type <- ifelse(grepl("index", outcome$var), "index", "comp")
+
+market_coefplot <- ggplot(outcome, aes(y=coef_sd, x = var)) +
+  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
+  geom_point(aes(shape=outcome_type), size=4) +
+  scale_shape_manual(values=c("index" = 19, "comp" = 19))+ #17 & 2 for triangles
+  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0, linetype=outcome_type)) +
+  scale_linetype_manual(values = c("dotted", "solid")) +
+  labs(x = "Outcome", y = "Effect Size Estimate") +
+  scale_y_continuous(limits=c(-1, 2),
+                     n.breaks=7)+
+  guides(shape=F) +
+  theme_classic()+
+  theme(text = element_text(size=15),
+        legend.position="none") +
+  coord_flip()
+
+pdf(file="market_coefplot.pdf",bg="transparent", width=10, height=7)
+market_coefplot
+dev.off()
+  
+```
+
+
+# making the events plot
+
+Chris: getting to pretty.
+
+```{r}
+outcome1 <- eventCoefs
+outcome1 <- outcome1[grepl("outgroup", outcome1$var) & grepl("rank", outcome1$var),]
+outcome1 <- outcome1[4:6,] # only want those that account for total size of event (outgroup percentage)
+outcome1[c("coef_sd", "ll_sd", "ul_sd")] <- outcome1[,c("coef", "ll", "ul")]/outcome1$sd
+outcome1 <- outcome1[,c("var", "coef_sd", "ll_sd", "ul_sd")]
+outcome1$var <- c("attend_outgroup_rank", "eat_outgroup_rank", 
+                 "outgroup_index_rank")
+outcome1$outcome_type <- ifelse(grepl("index", outcome1$var), "index", "comp")
+
+events_coefplot <- ggplot(outcome1, aes(y=coef_sd, x = var)) +
+  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
+  geom_point(aes(shape=outcome_type), size=4) +
+  scale_shape_manual(values=c("index" = 17, "comp" = 17))+ #17 & 2 for triangles
+  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0, linetype=outcome_type)) +
+  scale_linetype_manual(values = c("dotted", "solid")) +
+  labs(x = "Outcome", y = "Effect Size Estimate") +
+  scale_y_continuous(limits=c(-1, 2),
+                     n.breaks=7)+
+  guides(shape=F) +
+  theme_classic()+
+  theme(text = element_text(size=15),
+        legend.position="none") +
+  coord_flip()
+
+pdf(file="events_coefplot.pdf",bg="transparent", width=10, height=7)
+events_coefplot
+dev.off()
+  
+```
+
+
+# making the both plot
+
+
+```{r}
+outcome$df <- "markets"; outcome1$df <- "events"
+outcome$var <- paste0("markets-", outcome$var)
+outcome1$var <- paste0("events-", outcome1$var)
+outcome2 <- rbind(outcome, outcome1)
+outcome2 <- outcome2[grepl("index", outcome2$var),]
+
+marketsEvents_coefplot <- ggplot(outcome2, aes(y=coef_sd, x = var)) +
+  geom_hline(aes(yintercept = 0), linetype="dashed", color="gray")+
+  geom_point(aes(shape=df), size=4) +
+  scale_shape_manual(values=c("markets" = 19, "events" = 17))+ #17 & 2 for triangles
+  geom_errorbar(aes(ymin=ll_sd, ymax=ul_sd, width=0, linetype=outcome_type)) +
+  scale_linetype_manual(values = c("dotted", "solid")) +
+  labs(x = "Outcome", y = "Effect Size Estimate") +
+  scale_y_continuous(limits=c(-1, 2),
+                     n.breaks=7)+
+  guides(shape=F) +
+  theme_classic()+
+  theme(text = element_text(size=15),
+        legend.position="none") +
+  coord_flip()
+
+pdf(file="marketsEvents_coefplot.pdf",bg="transparent", width=10, height=7)
+marketsEvents_coefplot
+dev.off()
+  
+```
+
+Save outcome2 df in case want to add to svy coefplot.
+
+```{r, eval=F}
+save(outcome2, file="obsDat_fig_dat.rda")
+```

@@ -1,0 +1,261 @@
+---
+title: "g-aggAnalysis for academic paper"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+<!--Chris: notes
+
+could replace all lm() with lm_lin() but lm_lin() does not allow me to vary treatment in a function.-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(962022)
+rm(list=ls())
+load("../c_creating_dataframes/f-aggregateComms_ap.Rdata")
+load("../c_creating_dataframes/rand_df.Rdata")
+rm(list=ls(pattern="Var|var|Cols"))
+
+#True p-value function.  Don't need covariate adjustment to absorb error.  True p's Especially necessary with community level analysis, because we have a small number of clusters.  Treatment assigned at PSU level.
+load("true_fun.rda")
+
+#library(NPC)
+library(dplyr)
+library(mosaic)
+library(estimatr)
+library(robustbase)
+library(quantreg)
+library(sandwich)
+library(clubSandwich)
+library(lmtest)
+library(coin)
+
+# Subsets
+## Look at farmers and pastoralists separately.
+
+farmers <- ag.df[grepl(".farmers", ag.df$comm),]
+pastors <- ag.df[grepl(".pastor", ag.df$comm),]
+
+## Look at states separately.
+nas <- ag.df[ag.df$state %in% "nas",]
+ben <- ag.df[ag.df$state %in% "ben",]
+
+```
+
+# Variable list
+
+- Attitudes: attitude, endorsement experiment
+- Insecurity: in
+- Coordination: pgp_donate, pgp_amount, 
+- Contact: contactOnly, randExp/percExp, market/social observation
+
+# Testing Outcomes
+
+We will use the differencing strategy when treatment and control are not balanced at baseline.  We will use the controlling-for strategy when treatment and control are balanced at baseline.  We say the groups are balanced if they are within 0.2 SDs of eachother at baseline.
+
+true.fun1 is with differencing. true.fun is controlling-for. strat.fun tells us which to use.
+
+
+************
+
+# Make a table of all outcomes with coefs and pvalues for the diff ways of making indices and estimating models.
+
+- Rows as outcomes; columns for CW-Cont, CW-diff, Ind-Cont, Ind-diff; each column shows coef & pvalue.
+
+- index: inverse-covariance weights ("cw") or additive ("ind")
+- model: controlling-for ("cont") or differencing ("diff")
+
+```{r}
+analysis.fun <- function(var)
+{
+  if(paste0(var, "_cw_end") %in% names(ag.df))
+  {
+    var_cw_cont <- true.fun(paste0(var, "_cw"), 'treatment')
+    var_ind_cont <- true.fun(paste0(var, "_index"), 'treatment')
+    var_cw_diff <- true.fun1(paste0(var, "_cw"), 'treatment')
+    var_ind_diff <- true.fun1(paste0(var, "_index"), 'treatment')
+    
+    which1 <- strat.fun(paste0(var, "_cw_base"))
+    thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
+  }
+  else if(grepl("pgp", var))
+  {
+    var_cw_cont <- true.fun(var, 'treatment')
+    var_ind_cont <- NA
+    var_cw_diff <- NA
+    var_ind_diff <- NA
+    which1 <- NA
+    thebase <- NA
+  }
+  else
+  {
+    var_cw_cont <- true.fun(var, 'treatment')
+    var_ind_cont <- NA
+    var_cw_diff <- true.fun1(var, 'treatment')
+    var_ind_diff <- NA
+    
+    which1 <- strat.fun(var)
+    thebase <- ifelse(grepl("Contr", which1), "cw_cont", "cw_diff")
+  }
+  
+  var_tab <- rbind(var_cw_cont, var_ind_cont, var_cw_diff, var_ind_diff)
+  var_tab <- cbind (var_tab, c("cw_cont", "ind_cont", "cw_diff", "ind_diff"))
+  var_tab[4] <- thebase
+  colnames(var_tab)[3:4] <- c("version", "base")
+  var_tab[4] <- ifelse(var_tab[[4]] == var_tab[[3]], 1, 0)
+  
+  return(var_tab)
+}
+
+#(trust_tab <- analysis.fun(var='attitude'))
+#(in_tab <- analysis.fun('in'))
+#con_tab <- analysis.fun('contactOnly')
+#r_tab <- analysis.fun(var='rMean')
+#pgp_tab <- analysis.fun(var='pgp_amount_end')
+
+```
+
+loop over outcomes.  note: rmean and end_exp don't have index & cw versions. Can still do true.fun1 and true.fun, but cannot do icw and index.  
+
+Note: takes awhile to run (like 10 minutes) so ran once and now loading.
+
+```{r}
+# loop over all outcomes
+outcome_list <- c("attitude", "in", 'contactOnly',
+                  'rMean', "end_exp",
+                  "pgp_donate_end", "pgp_amount_end")
+newList <- vector(mode="list", length=length(outcome_list))
+```
+```{r, eval=F}
+for(i in 1:length(outcome_list))
+{
+  newList[[i]] <- analysis.fun(outcome_list[i])
+}
+save(newList, file="list_of_coefs_and_ps.Rda")
+```
+```{r}
+load("list_of_coefs_and_ps.Rda")
+```
+
+
+****************
+
+Now do it for raw vs binary category vs ranked contact outcomes.
+
+```{r, eval=F}
+table(ag.df$contactOnly_raw_cw)
+table(ag.df$contactOnly_cats_cw)
+table(ag.df$contactOnly_cw)
+
+var_cw_cont <- true.fun(paste0("contactOnly", "_cw"), 'treatment')
+var_cats_cont <- true.fun(paste0("contactOnly_cats", "_cw"), 'treatment')
+var_raw_cont <- true.fun(paste0("contactOnly_raw", "_cw"), 'treatment')
+
+var_cw_diff <- true.fun1(paste0("contactOnly", "_cw"), 'treatment')
+var_cats_diff <- true.fun1(paste0("contactOnly_cats", "_cw"), 'treatment')
+var_raw_diff <- true.fun1(paste0("contactOnly_raw", "_cw"), 'treatment')
+
+var_tab <- rbind(var_cw_cont, var_cats_cont, var_raw_cont, 
+                 var_cw_diff, var_cats_diff, var_raw_diff)
+save(var_tab, file="list_of_rank_bin_raw.Rda")
+```
+```{r}
+load("list_of_rank_bin_raw.Rda")
+```
+
+Now NPC (NPC now defunct, not on CRAN, i am using an old version.)
+
+```{r, eval=F}
+npc <- NPC::NPC(ag.df, tr.var = "treatment", tr.label = 1, 
+                    clust.var = "psu", block.var = "state", 
+                    y.vars = c("attitude_cw", "in_cw", 'contactOnly_cw',
+                  'rMean', "end_exp"), 
+                alternative = "greater", test.statistic = "StudentsT",n.perms=10000, seed=952022,
+             print.steps=FALSE)
+(combP <- npc$p.values['NPC']) # cumulative
+npc # all of them
+
+```
+
+******************
+
+# State-level diffs
+
+```{r}
+outcome_list_state <- c(paste0(outcome_list[1:3], "_cw"), outcome_list[4:length(outcome_list)])
+stateList <- vector(mode="list", length=length(outcome_list_state))
+for(i in 1:length(outcome_list_state))
+{
+  thelm <- lm_robust(ag.df[,outcome_list_state[i]]~ag.df[,"treatment"]*state,
+                            clusters = psu, data=ag.df)
+  stateList[[i]] <- tidy(thelm)[, c(1,2,5)]
+}
+names(stateList) <- outcome_list_state
+save(stateList, file="state_list.Rda")
+```
+
+
+# Farmer-pastoralist diffs
+
+```{r}
+ag.df$farm_past <- ifelse(grepl(".farmers", ag.df$comm), "farm", "past")
+#table(ag.df$comm, ag.df$farm_past)
+
+farmList <- vector(mode="list", length=length(outcome_list_state))
+for(i in 1:length(outcome_list_state))
+{
+  thelm <- lm_robust(ag.df[,outcome_list_state[i]]~ag.df[,"treatment"]*farm_past,
+                            clusters = psu, fixed_effects = state, data=ag.df)
+  farmList[[i]] <- tidy(thelm)[, c(1,2,5)]
+}
+names(farmList) <- outcome_list_state
+save(farmList, file="farm_list.Rda")
+
+```
+
+
+
+# Placebos
+
+```{r, eval=F}
+# loop over all placebo outcomes
+placebo_list <- c("vio", 
+                  "violence_group.criminals",
+                  "violence_group.defend_group",
+                  "violence_group.defend_religion",
+                  "violence_group.government", 
+                  "violence_group.maintain_culture",
+                  "violence_group.retaliate",
+                  'outgroup_atts_group.trust_rel',
+                  "radio")
+#analysis.fun(var=placebo_list[1])
+#analysis.fun(var=placebo_list[9])
+
+placeboList <- vector(mode="list", length=length(placebo_list))
+for(i in 1:length(placebo_list))
+{
+  placeboList[[i]] <- analysis.fun(placebo_list[i])
+}
+save(placeboList, file="pl_list_of_coefs_and_ps.Rda")
+```
+```{r}
+load("pl_list_of_coefs_and_ps.Rda")
+```
+
+
+**Attitudes towards actors in dispute resolution**
+
+```{r}
+# dispute resolution
+ag.df$disp_index
+strat.fun("disp_index_base")
+disp1 <- true.fun("disp_index", "treatment")
+
+```

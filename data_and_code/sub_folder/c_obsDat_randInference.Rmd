@@ -1,0 +1,202 @@
+---
+title: "obsDat_randInference"
+author: "Chris Grady"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+
+# data (from obsDat_analysis) ##chris: why scanning in from there? 
+## to get results of quantile regression?
+#load("eventsMedian.Rdata")
+#load("marketMedian.Rdata")
+
+# data from data cleaning file
+load("../a_clean/a_obsDat_clean.rda")
+
+events <- events[!events[,"eat_past"] %in% NA | !events$eat_farm %in% NA,] # remove the bad observation
+
+# libs
+library(dplyr)
+library(mosaic)
+library(estimatr)
+
+# from review: check if same coefficient without israel and hadiza, who could have known about treatment assignment.
+##for hell of it, check with _only_ israel and hadiza
+## events
+events_rb <- events[!grepl("hadiza nuhu|israel okpe", events$Observer.Name),]
+events_had <- events[grepl("hadiza nuhu|israel okpe", events$Observer.Name),]
+
+## markets
+markets_rb <- markets[!grepl("hadiza nuhu|israel okpe", markets$Observer.Name),]
+markets_had <- markets[grepl("hadiza nuhu|israel okpe", markets$Observer.Name),]
+
+```
+
+```{r}
+##lm, no rand inference.
+## using rank because not skewed like raw.
+summary(lm(pastoralists_index_rank~treatment*time+State+site, data=markets))
+
+# no israel/hadiza
+summary(lm(pastoralists_index_rank~treatment*time+State+site, data=markets_rb))
+
+# only israel/hadiza
+## note: only went to treatment sites
+mark_pasts_had <- summary(lm(pastoralists_index_rank~time, data=markets_had))$coefficients['time',c(1,4)]
+## comparison
+summary(lm(pastoralists_index_rank~time, data=markets_rb))$coefficients['time',c(1,4)]
+```
+
+```{r}
+#Want a true pval from randomization inference.  Would use coin for speed/brevity, but don't know how to account for sites and states in coin's oneway_test, so writing a true pval function.
+
+#To create this null distribution:
+#- within state, shuffle TR assignment between sites.
+#    - sites within a state are randomly assigned TR or CO
+
+#- within site, shuffle time between observations?
+#    - obs within a site are randomly assigned t1 or t2.
+
+#Definitely need to shuffle TR between sites.  Not sure if it makes sense to randomly assign observations as pre/post.  Pretty sure that doesn't make sense, actually, since pre/post are systematically different in ways we did not randomly assign.
+
+#True p-value function.
+
+# shuffle tr between sites
+true.fun <- function(var, nsims=5000, dat)
+{
+  thelm <- lm(dat[,var]~treatment*time+State+site, data=dat)
+  thecoef <-coef(thelm)['treatment:time']
+  
+  # randomly grab 6 in nas and 4 in ben to be treated
+  size_nas <- length(unique(dat$site[dat$State %in% "nasarawa" & dat$treatment %in% 1]))
+  size_ben <- length(unique(dat$site[dat$State %in% "benue" & dat$treatment %in% 1]))
+  rand.coef = rep(NA,nsims)
+  for(i in 1:nsims){
+    rand.nas <- sample(unique(dat$site[dat$State %in% "nasarawa"]), size=size_nas)
+    rand.ben <- sample(unique(dat$site[dat$State %in% "benue"]), size=size_ben)
+    rand <- c(as.character(rand.nas), as.character(rand.ben))
+    rand.samp <- dat
+    rand.samp[,'treatment'] <- ifelse(rand.samp$site %in% rand, 1, 0)
+     
+    lm.null <- lm(rand.samp[,var]~treatment*time+State+site, data=rand.samp)
+    rand.coef[i] <- coef(lm.null)['treatment:time']
+    }
+  
+  thep <- mean(rand.coef>=thecoef, na.rm=T)
+  thedf <- data.frame(coef=thecoef,truep=thep)
+  rownames(thedf) <- paste0(var, "~","ECPN")
+  return(thedf)
+}
+#true.fun(var='pastoralists_index_rank', dat=markets)
+
+```
+
+# Markets
+
+## Pastoralists
+
+Pastoralists Index Rank
+
+```{r}
+set.seed(0528)
+(mark_pasts <- true.fun(var='pastoralists_index_rank', dat=markets))
+#(mark_pasts <- true.fun(var='pastoralists_index_raw', dat=markets))
+```
+```{r}
+# without israel/hadiza
+(mark_pasts_rb <- true.fun(var='pastoralists_index_rank', dat=markets_rb))
+#(mark_pasts_rb <- true.fun(var='pastoralists_index_raw', dat=markets_rb))
+
+# cannot do it with only israel/hadiza -- they only went to TR sites
+```
+
+
+## Farmers
+
+```{r}
+set.seed(0528)
+(mark_farms <- true.fun(var='farmers_index_rank', dat=markets))
+#(mark_farms <- true.fun(var='farmers_index_raw', dat=markets))
+```
+```{r}
+# without israel/hadiza
+(mark_farms_rb <- true.fun(var='farmers_index_rank', dat=markets_rb))
+#(mark_farms_rb <- true.fun(var='farmers_index_raw', dat=markets_rb))
+
+#cannot do truep with only israel/hadiza -- they only went to TR sites
+mark_farms_had <- summary(lm(farmers_index_rank~time, data=markets_had))$coefficients['time',c(1,4)]
+## comparison
+summary(lm(farmers_index_rank~time, data=markets_rb))$coefficients['time',c(1,4)]
+```
+
+
+# Events
+
+no rand inf
+
+```{r, eval=F}
+summary(lm(outgroupPerc_index_rank~treatment*time+site, data=events))
+
+# TR group drops by 9, CO group drops by 18.
+mosaic::mean(events[events$time %in% 0 & events$treatment %in% 0, "outgroupPerc_index_rank"], na.rm=T)
+mosaic::mean(events[events$time %in% 1 & events$treatment %in% 0, "outgroupPerc_index_rank"])
+mosaic::mean(events[events$time %in% 0 & events$treatment %in% 1, "outgroupPerc_index_rank"])
+mosaic::mean(events[events$time %in% 1 & events$treatment %in% 1, "outgroupPerc_index_rank"])
+
+
+# without hadiza/israel
+summary(lm(outgroupPerc_index_rank~treatment*time+site, data=events_rb))
+```
+
+*rand inf.*
+
+Outgroup Variables. Index.
+
+```{r}
+set.seed(0528)
+# need to account for total size of event, what % outgroup was
+(out_ind <- true.fun(var='outgroupPerc_index_rank', dat=events))
+
+#robustness check: alt outcome measure -- don't use rank
+#(out_ind <- true.fun(var='outgroupPerc_index', dat=events))
+
+```
+```{r}
+# without israel/hadiza
+(out_ind_rb <- true.fun(var='outgroupPerc_index_rank', dat=events_rb))
+
+#only israel/hadiza
+out_ind_had <- summary(lm(outgroupPerc_index_rank~time, data=events_had))$coefficients['time',c(1,4)]
+## comparison
+summary(lm(outgroupPerc_index_rank~time, data=events_rb))$coefficients['time',c(1,4)]
+```
+
+# Save
+
+```{r}
+obsDat_truePs <- rbind(mark_pasts, mark_farms, out_ind)
+# fix rownames to match coefplot names (obsDat_figs.Rmd)
+rownames(obsDat_truePs) <- c("pastoralists_index_rank", 
+                             "farmers_index_rank",
+                             "outgroup_index_rank")
+save(mark_pasts,mark_farms,out_ind,obsDat_truePs, file="obsDat_truePs.rda")
+
+# Save robustness check that excludes hadiza/israel
+obsDat_truePs_rb <- rbind(mark_pasts_rb, mark_farms_rb, out_ind_rb)
+# fix rownames to match coefplot names (obsDat_figs.Rmd)
+rownames(obsDat_truePs_rb) <- c("pastoralists_index_rank_rb", 
+                             "farmers_index_rank_rb",
+                             "outgroup_index_rank_rb")
+save(mark_pasts_rb, mark_farms_rb, out_ind_rb,obsDat_truePs_rb, file="obsDat_truePs_rb.rda")
+
+# Save robustness check that is only hadiza/israel
+obsDat_truePs_had <- rbind(mark_pasts_had, mark_farms_had, out_ind_had)
+# fix rownames to match coefplot names (obsDat_figs.Rmd)
+rownames(obsDat_truePs_had) <- c("pastoralists_index_rank_had", 
+                             "farmers_index_rank_had",
+                             "outgroup_index_rank_had")
+save(mark_pasts_had, mark_farms_had, out_ind_had,obsDat_truePs_had, file="obsDat_truePs_had.rda")
+```
