@@ -3,10 +3,10 @@ title: "How Contact Can Promote Societal Change Amid Intergroup Conflict: An Int
 output:
   pdf_document:
     toc: true
-    toc_depth: 2
+    toc_depth: 1
   html_document:
     toc: true
-    toc_depth: 2
+    toc_depth: 1
 ---
 
 ```{r setup, include=FALSE}
@@ -21,9 +21,10 @@ load("../data_and_code/survey_dat/d_analysis/list_of_rank_bin_raw.Rda")
 # not included: Individual-levl balance between part/nonpart/control == unneeded because exploratory & no assumption of balance.
 ```
 
-# Supplementary Information
+**********
+\newpage
 
-## Appendix A: Randomization Inference and Bootstrapping
+# Appendix A: Randomization Inference and Bootstrapping
 
 Randomization inference and bootstrapping are nonparametric methods to generate $p$-values (randomization inference) and confidence intervals (bootstrapping).  With *randomization inference*, we first shuffle the treatment variable to break the relationship between treatment and outcomes.  Next we regress outcomes on treatment using our regression equation and store the resulting coefficient.  Lastly, we repeat that process 10,000 times to create the distribution of coefficients we would observe if treatment had no effect on outcomes -- the null hypothesis.  Our $p$-value is the proportion of the null distribution that is greater than or equal to our observed coefficient.  
 
@@ -32,10 +33,11 @@ Randomization inference and bootstrapping are nonparametric methods to generate 
 In each of these procedures, we mimic our randomization process by randomizing/resampling the intervention to communities in site-level clusters and within state blocks. This means that both communities in an implementation site (farmers and pastoralists) will always be treated/sampled together and that assignment to the intervention and resampling are conducted separately in Nassarawa and Benue, just as the intervention was assigned in this study.  This procedure ensures that our null distribution (for $p$-values) is created by randomizing the intervention between exchangeable units and that our empirical distribution (for confidence intervals) is created by resampling units as they were sampled.
 
 **********
+\newpage
 
-## Appendix B: Robustness checks for community analysis
+# Appendix B: Robustness checks for community analysis
 
-### Survey outcomes
+## Survey outcomes
 
 These tables shows results with different ways of making indices (additive vs inverse-covariance weighted), different models for estimating effects (differencing vs controlling-for), and different ways of coding count variables (raw vs ranked).  Each table is an outcome.  Rows are results for different ways of creating the outcomes.  Columns show the coefficient from OLS regression, true p-value from randomization inference, and a binary "base" indicator showing which method was used in the paper.  
 
@@ -131,14 +133,7 @@ percExp_tab <- knitr::kable(percExp_tab, format="latex")
 `r percExp_tab`
 \end{center}
 \end{table}
-<!--
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=.8\textwidth]{figs/randComm_plot.png}
-\caption{\label{fig:percExp_plot_comm} \textbf{Community Percent Experiment} This figure shows the proportion of each experimental group who would join a group or live in a community with increasing percentages of outgroup members. The outcome is the mean response of those two questions so that a respondent saying yes to both was assigned a 1, a respondent saying yes to one was assigned a 0.5, and a respondent saying no to both was assigned a 0. Red shows the treatment communities; blue shows control communities.  Light colors are values at baseline; dark colors are values at endline.}
-\end{center}
-\end{figure}
--->
+
 
 ```{r}
 endExp_tab <- newList[[5]][c(1,3),c(1:2,4)]
@@ -177,7 +172,7 @@ pgg_tab <- knitr::kable(pgg_tab, format="latex")
 `r pgg_tab`
 \end{center}
 \end{table}
-<!--
+<!-- plot unneeded, just takes up space.
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=.8\textwidth]{figs/pggComm_plot.png}
@@ -186,7 +181,7 @@ pgg_tab <- knitr::kable(pgg_tab, format="latex")
 \end{figure}
 -->
 
-### Behvioral outcomes
+## Behvioral outcomes
 
 ```{r}
 load("../data_and_code/review/behObs_enumsCheck_tab.Rda")
@@ -216,8 +211,9 @@ We first checked the change over time in outcomes they reported. Descriptively, 
 
 
 **********
+\newpage
 
-## Appendix C: Robustness checks for individual analysis
+# Appendix C: Robustness checks for individual analysis
 
 These tables shows results with different ways of making indices (additive vs inverse-covariance weighted), different models for estimating effects (differencing vs controlling-for), and different ways of coding count variables (raw vs ranked).  Each table is an outcome.  Rows are results for different ways of creating the outcomes.  Columns show the coefficient from OLS regression, true p-value from randomization inference, and a binary "base" indicator showing which method was used in the paper.  
 
@@ -340,8 +336,9 @@ pgg_tab_ind <- knitr::kable(pgg_tab_ind, format="latex")
 -->
 
 **********
+\newpage
 
-## Appendix D: Balance Tests
+# Appendix D: Balance Tests
 
 ```{r}
 load("balTests.rda")
@@ -391,8 +388,9 @@ bal_svy_tab2 <- knitr::kable(round(bal_svy$overall, 3), format="latex")
 \end{table}
 
 **********
+\newpage
 
-## Appendix E: Placebo tests
+# Appendix E: Placebo tests
 
 Several of our outcomes are survey self-reports, and self-reports could be affected by factors other than the intervntion. For example, our survey results are suspect if respondents in treatment communities learned the ``correct'' answers better than respondents in control communities (social desirability bias). If social desirability accounts for the effect in survey self-reports, we would also expect differences between treatment and control for other normatively desirable attitudes. 
 
@@ -411,7 +409,7 @@ load("../data_and_code/survey_dat/d_analysis/pl_list_of_coefs_and_ps_ind.Rda")
 #placeboList_ind
 ```
 
-### Community.
+## Community.
 
 ```{r}
 # vio
@@ -501,7 +499,7 @@ pl_rad_tab <- knitr::kable(pl_rad_tab, format="latex")
 \end{center}
 \end{table}
 
-### Individual
+## Individual
 
 ```{r}
 # vio
@@ -601,8 +599,9 @@ pl_rad_ind <- knitr::kable(pl_rad_ind, format="latex")
 \end{table}
 
 **********
+\newpage
 
-## Appendix F: State-level heterogeneous effects
+# Appendix F: State-level heterogeneous effects
 
 This looks at heterogeneous effects by state. This is a low-power analysis.  There are no significant differences in treatment effect by state.
 
@@ -639,8 +638,9 @@ state_tab <- knitr::kable(state_tab, format="latex")
 \end{table}
 
 **********
+\newpage
 
-## Appendix G: Farmer-pastoralist differences
+# Appendix G: Farmer-pastoralist differences
 
 We show demographic differences between farmers and pastoralists. We also shows regressions using demographic characteristics as control variables to confirm that accounting for these variables does not change the study's results.
 
@@ -724,8 +724,9 @@ farm_tab <- knitr::kable(farm_tab, format="latex")
 \end{table}
 
 **********
+\newpage
 
-## Appendix H: Survey Questions
+# Appendix H: Survey Questions
 
 **Attitudes**
 
@@ -793,12 +794,13 @@ Your community and [joint farmer/pastoralist community] have created a project c
 These are your individual donation envelopes.  All the donations will be private -- only you will know how much money you donated. It essential that you keep how much you give private -- please do not tell anyone.  I have with me a donation envelope to collect donations.  Please go into your home, put however much of the 1,000 Naira you wish to donate to the project committee in the envelope, take whatever amount you want to keep for yourself, and come back to place your envelope in the donation envelope.  Remember, you are welcome to donate none, some, or all of the money to the project committee.  After that we are finished and you may continue your day.  We will come back and publicly announce how much money your community's project committee will receive."
 
 **********
+\newpage
 
-## Appendix I: Alternative explanations
+# Appendix I: Alternative explanations
 
 It is possible that the effects of our intervention are due to impact of the development project around which the contact was organized, rather than intergroup contact itself. The effect could also be due to mediation provided to some community leaders. We ran three analyses to disentangle the effects of contact from the effects of the development projects and mediation.
 
-### Effect of contact vs. effect of development projects
+## Effect of contact vs. effect of development projects
 
 The first was to determine if treatment effects were significantly larger for communities where larger proportions of people were aware of, used, and perceived benefit from the projects. In treatment communities, we predicted outcome change with (1) awareness of boreholes, (2) use of boreholes, (3) awareness of quick-impact projects, and (4) perceived benefit from quick-impact projects. If treatment effects are due to development projects and not contact, we would expect larger effects where a greater proportion of respondents were aware of, used, and benefited from the development projects.
 
@@ -860,7 +862,7 @@ benPast_tab <- knitr::kable(benPast_tab, format="latex")
 \end{center}
 \end{table}
 
-### Effect of contact vs. effect of mediation
+## Effect of contact vs. effect of mediation
 
 ```{r}
 load("../data_and_code/review/mediat_tab.Rda")
@@ -878,8 +880,9 @@ The third analysis concerned mediation.  While we cannot rule out that the effec
 \end{table}
 
 **********
+\newpage
 
-## Appendix J: Family-Wise Error Rate (FWER)
+# Appendix J: Family-Wise Error Rate (FWER)
 
 To control the FWER, we conducted within-family hypothesis corrections using the Holm correction.  For two of our outcomes (pastoralists in market and perceptions of insecurity), the findings remain statistically significant. For the two other outcomes (self-reported contact and attitudes), significance levels shift from statistically significant to marginally significant (.04 to .08). This means we have a significant $p$-value for our hypothesis families about intergroup contact and about insecurity; we have a marginally significant $p$-value for our hypothesis family about attitudes; we have no signifcant $p$-value for our hypothesis family about cooperation.
 
@@ -902,8 +905,9 @@ holm_tab <- knitr::kable(holm_tab, format="latex")
 \end{table}
 
 **********
+\newpage
 
-## Appendix K: Power Analysis
+# Appendix K: Power Analysis
 
 At community level, we could detect effects of ~0.60 SDs with 0.80 power. We expected better power for our actual analysis because our power analysis does not use randomization inference to generate true p-values.  We simulated our community-level power analysis with the following code.
 
@@ -956,7 +960,7 @@ possibleTaus
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/review/power_figure.png}
+\includegraphics[width=\linewidth]{../data_and_code/review/power_figure.pdf}
 \caption{Community-level power analysis.}\label{fig:pow_comm}
 \end{figure}
 
@@ -969,49 +973,52 @@ At individual level, we could detect effects of ~0.40 SDs with 0.80 power. We ex
 \end{figure}
 
 **********
+\newpage
 
-## Appendix L: Difference-in-differences plots
+# Appendix L: Difference-in-differences plots
 
 Many effects are driven by worsening conditions in control communities. Given the small number of control communities, it's possible that the effects could be driven by a particularly bad period in a single control community. It's also possible that there could be ceiling or floor effects. These plots show that (1) the effects are not driven by a large drop in a single control community/site and (2) the overall effect is not demonstrating a floor below which no community-site falls.
 
-### Survey outcomes
+## Survey outcomes
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png}
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.pdf}
 \caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:att_comm}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png}
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.pdf}
 \caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:att_comm_dis}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png}
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.pdf}
 \caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:con_comm}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png}
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.pdf}
 \caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:con_comm_dis}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png}
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.pdf}
 \caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:in_comm}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png}
+\includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.pdf}
 \caption{Each point represents a community. This graph shows (1) that overall changes are not driven by a large change in a single community and (2) that the overall change does not reflect a ceiling or floor effect.}\label{fig:in_comm_dis}
 \end{figure}
 
+<!--
+#Removing survey experiments because disaggregating them at comm-level is weird.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png}
@@ -1023,8 +1030,9 @@ Many effects are driven by worsening conditions in control communities. Given th
 \includegraphics[width=\linewidth]{../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png}
 \caption{Difference-in-differences plot comparing change in treatment to change in control.}\label{fig:perc_comm}
 \end{figure}
+-->
 
-### Behavioral outcomes
+## Behavioral outcomes
 
 \begin{figure}[H]
 \centering
@@ -1065,10 +1073,11 @@ Many effects are driven by worsening conditions in control communities. Given th
 
 
 **********
+\newpage
 
-## Appendix M: Intervention and site-selection
+# Appendix M: Intervention and site-selection
 
-### Intervention Details
+## Intervention Details
 
 To address the rising conflict in the Middle Belt in Nigeria, Mercy Corps implemented a four-year, USAID-funded program titled Engaging Communities for Peace in Nigeria, targeted at over 9,000 people at 10 Middle Belt sites (where a “site” is a location that contains two conflicting communities). The main objective of the program was to foster positive contact between farmers and pastoralists, with the aim of improving their attitudes toward and relationships with each other. The program included three interventions. 
 
@@ -1080,6 +1089,6 @@ The second intervention was training community leaders in how to mediate dispute
 
 The third intervention was conflict prevention forums for the larger community, in which farmers and pastoralists came together to discuss issues and policies that were affecting them. Government officials also attended these events. Due to time, this aspect of the program was only lightly implemented. 
 
-### Site Selection Details
+## Site Selection Details
 
 The scoping exercise initially identified more than thirty potential implementation sites with a history of violence. The ECPN implementation team visited these sites to establish community need and obtain community consent for potentially becoming part of the ECPN program. From these visits we narrowed down the list of implementation sites to 24. These 24 sites received a preliminary survey of 10 individuals per farmer and pastoralist community to further identify need. This survey revealed one site that was too close geographically to a larger site, one site that was too remote for feasible implementation, and four sites did not fulfill our “demonstrated need” criteria. Of the remaining 18, three were lost before random assignment or implementation of the program. From the fifteen remaining sites, we randomly assigned ten to intervention, where ECPN would be implemented, and five to control, where ECPN would not be implemented.

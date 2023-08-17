@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  14 AUG 2023 17:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.29)  16 AUG 2023 17:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -425,169 +425,156 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 LaTeX Font Info:    Trying to load font information for U+msb on input line 114.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (./ecpn_appendix.toc
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 2.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 2.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 2.
-)
+) (./ecpn_appendix.toc)
 \tf@toc=\write5
 \openout5 = `ecpn_appendix.toc'.
 
  [1
 
-{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4] [5]
-Overfull \hbox (152.71764pt too wide) in paragraph at lines 563--576
+{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 128.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 128.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 128.
+ [2] [3] [4] [5] [6] [7]
+Overfull \hbox (152.71764pt too wide) in paragraph at lines 570--583
  [] 
  []
 
-[6]
-Overfull \hbox (160.91078pt too wide) in paragraph at lines 605--620
+
+Overfull \hbox (160.91078pt too wide) in paragraph at lines 612--627
  [] 
  []
 
-[7] [8] [9] [10]
-Overfull \hbox (22.382pt too wide) in paragraph at lines 1011--1020
+[8] [9] [10] [11] [12] [13]
+Overfull \hbox (22.382pt too wide) in paragraph at lines 1024--1033
  [] 
  []
 
 
-Overfull \hbox (55.54903pt too wide) in paragraph at lines 1031--1044
+Overfull \hbox (55.54903pt too wide) in paragraph at lines 1044--1057
  [] 
  []
 
-[11] [12]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1160.
+[14] [15]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1175.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [13] [14] [15] [16] [17]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1608.
+) [16] [17] [18] [19] [20]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1628.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1610.
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 1630.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1630.
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 1650.
  (c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-<../data_and_code/review/power_figure.png, id=214, 481.8pt x 481.8pt>
-File: ../data_and_code/review/power_figure.png Graphic file (type png)
-<use ../data_and_code/review/power_figure.png>
-Package pdftex.def Info: ../data_and_code/review/power_figure.png  used on input line 1657.
-(pdftex.def)             Requested size: 469.77148pt x 469.77148pt.
- [18]
-<../data_and_code/review/power_figure_ind.png, id=224, 775.56416pt x 401.5pt>
+<../data_and_code/review/power_figure.pdf, id=220, 505.89pt x 505.89pt>
+File: ../data_and_code/review/power_figure.pdf Graphic file (type pdf)
+<use ../data_and_code/review/power_figure.pdf>
+Package pdftex.def Info: ../data_and_code/review/power_figure.pdf  used on input line 1677.
+(pdftex.def)             Requested size: 469.76265pt x 469.76265pt.
+ [21]
+<../data_and_code/review/power_figure_ind.png, id=231, 775.56416pt x 401.5pt>
 File: ../data_and_code/review/power_figure_ind.png Graphic file (type png)
 <use ../data_and_code/review/power_figure_ind.png>
-Package pdftex.def Info: ../data_and_code/review/power_figure_ind.png  used on input line 1672.
+Package pdftex.def Info: ../data_and_code/review/power_figure_ind.png  used on input line 1692.
 (pdftex.def)             Requested size: 469.76805pt x 243.19312pt.
- [19 <../data_and_code/review/power_figure.png>]
-<../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png, id=232, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png  used on input line 1695.
+ [22 <../data_and_code/review/power_figure.pdf>] [23 <../data_and_code/review/power_figure_ind.png (PNG copy)>]
+<../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.pdf, id=249, 578.16pt x 433.62pt>
+File: ../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.pdf Graphic file (type pdf)
+<use ../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.pdf>
+Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.pdf  used on input line 1717.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [20 <../data_and_code/review/power_figure_ind.png (PNG copy)>]
-<../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png, id=240, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png  used on input line 1701.
+<../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.pdf, id=250, 578.16pt x 433.62pt>
+File: ../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.pdf Graphic file (type pdf)
+<use ../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.pdf>
+Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.pdf  used on input line 1723.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [21 <../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.png>]
-<../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png, id=248, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png  used on input line 1707.
+ [24 <../data_and_code/survey_dat/figs/did_plots/attitudeComm_plot.pdf>]
+<../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.pdf, id=265, 578.16pt x 433.62pt>
+File: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.pdf Graphic file (type pdf)
+<use ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.pdf>
+Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.pdf  used on input line 1729.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [22 <../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.png>]
-<../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png, id=255, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png  used on input line 1713.
+ [25 <../data_and_code/survey_dat/figs/did_plots/attitudeComm.plot_disag.pdf>]
+<../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.pdf, id=277, 578.16pt x 433.62pt>
+File: ../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.pdf Graphic file (type pdf)
+<use ../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.pdf>
+Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.pdf  used on input line 1735.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [23 <../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.png>]
-<../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png, id=262, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png  used on input line 1719.
+ [26 <../data_and_code/survey_dat/figs/did_plots/finished_didPlots/conComm_plot.pdf>]
+<../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.pdf, id=288, 578.16pt x 433.62pt>
+File: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.pdf Graphic file (type pdf)
+<use ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.pdf>
+Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.pdf  used on input line 1741.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [24 <../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.png>]
-<../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png, id=269, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png  used on input line 1725.
+ [27 <../data_and_code/survey_dat/figs/did_plots/conComm_plot_disag.pdf>]
+<../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.pdf, id=299, 578.16pt x 433.62pt>
+File: ../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.pdf Graphic file (type pdf)
+<use ../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.pdf>
+Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.pdf  used on input line 1747.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [25 <../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.png>]
-<../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png, id=278, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png  used on input line 1731.
-(pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [26 <../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.png>]
-<../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png, id=285, 578.16pt x 433.62pt>
-File: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png Graphic file (type png)
-<use ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png>
-Package pdftex.def Info: ../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png  used on input line 1737.
-(pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [27 <../data_and_code/survey_dat/figs/did_plots/finished_didPlots/endComm_plot.png>]
-<../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png, id=292, 578.16pt x 433.62pt>
+ [28 <../data_and_code/survey_dat/figs/did_plots/finished_didPlots/inComm_plot.pdf>]
+<../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png, id=310, 578.16pt x 433.62pt>
 File: ../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png Graphic file (type png)
 <use ../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png>
-Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png  used on input line 1746.
+Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png  used on input line 1756.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [28 <../data_and_code/survey_dat/figs/did_plots/finished_didPlots/randComm_plot.png>]
-<../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png, id=299, 578.16pt x 433.62pt>
+ [29 <../data_and_code/survey_dat/figs/did_plots/inComm_plot_disag.pdf>]
+<../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png, id=321, 578.16pt x 433.62pt>
 File: ../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png Graphic file (type png)
 <use ../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png>
-Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png  used on input line 1752.
+Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png  used on input line 1762.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [29 <../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png>]
-<../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png, id=308, 578.16pt x 433.62pt>
+ [30 <../data_and_code/obs_dat/b_analysis/market_pasts_TrTime.plot.png>]
+<../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png, id=330, 578.16pt x 433.62pt>
 File: ../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png Graphic file (type png)
 <use ../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png>
-Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png  used on input line 1758.
+Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png  used on input line 1768.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [30 <../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png>]
-<../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png, id=315, 578.16pt x 433.62pt>
+ [31 <../data_and_code/obs_dat/b_analysis/market_pasts_siteTime.plot.png>]
+<../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png, id=338, 578.16pt x 433.62pt>
 File: ../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png Graphic file (type png)
 <use ../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png>
-Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png  used on input line 1764.
+Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png  used on input line 1774.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [31 <../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png>]
-<../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png, id=323, 578.16pt x 433.62pt>
+ [32 <../data_and_code/obs_dat/b_analysis/market_farms_TrTime.plot.png>]
+<../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png, id=345, 578.16pt x 433.62pt>
 File: ../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png Graphic file (type png)
 <use ../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png>
-Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png  used on input line 1770.
+Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png  used on input line 1780.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [32 <../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png>]
-<../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png, id=330, 578.16pt x 433.62pt>
+ [33 <../data_and_code/obs_dat/b_analysis/market_farms_siteTime.plot.png>]
+<../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png, id=352, 578.16pt x 433.62pt>
 File: ../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png Graphic file (type png)
 <use ../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png>
-Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png  used on input line 1776.
+Package pdftex.def Info: ../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png  used on input line 1786.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
- [33 <../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png>] [34 <../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png>] [35] (./ecpn_appendix.aux)
+ [34 <../data_and_code/obs_dat/b_analysis/event_outgroup_TrTime.plot.png>] [35 <../data_and_code/obs_dat/b_analysis/events_outgroup_siteTime.plot.png>] [36] [37] (./ecpn_appendix.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `ecpn_appendix.out' has not changed.
-(rerunfilecheck)             Checksum: EE65711E81371E2CA849512A86EDFC49;3606.
+(rerunfilecheck)             Checksum: 251D00DD8BE1558C67772ED6CDB471FA;3303.
  ) 
 Here is how much of TeX's memory you used:
- 11481 strings out of 478025
- 186837 string characters out of 5838745
- 1872299 words of memory out of 5000000
- 31287 multiletter control sequences out of 15000+600000
+ 11461 strings out of 478025
+ 185872 string characters out of 5838745
+ 1873299 words of memory out of 5000000
+ 31271 multiletter control sequences out of 15000+600000
  563461 words of font info for 76 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,8n,76p,754b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,8n,76p,754b,497s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}<c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/chris/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on ecpn_appendix.pdf (35 pages, 1125559 bytes).
+Output written on ecpn_appendix.pdf (37 pages, 718834 bytes).
 PDF statistics:
- 429 PDF objects out of 1000 (max. 8388607)
- 337 compressed objects within 4 object streams
- 137 named destinations out of 1000 (max. 500000)
- 193 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 458 PDF objects out of 1000 (max. 8388607)
+ 368 compressed objects within 4 object streams
+ 135 named destinations out of 1000 (max. 500000)
+ 175 words of extra memory for PDF output out of 10000 (max. 10000000)
 

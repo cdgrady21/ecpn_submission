@@ -534,7 +534,7 @@ save(possibleTaus, file="new_power.Rdata")
 ```{r}
 load("new_power.Rdata")
 
-png("power_figure.png")
+pdf("power_figure.pdf")
 plot(possibleTaus$possibleTaus, possibleTaus$pow, type="b", pch=16, col = "black",ylab="Power", 
      xlab= expression(tau), main= "ECPN Community-Level Power Analysis", 
      cex.main=.9, xlim=c(0,1), ylim=c(0,1))

@@ -15,7 +15,7 @@ library(ggplot2)
 library(estimatr)
 
 # colors
-grps <-c("1", "0")
+grps <-c("ECPN", "Non-ECPN")
 color.codes<-as.character(c("#FC8D59", "#00BFC4"))
 ```
 
@@ -42,8 +42,8 @@ markets.df1 <- markets.df %>%
   dplyr::group_by(site,month_num) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-#for now fix this way; later don't summarise_all this column
-markets.df1$treatment <- as.factor(as.character(markets.df1$treatment))
+#make Treatment (ECPN, Non-ECPN)
+markets.df1$Treatment <-ifelse(markets.df1$treatment %in% 1, "ECPN", "Non-ECPN")
 
 
 #################
@@ -53,7 +53,7 @@ markets.df2 <- markets.df %>%
   dplyr::group_by(treatment,month_num) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-markets.df2$treatment <- as.factor(as.character(markets.df2$treatment))
+markets.df2$Treatment <-ifelse(markets.df2$treatment %in% 1, "ECPN", "Non-ECPN")
 
 #########
 
@@ -62,7 +62,7 @@ markets.df1b <- markets.df %>%
   dplyr::group_by(site,time) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-markets.df1b$treatment <- as.factor(as.character(markets.df1b$treatment))
+markets.df1b$Treatment <-ifelse(markets.df1b$treatment %in% 1, "ECPN", "Non-ECPN")
 
 ########
 
@@ -71,7 +71,7 @@ markets.df2b <- markets.df %>%
   dplyr::group_by(treatment,time) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-markets.df2b$treatment <- as.factor(as.character(markets.df2b$treatment))
+markets.df2b$Treatment <-ifelse(markets.df2b$treatment %in% 1, "ECPN", "Non-ECPN")
 ```
 
 ## Plots
@@ -83,8 +83,8 @@ markets.df2b$treatment <- as.factor(as.character(markets.df2b$treatment))
 
 plot.fun<-function(var, thedf, time1, group1, title, xlab, ylab, ymin=0){
   ggplot(data=thedf, aes(x=thedf[[time1]], y=thedf[[var]], group=thedf[[group1]])) +
-  geom_line(aes(color=treatment))+
-  geom_point(aes(color=treatment))+
+  geom_line(aes(color=Treatment))+
+  geom_point(aes(color=Treatment))+
   coord_cartesian(ylim = c(ymin, max(thedf[[var]]))) +
   geom_vline(xintercept=max(thedf[[time1]]/2)) +
   scale_colour_manual(values=setNames(color.codes, grps)) +
@@ -106,11 +106,11 @@ plot.fun<-function(var, thedf, time1, group1, title, xlab, ylab, ymin=0){
 market_pasts_siteMonth.plot <-
   plot.fun(var='pastoralists_index_rank', thedf=markets.df1,
          time1='month_num',
-         group1='site', title="Pastoralist index (site-level, month)", 
+         group1='site', title="Pastoralists in Market (site-level, month)", 
          xlab="Month", ylab="Index")
 
-png(file="market_pasts_siteMonth.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_pasts_siteMonth.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_pasts_siteMonth.plot
 dev.off()
@@ -119,7 +119,7 @@ dev.off()
 ```{r}
 plot.fun(var='pastoralists_index_raw', thedf=markets.df1,
          time1='month_num',
-         group1='site', title="Past Index by Month in TR and CO", 
+         group1='site', title="Pastoralists in Market by Month in TR and CO", 
          xlab="Month", ylab="Index",
          ymin=0)
 ```
@@ -129,11 +129,11 @@ plot.fun(var='pastoralists_index_raw', thedf=markets.df1,
 market_pasts_siteTime.plot <-
   plot.fun(var='pastoralists_index_rank', thedf=markets.df1b,
          time1='time',
-         group1='site', title="Pastoralist index (site-level, base-end)", 
+         group1='site', title="Pastoralists in Market (site-level, base-end)", 
          xlab="Baseline to Endline", ylab="Index")
 
-png(file="market_pasts_siteTime.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_pasts_siteTime.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_pasts_siteTime.plot
 dev.off()
@@ -152,11 +152,11 @@ plot.fun(var='pastoralists_index_raw', thedf=markets.df1b,
 market_pasts_TrMonth.plot <-
   plot.fun(var='pastoralists_index_rank', thedf=markets.df2,
          time1='month_num',
-         group1='treatment', title="Pastoralist index (TR-level, month)", 
+         group1='treatment', title="Pastoralists in Market (TR-level, month)", 
          xlab="Month", ylab="Index")
 
-png(file="market_pasts_TrMonth.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_pasts_TrMonth.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_pasts_TrMonth.plot
 dev.off()
@@ -175,11 +175,11 @@ plot.fun(var='pastoralists_index_raw', thedf=markets.df2,
 market_pasts_TrTime.plot <-
   plot.fun(var='pastoralists_index_rank', thedf=markets.df2b,
          time1='time',
-         group1='treatment', title="Pastoralist index (TR-level, base-end)", 
+         group1='treatment', title="Pastoralists in Market (TR-level, base-end)", 
          xlab="Baseline to Endline", ylab="Index")
 
-png(file="market_pasts_TrTime.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_pasts_TrTime.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_pasts_TrTime.plot
 dev.off()
@@ -201,11 +201,11 @@ plot.fun(var='pastoralists_index_raw', thedf=markets.df2b,
 market_farms_siteMonth.plot <-
   plot.fun(var='farmers_index_rank', thedf=markets.df1,
          time1='month_num',
-         group1='site', title="Farmer index (site-level, month)", 
+         group1='site', title="Farmers in Market (site-level, month)", 
          xlab="Month", ylab="Index")
 
-png(file="market_farms_siteMonth.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_farms_siteMonth.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_farms_siteMonth.plot
 dev.off()
@@ -217,11 +217,11 @@ dev.off()
 market_farms_siteTime.plot <-
   plot.fun(var='farmers_index_rank', thedf=markets.df1b,
          time1='time',
-         group1='site', title="Farmer index (site-level, base-end)", 
+         group1='site', title="Farmers in Market (site-level, base-end)", 
          xlab="Baseline to Endline", ylab="Index")
 
-png(file="market_farms_siteTime.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_farms_siteTime.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_farms_siteTime.plot
 dev.off()
@@ -233,11 +233,11 @@ dev.off()
 market_farms_TrMonth.plot <-
   plot.fun(var='farmers_index_rank', thedf=markets.df2,
          time1='month_num',
-         group1='treatment', title="Farmer index (TR-level, month)", 
+         group1='treatment', title="Farmers in Market (TR-level, month)", 
          xlab="Month", ylab="Index")
 
-png(file="market_farms_TrMonth.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_farms_TrMonth.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_farms_TrMonth.plot
 dev.off()
@@ -249,11 +249,11 @@ dev.off()
 market_farms_TrTime.plot <-
   plot.fun(var='farmers_index_rank', thedf=markets.df2b,
          time1='time',
-         group1='treatment', title="Farmer index (TR-level, base-end)", 
+         group1='treatment', title="Farmers in Market (TR-level, base-end)", 
          xlab="Baseline to Endline", ylab="Index")
 
-png(file="market_farms_TrTime.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="market_farms_TrTime.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 market_farms_TrTime.plot
 dev.off()
@@ -289,8 +289,7 @@ events.df1 <- events.df %>%
   dplyr::group_by(site,month_num) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-#for now fix this way; later don't summarise_all this column
-events.df1$treatment <- as.factor(as.character(events.df1$treatment))
+events.df1$Treatment <-ifelse(events.df1$treatment %in% 1, "ECPN", "Non-ECPN")
 
 ## sort by site and month_num
 events.df1 <- events.df1[order(events.df1$site, events.df1$month_num),]
@@ -305,7 +304,7 @@ events.df2 <- events.df %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
 
-events.df2$treatment <- as.factor(as.character(events.df2$treatment))
+events.df2$Treatment <-ifelse(events.df2$treatment %in% 1, "ECPN", "Non-ECPN")
 
 #########
 
@@ -314,7 +313,7 @@ events.df1b <- events.df %>%
   dplyr::group_by(site,time) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-events.df1b$treatment <- as.factor(as.character(events.df1b$treatment))
+events.df1b$Treatment <-ifelse(events.df1b$treatment %in% 1, "ECPN", "Non-ECPN")
 
 ##remove sites that don't have t1 and t2
 checkTab <- table(events.df1b$site, events.df1b$time)
@@ -328,7 +327,7 @@ events.df2b <- events.df %>%
   dplyr::group_by(treatment,time) %>%
   dplyr::summarise_all(funs(mean(., na.rm = TRUE))) %>%
   as.data.frame()
-events.df2b$treatment <- as.factor(as.character(events.df2b$treatment))
+events.df2b$Treatment <-ifelse(events.df2b$treatment %in% 1, "ECPN", "Non-ECPN")
 
 ```
 
@@ -339,11 +338,11 @@ events.df2b$treatment <- as.factor(as.character(events.df2b$treatment))
 events_outgroup_siteMonth.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df1,
          time1='month_num',
-         group1='site', title="Outgroup index (site-level, month)", 
+         group1='site', title="Outgroup Event Attendance (site-level, month)", 
          xlab="Month", ylab="Index")
 
-png(file="events_outgroup_siteMonth.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="events_outgroup_siteMonth.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 events_outgroup_siteMonth.plot
 dev.off()
@@ -355,11 +354,11 @@ dev.off()
 events_outgroup_siteTime.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df1b,
          time1='time',
-         group1='site', title="Outgroup index (site-level, base-end)", 
+         group1='site', title="Outgroup Event Attendance (site-level, base-end)", 
          xlab="Baseline to Endline", ylab="Index")
 
-png(file="events_outgroup_siteTime.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="events_outgroup_siteTime.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 events_outgroup_siteTime.plot
 dev.off()
@@ -371,11 +370,11 @@ dev.off()
 event_outgroup_TrMonth.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df2,
          time1='month_num',
-         group1='treatment', title="Outgroup index (TR-level, month)", 
+         group1='treatment', title="Outgroup Event Attendance (TR-level, month)", 
          xlab="Month", ylab="Index")
 
-png(file="event_outgroup_TrMonth.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="event_outgroup_TrMonth.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 event_outgroup_TrMonth.plot
 dev.off()
@@ -387,11 +386,11 @@ dev.off()
 event_outgroup_TrTime.plot <-
   plot.fun(var='outgroupPerc_index_rank', thedf=events.df2b,
          time1='time',
-         group1='treatment', title="Outgroup index (TR-level, base-end)", 
+         group1='treatment', title="Outgroup Event Attendance (TR-level, base-end)", 
          xlab="Baseline to Endline", ylab="Index")
 
-png(file="event_outgroup_TrTime.plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="event_outgroup_TrTime.plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 event_outgroup_TrTime.plot
 dev.off()

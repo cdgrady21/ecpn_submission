@@ -89,7 +89,7 @@ ggplot(data = res, aes(x = varF, y = coef_sd, color = Data)) +
         panel.grid.minor = element_blank())+
   scale_y_continuous(breaks = c(-1, -0.5, 0, 0.5, 1))
 
-ggsave("coef_agg.png", height=6, width = 6)
+ggsave("coef_agg.pdf", height=6, width = 6)
 
 
 ```
@@ -148,7 +148,7 @@ ggplot(data = outcome_ind, aes(x = var, y = size, color = Group)) +
   scale_color_manual(values = c("Part" = "#F8766D",
                                "Non" = "#00BFC4"), name = "Group")
 
-ggsave("coef_ind.png", width = 5, height = 3)
+ggsave("coef_ind.pdf", width = 5, height = 3)
 ```
 
 

@@ -5,16 +5,6 @@ output:
   html_document: default
 ---
 
-note: if want to convert to pdf:
-
-dev.copy(pdf,file="endComm_plot_nas.pdf")
-dev.off()
-
-pdf(file="endComm_plot_nas.pdf", bg="transparent", width=5, height=5)
-endComm_plot_nas
-dev.off()
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
@@ -24,20 +14,6 @@ library(ggplot2)
 
 load("didPlots_dfs.Rdata")
 
-#until I figure out insecurity, vio, list, reverse scale it.
-#ag.df$in_cw_base <- abs(ag.df$in_cw_base+1)
-#ag.df$in_cw_end <- abs(ag.df$in_cw_end+1)
-#panel.df$in_cw_y0 <- abs(panel.df$in_cw_y0+1)
-#panel.df$in_cw_y1 <- abs(panel.df$in_cw_y1+1)
-
-#ag.df$vio_cw_base <- abs(ag.df$vio_cw_base-1)
-#ag.df$vio_cw_end <- abs(ag.df$vio_cw_end-1)
-#panel.df$vio_cw_y0 <- abs(panel.df$vio_cw_y0-1)
-#panel.df$vio_cw_y1 <- abs(panel.df$vio_cw_y1-1)
-
-
-#ag.df$list_exp_base <- ag.df$list_exp_base*-1
-#ag.df$list_exp_end <- ag.df$list_exp_end*-1
 ```
 
 ## Attitudes
@@ -49,8 +25,8 @@ ECPN sites improved more on Outgroup Index than control sites.
          xlab="Survey", ylab="Average Attitudinal Index Score",
          ymin=0.3, ymax=0.7))
 
-png(file="attitudeComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="attitudeComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 attitudeComm.plot
 dev.off()
@@ -63,8 +39,8 @@ Part vs Non vs Con.  Part is blue and improves.  Non-part is green and gets a bi
          xlab="Survey", ylab="Average Attitudinal Index Score",
          ymin=0.3, ymax=0.7))
 
-png(file="attitudePan_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="attitudePan_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 attitudePan.plot
 dev.off()
@@ -90,16 +66,6 @@ dev.off()
          ymin=0.3, ymax=0.7))
 ```
 
-
-**********************
-chris: Titles need updating after this point.
-**********************
-
-
-
-
-
-
 ## Intergroup Contact Index
 
 ECPN sites decreased less on contact index than control sites.
@@ -109,8 +75,8 @@ ECPN sites decreased less on contact index than control sites.
          xlab="Survey", ylab="Average Intergroup Contact Index Score",
          ymin=0.3, ymax=0.7))
 
-png(file="conComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="conComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 conComm.plot
 dev.off()
@@ -123,8 +89,8 @@ Part improves, Non-part and Control both get worse at identical rate.
          xlab="Survey", ylab="Average Intergroup Contact Index Score",
          ymin=0, ymax=0.7))
 
-png(file="conPan_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="conPan_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 conPan.plot
 dev.off()
@@ -152,10 +118,10 @@ ECPN sites improved more on the security index than control sites.
 ```{r}
 (inComm.plot <- plot.fun(var='in_cw', thedf=plot.df, time='survey', title="Perceptions of Physical Security - Community", 
          xlab="Survey", ylab="Average Perceptions of Physical Security Index Score",
-         ymin=0.3, ymax=0.7))
+         ymin=-0.7, ymax=-0.3))
 
-png(file="inComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="inComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 inComm.plot
 dev.off()
@@ -168,8 +134,8 @@ Control gets much worse, part gets a little worse and non-part gets a little bet
          xlab="Survey", ylab="Average Perceptions of Physical Security Index Score",
          ymin=0.3, ymax=0.7))
 
-png(file="inPan_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="inPan_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 inPan.plot
 dev.off()
@@ -185,8 +151,8 @@ Communities: Treatment gets _more_ accepting of violence, Control gets less acce
          xlab="Survey", ylab="Average Violence Index Score",
          ymin=0.1, ymax=0.6))
 
-png(file="vioComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="vioComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 vioComm.plot
 dev.off()
@@ -199,8 +165,8 @@ Panel: All groups become less violence-accepting at ~the same rate.
          xlab="Survey", ylab="Average Attitudes towards Violence Index Score",
          ymin=0.1, ymax=0.6))
 
-png(file="vioPan_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="vioPan_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 vioPan.plot
 dev.off()
@@ -252,8 +218,8 @@ plot2.df$SurveyGroup <- ordered(plot2.df$treatmentSurvey,
   ylab("Percentage Subjects Willing to Join/Live") + 
   scale_color_manual(values=c("firebrick2", "firebrick4", "deepskyblue", "deepskyblue4"), guide=F))
 
-png(file="randComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="randComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 randComm.plot2
 dev.off()
@@ -332,8 +298,8 @@ rand_ind.df2$SurveyGroup <- ordered(rand_ind.df2$treatmentSurvey,
   ylab("Percentage Subjects Willing to Join/Live") + 
   scale_color_manual(values=c("firebrick2", "firebrick4", "palegreen2", "palegreen4", "deepskyblue", "deepskyblue4" ), guide=F))
 
-png(file="randPan_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="randPan_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 randPan.plot
 dev.off()
@@ -378,8 +344,8 @@ Both groups have mildly negative response to outgroup endorsement at baseline.  
          xlab="Survey", ylab="Average Change in Support for Policy Endorsed by Outgroup",
          ymin=-0.6, ymax=0))
 
-png(file="endComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="endComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 endComm.plot
 dev.off()
@@ -409,8 +375,8 @@ levels(end.df$variable) <- c("Endorse", "Endorse", "CO", "CO")
   theme(plot.title = element_text(size=18)) +
   xlab("Agreement"))
 
-png(file="pggComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="pggComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 pggComm.plot
 dev.off()
@@ -490,8 +456,8 @@ pgg.df$Treatment <- ordered(pgg.df$Treatment, levels = c("ECPN", "Non-ECPN"))
     "Percent Donating", 
     sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
 
-png(file="pggComm_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="pggComm_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 pggComm.plot
 dev.off()
@@ -531,8 +497,8 @@ pgg.df2$Treatment <- pgg.df2$tr2
     "Percent Donating", 
     sec.axis = sec_axis(~ . * 1000, name = "Donation Amount")))
 
-png(file="did_plots/pggPan_plot.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="did_plots/pggPan_plot.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 pggPan.plot
 dev.off()

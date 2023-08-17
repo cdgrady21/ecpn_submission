@@ -5,16 +5,6 @@ output:
   html_document: default
 ---
 
-note: if want to convert to pdf:
-
-dev.copy(pdf,file="endComm_plot_nas.pdf")
-dev.off()
-
-pdf(file="endComm_plot_nas.pdf", bg="transparent", width=5, height=5)
-endComm_plot_nas
-dev.off()
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
@@ -179,22 +169,13 @@ Plot.df4 is panel.df at site-level.
 
 ## Trust Index
 
-ECPN sites improed more on Outgroup Index than control sites.
-
-```{r, eval=F}
-(attitudeComm.plot_disag <- plot.fun(var='attitude_cw', group='psu', thedf=plot1.df, time='survey', title="Trust - Community", 
-         xlab="Survey", ylab="Average Attitudinal Index Score",
-         ymin=-0.1, ymax=1.1))
-```
-
 ```{r}
 (attitudeComm.plot <- plot.fun(var='attitude_cw', group='comm', thedf=plot.df, time='survey', title="Community-level attitude change", 
          xlab="Survey", ylab="Average Attitudinal Index Score",
          ymin=-0.1, ymax=1.1))
 
-
-png(file="attitudeComm.plot_disag.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="attitudeComm.plot_disag.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 attitudeComm.plot
 dev.off()
@@ -207,8 +188,8 @@ Part vs Non vs Con.  Part is blue and improves.  Non-part is green and gets a bi
          xlab="Survey", ylab="Average Attitudinal Index Score",
          ymin=-0.1, ymax=1.1))
 
-png(file="attitudePan_plot_disag.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="attitudePan_plot_disag.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 attitudePan.plot
 dev.off()
@@ -226,8 +207,8 @@ ECPN sites decreased less on contact index than control sites.
                           ylab="Average Intergroup Contact Index Score",
                           ymin=-0.1, ymax=1.1))
 
-png(file="conComm_plot_disag.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="conComm_plot_disag.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 conComm.plot
 dev.off()
@@ -244,10 +225,41 @@ ECPN sites improved more on the security index than control sites.
          xlab="Survey", ylab="Average Perceptions of Insecurity Index Score",
          ymin=-1.1, ymax=0.1))
 
-png(file="inComm_plot_disag.png", bg="transparent", units="in",
-   width=8, height=6, res=300)
+pdf(file="inComm_plot_disag.pdf", bg="transparent",
+   width=8, height=6)
 par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
 inComm.plot
 dev.off()
 ```
 
+# svy exps
+
+```{r}
+(endExp_plot <- plot.fun(var='end_exp', group='comm',
+                          thedf=plot.df, time='survey',
+                          title="Community-level endorsement experiment",
+                          xlab="Survey", 
+                          ylab="Average Effect of Outgroup Endorsement",
+                          ymin=-2, ymax=1))
+
+pdf(file="endExp_plot_disag.pdf", bg="transparent",
+   width=8, height=6)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+endExp_plot
+dev.off()
+```
+
+```{r}
+(rMean_plot <- plot.fun(var='rMean', group='comm',
+                          thedf=plot.df, time='survey',
+                          title="Community-level percent experiment",
+                          xlab="Survey", 
+                          ylab="Average Contact Willingness",
+                          ymin=-0.1, ymax=1))
+
+pdf(file="rMean_plot_disag.pdf", bg="transparent",
+   width=8, height=6)
+par(mar=c(0,3,4,0),mgp=c(1.5,.5,0),oma=rep(0,4))
+rMean_plot
+dev.off()
+```
