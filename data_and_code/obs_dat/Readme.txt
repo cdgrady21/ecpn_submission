@@ -8,7 +8,6 @@ obsDat_coefplot_coefs.Rmd
 
 obsDat_figs.Rmd
 - saves "obsDat_fig_dat.rda" ("outcome2") which is used in ecpn_coefplot_final.Rmd
-- chris: need to make sure outcomes used in coefplot is same as outcomes used in true pvalues.
 
 c_obsDat_randInference.Rmd
 - true pvalues for observational data
@@ -16,6 +15,3 @@ c_obsDat_randInference.Rmd
 	- "mark_pasts": pastoralists in the market
 	- "mark_farms": farmers in the market
 	- "out_ind": percentage of outgroup members at social events
-- chris: use "obsDat_truePs.rda" in review_appendix.Rmd to do control family-wise error rate.
-- chris: need to make sure outcomes used in coefplot is same as outcomes used in true pvalues.
-	- same outcomes, coefs slightly different because c_obsDat_randInference.Rmd uses fixed effects for site and state, but obsDat_coefplot_coefs.Rmd does not.
